@@ -1,0 +1,575 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -scheme CleanerApp -destination platform=macOS -derivedDataPath build/DerivedData CODE_SIGNING_ALLOWED=NO build
+
+Build settings from command line:
+    CODE_SIGNING_ALLOWED = NO
+
+ComputePackagePrebuildTargetDependencyGraph
+
+Prepare packages
+
+CreateBuildRequest
+
+SendProjectDescription
+
+CreateBuildOperation
+
+ComputeTargetDependencyGraph
+note: Building targets in dependency order
+note: Target dependency graph (1 target)
+    Target 'CleanerApp' in project 'CleanerApp' (no dependencies)
+
+GatherProvisioningInputs
+
+CreateBuildDescription
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --version --output-format xml1
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc --version
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
+
+Build description signature: 7855a41f73c2d46ae8848e7717ff4274
+Build description path: /Users/muratonurcu/Desktop/DustBuster 2.0/build/DerivedData/Build/Intermediates.noindex/XCBuildData/7855a41f73c2d46ae8848e7717ff4274.xcbuilddata
+ClangStatCache /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/SDKStatCaches.noindex/macosx26.1-25B74-3ae1261907bdadc328169391a47051a6.sdkstatcache
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp.xcodeproj
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk -o /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/SDKStatCaches.noindex/macosx26.1-25B74-3ae1261907bdadc328169391a47051a6.sdkstatcache
+
+CreateBuildDirectory /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp.xcodeproj
+    builtin-create-build-directory /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products
+
+CreateBuildDirectory /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp.xcodeproj
+    builtin-create-build-directory /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex
+
+CreateBuildDirectory /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp.xcodeproj
+    builtin-create-build-directory /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules
+
+CreateBuildDirectory /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/ExplicitPrecompiledModules
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp.xcodeproj
+    builtin-create-build-directory /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/ExplicitPrecompiledModules
+
+CreateBuildDirectory /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/EagerLinkingTBDs/Debug
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp.xcodeproj
+    builtin-create-build-directory /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/EagerLinkingTBDs/Debug
+
+WriteAuxiliaryFile /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp-0b10b29e9d6a6165201dfa8079db14a0-VFS/all-product-headers.yaml
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp.xcodeproj
+    write-file /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp-0b10b29e9d6a6165201dfa8079db14a0-VFS/all-product-headers.yaml
+
+CreateBuildDirectory /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp.xcodeproj
+    builtin-create-build-directory /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug
+
+WriteAuxiliaryFile /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/empty-CleanerApp.plist (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    write-file /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/empty-CleanerApp.plist
+
+WriteAuxiliaryFile /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp_const_extract_protocols.json (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    write-file /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp_const_extract_protocols.json
+
+WriteAuxiliaryFile /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp-OutputFileMap.json (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    write-file /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp-OutputFileMap.json
+
+WriteAuxiliaryFile /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp.SwiftFileList (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    write-file /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp.SwiftFileList
+
+WriteAuxiliaryFile /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp.hmap (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    write-file /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp.hmap
+
+WriteAuxiliaryFile /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp.SwiftConstValuesFileList (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    write-file /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp.SwiftConstValuesFileList
+
+WriteAuxiliaryFile /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp.LinkFileList (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    write-file /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp.LinkFileList
+
+WriteAuxiliaryFile /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp.DependencyStaticMetadataFileList (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    write-file /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp.DependencyStaticMetadataFileList
+
+WriteAuxiliaryFile /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp.DependencyMetadataFileList (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    write-file /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp.DependencyMetadataFileList
+
+WriteAuxiliaryFile /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp-project-headers.hmap (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    write-file /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp-project-headers.hmap
+
+WriteAuxiliaryFile /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp-own-target-headers.hmap (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    write-file /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp-own-target-headers.hmap
+
+WriteAuxiliaryFile /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp-generated-files.hmap (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    write-file /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp-generated-files.hmap
+
+WriteAuxiliaryFile /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp-all-target-headers.hmap (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    write-file /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp-all-target-headers.hmap
+
+WriteAuxiliaryFile /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp-all-non-framework-target-headers.hmap (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    write-file /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp-all-non-framework-target-headers.hmap
+
+WriteAuxiliaryFile /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp-DebugDylibPath-normal-arm64.txt (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    write-file /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp-DebugDylibPath-normal-arm64.txt
+
+WriteAuxiliaryFile /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp-DebugDylibInstallName-normal-arm64.txt (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    write-file /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp-DebugDylibInstallName-normal-arm64.txt
+
+MkDir /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app/Contents/MacOS (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    /bin/mkdir -p /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app/Contents/MacOS
+
+MkDir /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app/Contents/Resources (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    /bin/mkdir -p /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app/Contents/Resources
+
+MkDir /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app/Contents (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    /bin/mkdir -p /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app/Contents
+
+MkDir /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    /bin/mkdir -p /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app
+
+Ld /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app/Contents/MacOS/__preview.dylib normal (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-macos14.0 -dynamiclib -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk -O0 -L/Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug -F/Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug -install_name @rpath/CleanerApp.debug.dylib -rdynamic -Xlinker -no_deduplicate -Xlinker -dependency_info -Xlinker /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp_dependency_info.dat -o /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app/Contents/MacOS/__preview.dylib
+
+MkDir /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/assetcatalog_output/unthinned (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    /bin/mkdir -p /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/assetcatalog_output/unthinned
+
+GenerateAssetSymbols /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/Assets.xcassets (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    /Applications/Xcode.app/Contents/Developer/usr/bin/actool /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/Assets.xcassets --compile /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app/Contents/Resources --output-format human-readable-text --notices --warnings --export-dependency-info /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/assetcatalog_dependencies --output-partial-info-plist /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/assetcatalog_generated_info.plist --app-icon AppIcon --accent-color AccentColor --enable-on-demand-resources NO --development-region en --target-device mac --minimum-deployment-target 14.0 --platform macosx --bundle-identifier muratonurcu.CleanerApp --generate-swift-asset-symbols /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/DerivedSources/GeneratedAssetSymbols.swift --generate-objc-asset-symbols /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/DerivedSources/GeneratedAssetSymbols.h --generate-asset-symbol-index /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/DerivedSources/GeneratedAssetSymbols-Index.plist
+2025-12-13 03:37:12.668 ibtoold[20577:480145] CoreSimulatorService connection became invalid.  Simulator services will no longer be available.
+2025-12-13 03:37:12.670 ibtoold[20577:480156] Logging connecton invalid: <OS_xpc_error: <dictionary: 0x1fcdac960> { count = 1, transaction: 0, voucher = 0x0, contents =
+	"XPCErrorDescription" => <string: 0x1fcdacaa8> { string cache = 0x0, length = 18, contents = "Connection invalid" }
+}>
+2025-12-13 03:37:12.670 ibtoold[20577:480156] Error opening log file (/Users/muratonurcu/Library/Logs/CoreSimulator/CoreSimulator.com.apple.ibtool.log): Operation not permitted
+[-[SimServiceContext sendRequest:]:1743] ERROR : Unable to deliver request ({
+    "developer_dir" = "/Applications/Xcode.app/Contents/Developer";
+    request = "set_developer_dir";
+}) because we are not connected to CoreSimulatorService.
+[-[SimServiceContext initWithDeveloperDir:connectionType:error:]:450] WARN  : Unable to discover any Simulator runtimes. Developer Directory is /Applications/Xcode.app/Contents/Developer.
+[-[SimDiskImageManager init]:175] ERROR : Could not kickstart simdiskimaged; SimDiskImageManager services will not be available: Error Domain=NSPOSIXErrorDomain Code=53 "Software caused connection abort" UserInfo={NSLocalizedDescription=Error returned in reply from CoreSimulatorService: Connection invalid}
+[-[SimDiskImageManager _onQueue_checkConnection:]:219] ERROR : simdiskimaged connection is currently unavailable because connection became invalid
+[-[SimDiskImageManager _onQueue_checkConnection:]:219] ERROR : simdiskimaged connection is currently unavailable because connection became invalid
+[-[SimServiceContext initWithDeveloperDir:connectionType:error:]_block_invoke:486] ERROR : Could not get list of trusted mount directories: Error Domain=com.apple.CoreSimulator.SimError Code=409 "Cannot talk to the service used to manage runtime disk images (simdiskimaged) because its launchd job is not registered or was unloaded" UserInfo={NSLocalizedDescription=Cannot talk to the service used to manage runtime disk images (simdiskimaged) because its launchd job is not registered or was unloaded}
+[-[SimServiceContext sendRequest:reply:error:]:1763] ERROR : Unable to deliver request ({
+    request = "notification_subscription";
+    "set_path" = "/Users/muratonurcu/Library/Developer/CoreSimulator/Devices";
+}) because we are not connected to CoreSimulatorService.
+2025-12-13 03:37:12.763 ibtoold[20577:480147] Error Domain=NSPOSIXErrorDomain Code=61 "Connection refused" UserInfo={NSLocalizedDescription=CoreSimulatorService connection became invalid.  Simulator services will no longer be available.}
+/* com.apple.actool.compilation-results */
+/Users/muratonurcu/Desktop/DustBuster 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/DerivedSources/GeneratedAssetSymbols-Index.plist
+/Users/muratonurcu/Desktop/DustBuster 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/DerivedSources/GeneratedAssetSymbols.h
+/Users/muratonurcu/Desktop/DustBuster 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/DerivedSources/GeneratedAssetSymbols.swift
+
+
+MkDir /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/assetcatalog_output/thinned (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    /bin/mkdir -p /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/assetcatalog_output/thinned
+
+CompileAssetCatalogVariant thinned /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app/Contents/Resources /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/Assets.xcassets (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    /Applications/Xcode.app/Contents/Developer/usr/bin/actool /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/Assets.xcassets --compile /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/assetcatalog_output/thinned --output-format human-readable-text --notices --warnings --export-dependency-info /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/assetcatalog_dependencies_thinned --output-partial-info-plist /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/assetcatalog_generated_info.plist_thinned --app-icon AppIcon --accent-color AccentColor --enable-on-demand-resources NO --development-region en --target-device mac --minimum-deployment-target 14.0 --platform macosx
+2025-12-13 03:37:12.722 ibtoold[20576:480146] CoreSimulatorService connection became invalid.  Simulator services will no longer be available.
+2025-12-13 03:37:12.724 ibtoold[20576:480159] Logging connecton invalid: <OS_xpc_error: <dictionary: 0x1fcdac960> { count = 1, transaction: 0, voucher = 0x0, contents =
+	"XPCErrorDescription" => <string: 0x1fcdacaa8> { string cache = 0x0, length = 18, contents = "Connection invalid" }
+}>
+2025-12-13 03:37:12.724 ibtoold[20576:480146] Error opening log file (/Users/muratonurcu/Library/Logs/CoreSimulator/CoreSimulator.com.apple.ibtool.log): Operation not permitted
+[-[SimServiceContext sendRequest:]:1743] ERROR : Unable to deliver request ({
+    "developer_dir" = "/Applications/Xcode.app/Contents/Developer";
+    request = "set_developer_dir";
+}) because we are not connected to CoreSimulatorService.
+[-[SimServiceContext initWithDeveloperDir:connectionType:error:]:450] WARN  : Unable to discover any Simulator runtimes. Developer Directory is /Applications/Xcode.app/Contents/Developer.
+[-[SimDiskImageManager init]:175] ERROR : Could not kickstart simdiskimaged; SimDiskImageManager services will not be available: Error Domain=NSPOSIXErrorDomain Code=53 "Software caused connection abort" UserInfo={NSLocalizedDescription=Error returned in reply from CoreSimulatorService: Connection invalid}
+[-[SimDiskImageManager _onQueue_checkConnection:]:239] ERROR : simdiskimaged returned error (invalid), marking disconnected.
+[-[SimDiskImageManager _onQueue_checkConnection:]:219] ERROR : simdiskimaged connection is currently unavailable because connection became invalid
+[-[SimServiceContext initWithDeveloperDir:connectionType:error:]_block_invoke:486] ERROR : Could not get list of trusted mount directories: Error Domain=com.apple.CoreSimulator.SimError Code=409 "Cannot talk to the service used to manage runtime disk images (simdiskimaged) because its launchd job is not registered or was unloaded" UserInfo={NSLocalizedDescription=Cannot talk to the service used to manage runtime disk images (simdiskimaged) because its launchd job is not registered or was unloaded}
+2025-12-13 03:37:12.799 ibtoold[20576:480148] Error Domain=NSPOSIXErrorDomain Code=61 "Connection refused" UserInfo={NSLocalizedDescription=CoreSimulatorService connection became invalid.  Simulator services will no longer be available.}
+[-[SimServiceContext sendRequest:reply:error:]:1763] ERROR : Unable to deliver request ({
+    request = "notification_subscription";
+    "set_path" = "/Users/muratonurcu/Library/Developer/CoreSimulator/Devices";
+}) because we are not connected to CoreSimulatorService.
+/* com.apple.actool.compilation-results */
+/Users/muratonurcu/Desktop/DustBuster 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/assetcatalog_generated_info.plist_thinned
+/Users/muratonurcu/Desktop/DustBuster 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/assetcatalog_output/thinned/AppIcon.icns
+/Users/muratonurcu/Desktop/DustBuster 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/assetcatalog_output/thinned/Assets.car
+
+
+LinkAssetCatalog /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/Assets.xcassets (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    builtin-linkAssetCatalog --thinned /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/assetcatalog_output/thinned --thinned-dependencies /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/assetcatalog_dependencies_thinned --thinned-info-plist-content /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/assetcatalog_generated_info.plist_thinned --unthinned /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/assetcatalog_output/unthinned --unthinned-dependencies /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/assetcatalog_dependencies_unthinned --unthinned-info-plist-content /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/assetcatalog_generated_info.plist_unthinned --output /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app/Contents/Resources --plist-output /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/assetcatalog_generated_info.plist
+note: Emplaced /Users/muratonurcu/Desktop/DustBuster 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app/Contents/Resources/Assets.car (in target 'CleanerApp' from project 'CleanerApp')
+note: Emplaced /Users/muratonurcu/Desktop/DustBuster 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app/Contents/Resources/AppIcon.icns (in target 'CleanerApp' from project 'CleanerApp')
+
+ProcessInfoPlistFile /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app/Contents/Info.plist /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/empty-CleanerApp.plist (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    builtin-infoPlistUtility /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/empty-CleanerApp.plist -producttype com.apple.product-type.application -genpkginfo /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app/Contents/PkgInfo -expandbuildsettings -platform macosx -additionalcontentfile /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/assetcatalog_generated_info.plist -o /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app/Contents/Info.plist
+
+SwiftDriver CleanerApp normal arm64 com.apple.xcode.tools.swift.compiler (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    builtin-SwiftDriver -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name CleanerApp -Onone -enforce-exclusivity\=checked @/Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp.SwiftFileList -DDEBUG -default-isolation\=MainActor -enable-bare-slash-regex -enable-upcoming-feature DisableOutwardActorInference -enable-upcoming-feature InferSendableFromCaptures -enable-upcoming-feature GlobalActorIsolatedTypesUsability -enable-upcoming-feature MemberImportVisibility -enable-upcoming-feature InferIsolatedConformances -enable-upcoming-feature NonisolatedNonsendingByDefault -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk -target arm64-apple-macos14.0 -g -module-cache-path /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug -F /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug -emit-localized-strings -emit-localized-strings-path /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64 -c -j8 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/SDKStatCaches.noindex/macosx26.1-25B74-3ae1261907bdadc328169391a47051a6.sdkstatcache -output-file-map /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp_const_extract_protocols.json -Xcc -iquote -Xcc /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp-generated-files.hmap -Xcc -I/Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp-own-target-headers.hmap -Xcc -I/Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp-all-target-headers.hmap -Xcc -iquote -Xcc /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp-project-headers.hmap -Xcc -I/Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/include -Xcc -I/Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/DerivedSources-normal/arm64 -Xcc -I/Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/DerivedSources/arm64 -Xcc -I/Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp-Swift.h -working-directory /Users/muratonurcu/Desktop/DustBuster\ 2.0 -experimental-emit-module-separately -disable-cmo
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/_Builtin_stddef-DSUTIGBIM98COLDMTVSBZ5H2V.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/_AvailabilityInternal-9KF9FWHS0VL6B7VVR7LYMRY13.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/ptrauth-A77QPABHBQNFT83QLIKIL90NM.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/_Builtin_stdarg-AYCS6H24NQR9WMFLW0YZGJ8FT.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/ptrcheck-97Y5GRZVBOD9VIBNM5TE4E4E5.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/_Builtin_float-4O62F3071BYHZRGMQJ39VPKMF.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/_SwiftConcurrencyShims-DI7U0I49H5AA156EQZS3P3APP.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/_Builtin_stdbool-9LU5A3WPW1YSPEG7R07Y21YPQ.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/SwiftShims-474E3DSB5S7M6BNJSEXF6LMA2.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/DeveloperToolsSupport-6SVJTASNTT2UNGRXSTJN5RO51.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/_DarwinFoundation1-AYR2IPK1ZHGABNOLFUGY9RMSI.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/_DarwinFoundation2-7GZTEYX2EE7JBTP07PQLFKZTW.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/_Builtin_limits-6SPG8HRYJZ17RJJCK2940NWT6.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/_Builtin_stdint-DDBTB5AVJZWOQ6FAAL2GHUVDM.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/_Builtin_tgmath-9L0YHSG0BSONMB6OM1RH23WA7.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/sys_types-3K5JQY4IEGN1BTSWDQV6BW6WW.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/_DarwinFoundation3-9E67Z6F8HOA8AMFUWSIL9G7XJ.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/OpenGL-3WUNBORIB1QW0CMHPG6V2KVTJ.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/_Builtin_intrinsics-7KI4YPN7HO4ZD7C9GLDEJ63WN.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/libDER-8I8L6SHDBDU6102MGX3Y8334V.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/_Builtin_stdatomic-D1YGSWRM6MWEFZQWEAVIWDNAT.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/_Builtin_inttypes-CGRIIC1BUV6JMUDC551NA9NXD.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/Darwin-C32N4NU1LRMKMTA0NX2PIAI80.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/simd-AW1NF0I5OY4OM4T7H2YUQNTRP.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/libkern-ECEAHZ1V38F9X7GEBTZAXSWM0.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/CUPS-8SB6C7BWSLT7FLZ3IET7QQ0YN.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/launch-D2WXGV4NKFNV6IFZ5ZI8OXJAI.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/MachO-CI4HHBVKPOP9NW9ZHJGRA4FW0.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/ObjectiveC-4SI10Q1TBW7XDMRUPCGZPL3HT.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/Spatial-33C0H9CG6T80WTNEFL54AL26G.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/os_object-DD8J790I8BHVMEPD3JQLBTSYG.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/os_workgroup-BRBFJ1MAQDRWJNR9PE56X9YLE.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/Dispatch-EYXNSA9P3UI4HBKMDXGJKMM2Z.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/XPC-8E1MQF2W7P1BGSKYRXHWB8PPQ.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/CoreFoundation-BA368ZSOU23H2QB6IDANQ5A8Y.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/os-670D4DGOXDDM3OJLP9OU09N4U.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/CFNetwork-4Q2VZU37ESNR6PGNHXYFR5FR.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/ColorSync-BSM1HPQ75I6KO0GIMP5SVDG1Q.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/IOKit-691H98SO5SK2R29ZVOWGAZBWH.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/Security-DAC5QM82IELEH77MVCM1L751M.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/DiskArbitration-1ZVD41ACZ8EO77NQMMMGQH3I3.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/CoreGraphics-1N5IKS58D31LZVNZ2DNFPS3KM.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/CoreServices-2PMSHDANT6824KUGX417B4TBT.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/ImageIO-9F8900NGTQ6ZOWA9A2RZ1UL2V.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/CoreText-7SOV509ZF37OBH5A3RPX77AQF.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/Foundation-DSRQSGKX1J34Z3J1F0MZPOFJ.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/DataDetection-8RM53DITCWPUQWX3E7C1I3F4Q.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/Accessibility-449YWDCH9A5BRLFZJDQ5FZE6B.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/Symbols-DT5XD64EUSHSEK65MU4ZNQK5T.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/OSLog-387DRSF92H4LSNQTE9TSJFWPF.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/CoreData-BWGWE6Z0S80IFXDSVG9Z4R73E.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/CoreTransferable-8SSU3JTRWIWIPKC9VDQ0UBUBN.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/ApplicationServices-7RGY8P9Y6H16Z9NXYBQ1AINQL.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/IOSurface-7KT2706K43EZ1GDG5RCNCHMO9.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/UniformTypeIdentifiers-5H5FJOC98AFPLXBMY1XAPOMVQ.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/Metal-2375DX7G341M9B35YBUA90G5F.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/CoreVideo-AIILHOXX9NWKD28BK94WS2JW4.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/CoreImage-D21HT46P5YQLHDHNZM925VT2T.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/QuartzCore-2XWMIKUM4PMK8C8FA8GTWSRC3.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/SwiftUICore-31XHFILI0QSBAVHBATN31DMXI.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/AppKit-13UEIDQ61RVO9S77ZHSR1W13A.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/SwiftUI-5OO1TK3R4MQQ7O5X2RSTUSPFJ.pcm
+
+SwiftEmitModule normal arm64 Emitting\ module\ for\ CleanerApp (in target 'CleanerApp' from project 'CleanerApp')
+
+EmitSwiftModule normal arm64 (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    
+
+SwiftCompile normal arm64 Compiling\ FileItem.swift,\ FullDiskAccessLockedView.swift,\ LargeFileItem.swift,\ LargeFileManager.swift /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/FileItem.swift /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/FullDiskAccessLockedView.swift /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/LargeFileItem.swift /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/LargeFileManager.swift (in target 'CleanerApp' from project 'CleanerApp')
+SwiftCompile normal arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/FileItem.swift (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    
+
+SwiftCompile normal arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/FullDiskAccessLockedView.swift (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    
+
+SwiftCompile normal arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/LargeFileItem.swift (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    
+
+SwiftCompile normal arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/LargeFileManager.swift (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    
+
+SwiftCompile normal arm64 Compiling\ LargeFilesView.swift,\ LargeFilesViewModel.swift,\ LogManager.swift,\ MainDetailRouter.swift /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/LargeFilesView.swift /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/LargeFilesViewModel.swift /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/LogManager.swift /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/MainDetailRouter.swift (in target 'CleanerApp' from project 'CleanerApp')
+SwiftCompile normal arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/LargeFilesView.swift (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    
+
+SwiftCompile normal arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/LargeFilesViewModel.swift (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    
+
+SwiftCompile normal arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/LogManager.swift (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    
+
+SwiftCompile normal arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/MainDetailRouter.swift (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    
+
+SwiftCompile normal arm64 Compiling\ ProcessListView.swift,\ ProcessManager.swift,\ SafeDeleteService.swift /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/ProcessListView.swift /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/ProcessManager.swift /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/SafeDeleteService.swift (in target 'CleanerApp' from project 'CleanerApp')
+SwiftCompile normal arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/ProcessListView.swift (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    
+
+SwiftCompile normal arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/ProcessManager.swift (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    
+
+SwiftCompile normal arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/SafeDeleteService.swift (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    
+
+SwiftCompile normal arm64 Compiling\ AppPermissionViewModel.swift,\ CleanerAppApp.swift,\ CleanerManager.swift,\ CleanerReviewView.swift /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/AppPermissionViewModel.swift /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/CleanerAppApp.swift /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/CleanerManager.swift /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/CleanerReviewView.swift (in target 'CleanerApp' from project 'CleanerApp')
+
+SwiftCompile normal arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/AppPermissionViewModel.swift (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    
+
+SwiftCompile normal arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/CleanerAppApp.swift (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    
+
+SwiftCompile normal arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/CleanerManager.swift (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    
+
+SwiftCompile normal arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/CleanerReviewView.swift (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    
+
+SwiftCompile normal arm64 Compiling\ MaterialCard.swift,\ PermissionGate.swift,\ PermissionManager.swift,\ ProcessItem.swift /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/MaterialCard.swift /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/PermissionGate.swift /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/PermissionManager.swift /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/ProcessItem.swift (in target 'CleanerApp' from project 'CleanerApp')
+
+SwiftCompile normal arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/MaterialCard.swift (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    
+
+SwiftCompile normal arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/PermissionGate.swift (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    
+
+SwiftCompile normal arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/PermissionManager.swift (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    
+
+SwiftCompile normal arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/ProcessItem.swift (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    
+
+SwiftCompile normal arm64 Compiling\ CleaningPlan.swift,\ ContentView.swift,\ DashboardView.swift,\ DashboardViewModel.swift /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/CleaningPlan.swift /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/ContentView.swift /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/DashboardView.swift /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/DashboardViewModel.swift (in target 'CleanerApp' from project 'CleanerApp')
+
+SwiftCompile normal arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/CleaningPlan.swift (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    
+
+SwiftCompile normal arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/ContentView.swift (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    
+
+SwiftCompile normal arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/DashboardView.swift (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    
+
+SwiftCompile normal arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/DashboardViewModel.swift (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    
+
+SwiftCompile normal arm64 Compiling\ SystemMonitor.swift,\ View+Glass.swift,\ GeneratedAssetSymbols.swift /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/SystemMonitor.swift /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/View+Glass.swift /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/DerivedSources/GeneratedAssetSymbols.swift (in target 'CleanerApp' from project 'CleanerApp')
+SwiftCompile normal arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/SystemMonitor.swift (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    
+
+SwiftCompile normal arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/View+Glass.swift (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    
+
+SwiftCompile normal arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/DerivedSources/GeneratedAssetSymbols.swift (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    
+
+SwiftCompile normal arm64 Compiling\ SettingsView.swift,\ SidebarItem.swift,\ SidebarView.swift /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/SettingsView.swift /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/SidebarItem.swift /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/SidebarView.swift (in target 'CleanerApp' from project 'CleanerApp')
+
+SwiftCompile normal arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/SettingsView.swift (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    
+
+SwiftCompile normal arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/SidebarItem.swift (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    
+
+SwiftCompile normal arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/CleanerApp/SidebarView.swift (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    
+
+SwiftDriverJobDiscovery normal arm64 Emitting module for CleanerApp (in target 'CleanerApp' from project 'CleanerApp')
+
+SwiftDriver\ Compilation\ Requirements CleanerApp normal arm64 com.apple.xcode.tools.swift.compiler (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    builtin-Swift-Compilation-Requirements -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name CleanerApp -Onone -enforce-exclusivity\=checked @/Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp.SwiftFileList -DDEBUG -default-isolation\=MainActor -enable-bare-slash-regex -enable-upcoming-feature DisableOutwardActorInference -enable-upcoming-feature InferSendableFromCaptures -enable-upcoming-feature GlobalActorIsolatedTypesUsability -enable-upcoming-feature MemberImportVisibility -enable-upcoming-feature InferIsolatedConformances -enable-upcoming-feature NonisolatedNonsendingByDefault -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk -target arm64-apple-macos14.0 -g -module-cache-path /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug -F /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug -emit-localized-strings -emit-localized-strings-path /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64 -c -j8 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/SDKStatCaches.noindex/macosx26.1-25B74-3ae1261907bdadc328169391a47051a6.sdkstatcache -output-file-map /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp_const_extract_protocols.json -Xcc -iquote -Xcc /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp-generated-files.hmap -Xcc -I/Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp-own-target-headers.hmap -Xcc -I/Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp-all-target-headers.hmap -Xcc -iquote -Xcc /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp-project-headers.hmap -Xcc -I/Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/include -Xcc -I/Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/DerivedSources-normal/arm64 -Xcc -I/Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/DerivedSources/arm64 -Xcc -I/Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp-Swift.h -working-directory /Users/muratonurcu/Desktop/DustBuster\ 2.0 -experimental-emit-module-separately -disable-cmo
+
+SwiftDriverJobDiscovery normal arm64 Compiling AppPermissionViewModel.swift, CleanerAppApp.swift, CleanerManager.swift, CleanerReviewView.swift (in target 'CleanerApp' from project 'CleanerApp')
+
+SwiftDriverJobDiscovery normal arm64 Compiling SettingsView.swift, SidebarItem.swift, SidebarView.swift (in target 'CleanerApp' from project 'CleanerApp')
+
+SwiftDriverJobDiscovery normal arm64 Compiling FileItem.swift, FullDiskAccessLockedView.swift, LargeFileItem.swift, LargeFileManager.swift (in target 'CleanerApp' from project 'CleanerApp')
+
+SwiftDriverJobDiscovery normal arm64 Compiling CleaningPlan.swift, ContentView.swift, DashboardView.swift, DashboardViewModel.swift (in target 'CleanerApp' from project 'CleanerApp')
+
+SwiftDriverJobDiscovery normal arm64 Compiling LargeFilesView.swift, LargeFilesViewModel.swift, LogManager.swift, MainDetailRouter.swift (in target 'CleanerApp' from project 'CleanerApp')
+
+SwiftDriverJobDiscovery normal arm64 Compiling MaterialCard.swift, PermissionGate.swift, PermissionManager.swift, ProcessItem.swift (in target 'CleanerApp' from project 'CleanerApp')
+
+SwiftMergeGeneratedHeaders /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/DerivedSources/CleanerApp-Swift.h /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp-Swift.h (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    builtin-swiftHeaderTool -arch arm64 /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp-Swift.h -o /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/DerivedSources/CleanerApp-Swift.h
+
+SwiftDriverJobDiscovery normal arm64 Compiling ProcessListView.swift, ProcessManager.swift, SafeDeleteService.swift (in target 'CleanerApp' from project 'CleanerApp')
+
+SwiftDriverJobDiscovery normal arm64 Compiling SystemMonitor.swift, View+Glass.swift, GeneratedAssetSymbols.swift (in target 'CleanerApp' from project 'CleanerApp')
+
+Copy /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.swiftmodule/arm64-apple-macos.swiftmodule /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp.swiftmodule (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp.swiftmodule /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.swiftmodule/arm64-apple-macos.swiftmodule
+
+Copy /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.swiftmodule/arm64-apple-macos.swiftdoc /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp.swiftdoc (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp.swiftdoc /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.swiftmodule/arm64-apple-macos.swiftdoc
+
+Copy /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.swiftmodule/arm64-apple-macos.abi.json /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp.abi.json (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp.abi.json /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.swiftmodule/arm64-apple-macos.abi.json
+
+Copy /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.swiftmodule/Project/arm64-apple-macos.swiftsourceinfo /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp.swiftsourceinfo (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp.swiftsourceinfo /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.swiftmodule/Project/arm64-apple-macos.swiftsourceinfo
+
+SwiftDriver\ Compilation CleanerApp normal arm64 com.apple.xcode.tools.swift.compiler (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    builtin-Swift-Compilation -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name CleanerApp -Onone -enforce-exclusivity\=checked @/Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp.SwiftFileList -DDEBUG -default-isolation\=MainActor -enable-bare-slash-regex -enable-upcoming-feature DisableOutwardActorInference -enable-upcoming-feature InferSendableFromCaptures -enable-upcoming-feature GlobalActorIsolatedTypesUsability -enable-upcoming-feature MemberImportVisibility -enable-upcoming-feature InferIsolatedConformances -enable-upcoming-feature NonisolatedNonsendingByDefault -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk -target arm64-apple-macos14.0 -g -module-cache-path /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug -F /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug -emit-localized-strings -emit-localized-strings-path /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64 -c -j8 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/SDKStatCaches.noindex/macosx26.1-25B74-3ae1261907bdadc328169391a47051a6.sdkstatcache -output-file-map /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp_const_extract_protocols.json -Xcc -iquote -Xcc /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp-generated-files.hmap -Xcc -I/Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp-own-target-headers.hmap -Xcc -I/Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp-all-target-headers.hmap -Xcc -iquote -Xcc /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp-project-headers.hmap -Xcc -I/Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/include -Xcc -I/Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/DerivedSources-normal/arm64 -Xcc -I/Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/DerivedSources/arm64 -Xcc -I/Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp-Swift.h -working-directory /Users/muratonurcu/Desktop/DustBuster\ 2.0 -experimental-emit-module-separately -disable-cmo
+
+Ld /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app/Contents/MacOS/CleanerApp.debug.dylib normal (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-macos14.0 -dynamiclib -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk -O0 -L/Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/EagerLinkingTBDs/Debug -L/Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug -F/Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/EagerLinkingTBDs/Debug -F/Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug -filelist /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp.LinkFileList -install_name @rpath/CleanerApp.debug.dylib -Xlinker -rpath -Xlinker /usr/lib/swift -Xlinker -rpath -Xlinker @executable_path/../Frameworks -Xlinker -object_path_lto -Xlinker /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp_lto.o -rdynamic -Xlinker -no_deduplicate -Xlinker -dependency_info -Xlinker /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp_dependency_info.dat -fobjc-link-runtime -L/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx -L/usr/lib/swift -Xlinker -add_ast_path -Xlinker /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp.swiftmodule @/Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp-linker-args.resp -Xlinker -alias -Xlinker _main -Xlinker ___debug_main_executable_dylib_entry_point -o /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app/Contents/MacOS/CleanerApp.debug.dylib
+
+ConstructStubExecutorLinkFileList /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp-ExecutorLinkFileList-normal-arm64.txt (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    construct-stub-executor-link-file-list /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app/Contents/MacOS/CleanerApp.debug.dylib /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libPreviewsJITStubExecutor_no_swift_entry_point.a /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libPreviewsJITStubExecutor.a --output /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp-ExecutorLinkFileList-normal-arm64.txt
+note: Using stub executor library with Swift entry point. (in target 'CleanerApp' from project 'CleanerApp')
+
+Ld /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app/Contents/MacOS/CleanerApp normal (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-macos14.0 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk -O0 -L/Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug -F/Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug -Xlinker -rpath -Xlinker @executable_path -Xlinker -rpath -Xlinker @executable_path/../Frameworks -rdynamic -Xlinker -no_deduplicate -e ___debug_blank_executor_main -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __debug_dylib -Xlinker /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp-DebugDylibPath-normal-arm64.txt -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __debug_instlnm -Xlinker /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp-DebugDylibInstallName-normal-arm64.txt -Xlinker -filelist -Xlinker /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp-ExecutorLinkFileList-normal-arm64.txt /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app/Contents/MacOS/CleanerApp.debug.dylib -o /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app/Contents/MacOS/CleanerApp
+
+ExtractAppIntentsMetadata (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --module-name CleanerApp --sdk-root /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.1.sdk --xcode-version 17B100 --platform-family macOS --deployment-target 14.0 --bundle-identifier muratonurcu.CleanerApp --output /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app/Contents/Resources --target-triple arm64-apple-macos14.0 --binary-file /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app/Contents/MacOS/CleanerApp --dependency-file /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp_dependency_info.dat --stringsdata-file /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp.SwiftFileList --metadata-file-list /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp.DependencyMetadataFileList --static-metadata-file-list /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/CleanerApp.DependencyStaticMetadataFileList --swift-const-vals-list /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/Objects-normal/arm64/CleanerApp.SwiftConstValuesFileList --compile-time-extraction --deployment-aware-processing --validate-assistant-intents --no-app-shortcuts-localization
+2025-12-13 03:37:23.145 appintentsmetadataprocessor[20919:481708] Starting appintentsmetadataprocessor export
+2025-12-13 03:37:23.147 appintentsmetadataprocessor[20919:481708] warning: Metadata extraction skipped. No AppIntents.framework dependency found.
+
+CopySwiftLibs /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    builtin-swiftStdLibTool --copy --verbose --scan-executable /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app/Contents/MacOS/CleanerApp.debug.dylib --scan-folder /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app/Contents/Frameworks --scan-folder /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app/Contents/PlugIns --scan-folder /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app/Contents/Library/SystemExtensions --scan-folder /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app/Contents/Extensions --platform macosx --toolchain /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app/Contents/Frameworks --strip-bitcode --strip-bitcode-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Intermediates.noindex/CleanerApp.build/Debug/CleanerApp.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os --back-deploy-swift-span
+Ignoring --strip-bitcode because --sign was not passed
+
+RegisterExecutionPolicyException /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    builtin-RegisterExecutionPolicyException /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app
+
+Validate /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    builtin-validationUtility /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app -no-validate-extension -infoplist-subpath Contents/Info.plist
+
+Touch /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    /usr/bin/touch -c /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app
+
+RegisterWithLaunchServices /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app (in target 'CleanerApp' from project 'CleanerApp')
+    cd /Users/muratonurcu/Desktop/DustBuster\ 2.0
+    /System/Library/Frameworks/CoreServices.framework/Versions/Current/Frameworks/LaunchServices.framework/Versions/Current/Support/lsregister -f -R -trusted /Users/muratonurcu/Desktop/DustBuster\ 2.0/build/DerivedData/Build/Products/Debug/CleanerApp.app
+
+** BUILD SUCCEEDED **
+

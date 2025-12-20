@@ -29,7 +29,7 @@ A safe system cleaner for macOS.
 
 ## License
 
-MIT License
+GPL-3.0 License
 
 ## Developer
 

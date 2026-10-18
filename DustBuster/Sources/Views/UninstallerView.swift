@@ -233,6 +233,16 @@ struct UninstallerView: View {
                                         .padding(.vertical, 2)
                                         .background(Color.secondary.opacity(0.15))
                                         .cornerRadius(4)
+
+                                    if !item.isStrongMatch {
+                                        Text("İsim benzerliği — kontrol et")
+                                            .font(.caption2)
+                                            .padding(.horizontal, 6)
+                                            .padding(.vertical, 2)
+                                            .background(Color.orange.opacity(0.15))
+                                            .foregroundColor(.orange)
+                                            .cornerRadius(4)
+                                    }
                                 }
                                 
                                 // Satır 2: Path (kısaltılmış)

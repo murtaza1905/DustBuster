@@ -379,7 +379,15 @@ final class UninstallerViewModel: ObservableObject {
             let deep = self.manager.buildItemsDeep(appURL: appURL, bundleId: bundleId, appName: appName)
             DispatchQueue.main.async {
                 guard currentGeneration == self.scanGeneration else { return }
-                self.items = self.mergeByPathKeepingExisting(existing: self.items, incoming: deep)
+                let limit = UninstallerManager.maxReasonableResults
+                if deep.count > limit {
+                    // Güvenlik eşiği: bu kadar sonuç ancak eşleştirme hatasıyla çıkar.
+                    // Yalnızca bundle ID ile birebir bulunan (hızlı tarama) öğeler listede kalır.
+                    self.errorMessage = "Tarama \(deep.count) öğe buldu; bu sayı güvenlik sınırının (\(limit)) üzerinde. Yalnızca bundle ID ile birebir eşleşen öğeler listelendi."
+                    self.logManager.log("Uninstaller: tarama sınırı aşıldı (\(deep.count) > \(limit)), derin sonuçlar atıldı", category: .audit, level: .warning)
+                } else {
+                    self.items = self.mergeByPathKeepingExisting(existing: self.items, incoming: deep)
+                }
                 self.isScanning = false
             }
         }
@@ -397,6 +405,7 @@ final class UninstallerViewModel: ObservableObject {
         }
 
         return merged.sorted {
+            if $0.isStrongMatch != $1.isStrongMatch { return $0.isStrongMatch }
             let a = kindRank($0.kind), b = kindRank($1.kind)
             if a != b { return a < b }
             return $0.displayName.localizedCaseInsensitiveCompare($1.displayName) == .orderedAscending
@@ -433,9 +442,10 @@ final class UninstallerViewModel: ObservableObject {
         sizeInFlight.insert(path)
 
         let currentGeneration = scanGeneration
+        let isAppBundle = (appURL?.standardizedFileURL.path == url.standardizedFileURL.path)
         sizeQueue.addOperation { [weak self] in
             guard let self = self else { return }
-            let size = self.manager.computeSizeBytes(for: url)
+            let size = self.manager.computeSizeBytes(for: url, isAppBundle: isAppBundle)
             OperationQueue.main.addOperation {
                 guard currentGeneration == self.scanGeneration else { return }
                 self.sizeInFlight.remove(path)

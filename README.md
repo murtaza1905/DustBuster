@@ -37,13 +37,20 @@ cd ~/Desktop/DustBuster
 ./scripts/install.sh
 ```
 
-The script generates the Xcode project, builds a universal Release binary, ad-hoc signs it, installs it to `/Applications` and launches it.
+The script pulls the latest code, generates the Xcode project, builds a universal Release binary, ad-hoc signs it, archives it to `releases/`, replaces the copy in `/Applications` and launches it. The cloned folder is meant to stay as a permanent "hub": run the same command again to update.
+
+```bash
+cd ~/Desktop/DustBuster
+./scripts/install.sh                        # update + clean reinstall
+./scripts/install.sh --list                 # archived builds in releases/
+./scripts/install.sh releases/<file>.zip    # reinstall an archived build
+```
 
 Other scripts:
 
 | Script | Purpose |
 |---|---|
-| `./scripts/install.sh` | Build + install to `/Applications` + launch |
+| `./scripts/install.sh` | Pull, build, archive, clean-install to `/Applications`, launch |
 | `./scripts/uninstall.sh` | Remove the app and its preferences |
 | `./scripts/make-dmg.sh` | Build a universal `.dmg` into `dist/` |
 

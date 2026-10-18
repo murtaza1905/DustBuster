@@ -71,7 +71,7 @@ struct DashboardView: View {
                                 Text("Önbellek ve Gereksiz Dosyalar")
                                     .font(.title2)
                                     .bold()
-                                Text("Chrome, Brave, Edge, Opera ve Sistem Logları.")
+                                Text("Tarayıcı önbellekleri (Safari, Chrome, Brave, Edge, Opera, Firefox), uygulama önbellekleri ve kullanıcı logları.")
                                     .font(.footnote)
                                     .foregroundColor(.secondary)
                             }
@@ -97,7 +97,7 @@ struct DashboardView: View {
                                     .font(.subheadline)
                                     .bold()
                                 
-                                Text("Tam Disk Erişimi verildiğinde DustBuster, sistem logları ve önbellek klasörlerine güvenli şekilde erişebilir. Bu yetkiyi dilediğiniz zaman Sistem Ayarları > Gizlilik ve Güvenlik > Tam Disk Erişimi bölümünden yönetebilirsiniz.")
+                                Text("Tam Disk Erişimi verildiğinde DustBuster, önbellek, log ve tarayıcı konteyner klasörlerine güvenli şekilde erişebilir. Bu yetkiyi dilediğiniz zaman Sistem Ayarları > Gizlilik ve Güvenlik > Tam Disk Erişimi bölümünden yönetebilirsiniz.")
                                     .font(.footnote)
                                     .foregroundColor(.secondary)
                                     .multilineTextAlignment(.center)

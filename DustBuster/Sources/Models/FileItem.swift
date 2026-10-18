@@ -19,8 +19,8 @@ struct FileItem: Identifiable, Hashable {
     }
 
     var displayName: String {
-        // MARK: - Safari Cache
-        if path.contains("/com.apple.Safari") {
+        // MARK: - Safari Cache (dizin sınırına saygılı: com.apple.Safari.SafeBrowsing buraya girmez)
+        if path.contains("/com.apple.Safari/") || path.hasSuffix("/com.apple.Safari") {
             if path.contains("WebKitCache") {
                 return "Safari WebKit Cache"
             }
@@ -44,14 +44,25 @@ struct FileItem: Identifiable, Hashable {
         // MARK: - Chromium Tabanlı Tarayıcılar (Dinamik Tespit)
         if path.contains("/Library/Application Support/") {
             // Chromium cache pattern kontrolü
-            let chromiumCacheTypes = ["Cache", "Code Cache", "GPUCache"]
+            let chromiumCacheTypes = ["Cache", "Code Cache", "GPUCache",
+                                      "ShaderCache", "GrShaderCache", "GraphiteDawnCache",
+                                      "DawnWebGPUCache", "DawnGraphiteCache"]
             let lastComponent = url.lastPathComponent
 
             if chromiumCacheTypes.contains(lastComponent) {
                 // Tarayıcı ismini path'ten çıkar
                 let browserName = extractChromiumBrowserName(from: path)
-                let cacheType = lastComponent == "GPUCache" ? "GPU Cache" : lastComponent
-                return "\(browserName) \(cacheType)"
+                let cacheType: String
+                switch lastComponent {
+                case "GPUCache": cacheType = "GPU Cache"
+                case "ShaderCache", "GrShaderCache": cacheType = "Shader Cache"
+                case "GraphiteDawnCache", "DawnWebGPUCache", "DawnGraphiteCache": cacheType = "GPU Shader Cache"
+                default: cacheType = lastComponent
+                }
+                // Default dışındaki profiller adda belirtilir ("Profile 1")
+                let profile = url.deletingLastPathComponent().lastPathComponent
+                let profileSuffix = profile.hasPrefix("Profile ") ? " (\(profile))" : ""
+                return "\(browserName)\(profileSuffix) \(cacheType)"
             }
         }
 

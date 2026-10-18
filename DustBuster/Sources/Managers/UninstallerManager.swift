@@ -84,10 +84,32 @@ struct SearchTerms {
         "microsoft", "adobe", "mozilla", "chrome", "firefox", "edge", "opera"
     ]
 
+    /// Aynı uygulamanın ayrı dağıtım kanalları (Chrome Canary, X Beta…) ayrı uygulama sayılır.
+    static let channelWords: Set<String> = [
+        "canary", "beta", "dev", "nightly", "alpha", "insiders", "insider", "preview", "rc"
+    ]
+
     static func tokens(of text: String) -> [String] {
         text.lowercased()
             .split(whereSeparator: { !$0.isLetter && !$0.isNumber })
             .map(String.init)
+    }
+
+    /// `name` içinde `bid.` ifadesinden hemen sonra gelen bileşen; yoksa "".
+    static func component(after bid: String, in name: String) -> String {
+        guard let range = name.range(of: bid + ".") else { return "" }
+        let rest = name[range.upperBound...]
+        return rest.split(separator: ".").first.map(String.init) ?? ""
+    }
+
+    /// Arama kökünden itibaren göreli yol ("Google/Chrome"); kök dışındaysa yalnızca son bileşen.
+    static func relativePath(of url: URL, under root: URL) -> String {
+        let path = url.path
+        let rootPath = root.path
+        if path.hasPrefix(rootPath + "/") {
+            return String(path.dropFirst(rootPath.count + 1))
+        }
+        return url.lastPathComponent
     }
 
     /// Uygulama adı ve varyantlarından token kümeleri üretir; genel/kısa adları eler.
@@ -120,44 +142,57 @@ struct SearchTerms {
     func matchesBundleId(_ name: String) -> Bool {
         let n = name.lowercased()
         for bid in bundleIds {
-            if n == bid
+            let isMatch = n == bid
                 || n.hasPrefix(bid + ".")
                 || n.hasSuffix("." + bid)
-                || n.contains("." + bid + ".") {
-                return true
-            }
+                || n.contains("." + bid + ".")
+            guard isMatch else { continue }
+            // com.google.chrome.canary → Chrome'un değil, Canary'nin dosyası
+            let next = SearchTerms.component(after: bid, in: n)
+            if SearchTerms.channelWords.contains(next) { continue }
+            return true
         }
         return false
     }
 
-    /// Verilen dosya/klasör adının uygulamaya ait olup olmadığını ve eşleşme gücünü döner.
-    func match(_ rawName: String, isDirectory: Bool = false) -> UninstallMatchStrength? {
-        let name = rawName.lowercased()
+    /// Verilen yolun (arama köküne göre göreli, ör. "Google/Chrome") uygulamaya ait olup
+    /// olmadığını ve eşleşme gücünü döner. Tek bileşenli adlar da aynı yoldan geçer.
+    func match(_ relativePath: String, isDirectory: Bool = false) -> UninstallMatchStrength? {
+        let lower = relativePath.lowercased()
+        let lastComponent = lower.split(separator: "/").last.map(String.init) ?? lower
 
         // Apple'a ait adlar: kaldırılan uygulama Apple'ın değilse asla eşleşmez
-        if !isAppleApp && (name == "com.apple" || name.hasPrefix("com.apple.")) {
+        if !isAppleApp && (lastComponent == "com.apple" || lastComponent.hasPrefix("com.apple.")) {
             return nil
         }
 
-        if matchesBundleId(name) {
+        if matchesBundleId(lastComponent) {
             return .strong
         }
 
         guard !nameTokenSets.isEmpty else { return nil }
 
-        let fullTokens = SearchTerms.tokens(of: name)
-        guard !fullTokens.isEmpty else { return nil }
+        // Yolun tamamının token'ları: "Google/Chrome" → [google, chrome]
+        let pathTokens = SearchTerms.tokens(of: lower)
+        guard !pathTokens.isEmpty else { return nil }
 
-        // Dosya ise uzantıyı at ("PdfCraft.log" → "pdfcraft")
-        var baseTokens = fullTokens
-        if !isDirectory, let dot = name.lastIndex(of: "."), dot != name.startIndex {
-            baseTokens = SearchTerms.tokens(of: String(name[..<dot]))
+        // Son bileşenin token'ları; dosya ise uzantı atılır ("PdfCraft.log" → "pdfcraft")
+        var lastTokens = SearchTerms.tokens(of: lastComponent)
+        if !isDirectory, let dot = lastComponent.lastIndex(of: "."), dot != lastComponent.startIndex {
+            lastTokens = SearchTerms.tokens(of: String(lastComponent[..<dot]))
         }
 
-        for termTokens in nameTokenSets where baseTokens == termTokens || fullTokens == termTokens {
+        for termTokens in nameTokenSets where lastTokens == termTokens || pathTokens == termTokens {
             return .strong
         }
-        for termTokens in nameTokenSets where SearchTerms.containsContiguous(termTokens, in: fullTokens) {
+
+        // "Chrome Canary", "X Beta" gibi kanal türevleri ayrı uygulamadır
+        for token in lastTokens where SearchTerms.channelWords.contains(token) {
+            let termHasIt = nameTokenSets.contains { $0.contains(token) }
+            if !termHasIt { return nil }
+        }
+
+        for termTokens in nameTokenSets where SearchTerms.containsContiguous(termTokens, in: pathTokens) {
             return .weak
         }
         return nil
@@ -405,12 +440,12 @@ final class UninstallerManager {
             ("Logs", .logs, true),
             ("Saved Application State", .savedState, false),
             ("Containers", .containers, false),
-            ("Group Containers", .groupContainers, true),
+            ("Group Containers", .groupContainers, false),
             ("LaunchAgents", .launchAgents, false),
             ("HTTPStorages", .httpStorages, false),
             ("Cookies", .cookies, false),
             ("Application Scripts", .applicationScripts, false),
-            ("Caches/com.apple.nsurlsessiond/Downloads", .caches, true),
+            ("Caches/com.apple.nsurlsessiond/Downloads", .caches, false),
         ]
 
         let aggressiveLocations: [(String, UninstallItemKind, Bool)] = [
@@ -437,6 +472,7 @@ final class UninstallerManager {
             guard fileManager.fileExists(atPath: dirURL.path) else { continue }
 
             let found = searchDirectory(
+                root: dirURL,
                 at: dirURL,
                 searchTerms: searchTerms,
                 kind: kind,
@@ -467,6 +503,7 @@ final class UninstallerManager {
     }
 
     private func searchDirectory(
+        root: URL,
         at url: URL,
         searchTerms: SearchTerms,
         kind: UninstallItemKind,
@@ -490,8 +527,10 @@ final class UninstallerManager {
 
             let itemName = itemURL.lastPathComponent
             let isDir = (try? itemURL.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) ?? false
+            // Köke göre göreli yol: "Google/Chrome" gibi iç içe geliştirici klasörlerini yakalar
+            let relativePath = SearchTerms.relativePath(of: itemURL, under: root)
 
-            if let strength = searchTerms.match(itemName, isDirectory: isDir) {
+            if let strength = searchTerms.match(relativePath, isDirectory: isDir) {
                 results.append(Candidate(
                     url: itemURL,
                     kind: kind,
@@ -503,6 +542,7 @@ final class UninstallerManager {
                 if !searchTerms.isAppleApp && itemName.lowercased().hasPrefix("com.apple.") { continue }
 
                 let subResults = searchDirectory(
+                    root: root,
                     at: itemURL,
                     searchTerms: searchTerms,
                     kind: kind,
@@ -587,6 +627,7 @@ final class UninstallerManager {
             guard fileManager.fileExists(atPath: dirURL.path) else { continue }
 
             let found = searchSystemDirectory(
+                root: dirURL,
                 at: dirURL,
                 searchTerms: searchTerms,
                 kind: kind,
@@ -600,6 +641,7 @@ final class UninstallerManager {
     }
 
     private func searchSystemDirectory(
+        root: URL,
         at url: URL,
         searchTerms: SearchTerms,
         kind: UninstallItemKind,
@@ -630,8 +672,9 @@ final class UninstallerManager {
 
             let itemName = itemURL.lastPathComponent
             let isDir = (try? itemURL.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) ?? false
+            let relativePath = SearchTerms.relativePath(of: itemURL, under: root)
 
-            if searchTerms.match(itemName, isDirectory: isDir) == .strong {
+            if searchTerms.match(relativePath, isDirectory: isDir) == .strong {
                 results.append(Candidate(
                     url: itemURL,
                     kind: kind,
@@ -641,6 +684,7 @@ final class UninstallerManager {
             } else if recursive && isDir {
                 if !searchTerms.isAppleApp && itemName.lowercased().hasPrefix("com.apple.") { continue }
                 let subResults = searchSystemDirectory(
+                    root: root,
                     at: itemURL,
                     searchTerms: searchTerms,
                     kind: kind,
@@ -755,13 +799,14 @@ final class UninstallerManager {
         var seen: Set<String> = []
         for (subpath, depth) in locations {
             let dir = homeLibrary.appendingPathComponent(subpath)
-            collectMentions(at: dir, needles: needles, maxDepth: depth, currentDepth: 0, into: &found, seen: &seen, limit: limit)
+            collectMentions(root: dir, at: dir, needles: needles, maxDepth: depth, currentDepth: 0, into: &found, seen: &seen, limit: limit)
             if found.count >= limit { break }
         }
         return (needles, found)
     }
 
     private func collectMentions(
+        root: URL,
         at dir: URL,
         needles: [String],
         maxDepth: Int,
@@ -781,7 +826,8 @@ final class UninstallerManager {
             if found.count >= limit { return }
             if isSymlink(itemURL) { continue }
 
-            let squashedName = SearchTerms.tokens(of: itemURL.lastPathComponent).joined()
+            // Köke göre göreli yol sıkıştırılır: "Google/Chrome" → "googlechrome"
+            let squashedName = SearchTerms.tokens(of: SearchTerms.relativePath(of: itemURL, under: root)).joined()
             if needles.contains(where: { squashedName.contains($0) }) {
                 let path = itemURL.path
                 if !seen.contains(path) {
@@ -793,7 +839,7 @@ final class UninstallerManager {
 
             let isDir = (try? itemURL.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) ?? false
             if isDir {
-                collectMentions(at: itemURL, needles: needles, maxDepth: maxDepth, currentDepth: currentDepth + 1, into: &found, seen: &seen, limit: limit)
+                collectMentions(root: root, at: itemURL, needles: needles, maxDepth: maxDepth, currentDepth: currentDepth + 1, into: &found, seen: &seen, limit: limit)
             }
         }
     }
@@ -843,12 +889,10 @@ final class UninstallerManager {
         var total: Int64 = 0
 
         for case let fileURL as URL in enumerator {
-            if isSymlink(fileURL) {
-                enumerator.skipDescendants()
-                continue
-            }
-
             guard let values = try? fileURL.resourceValues(forKeys: keys) else { continue }
+            // Symlink'ler sayılmaz; enumerator onları zaten izlemez, skipDescendants çağrılmaz
+            // (symlink üzerinde skipDescendants, komşu gerçek klasörlerin atlanmasına yol açıyordu)
+            if values.isSymbolicLink == true { continue }
             if values.isDirectory == true { continue }
 
             total += fileSize(from: values)

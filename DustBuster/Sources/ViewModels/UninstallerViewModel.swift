@@ -396,6 +396,13 @@ final class UninstallerViewModel: ObservableObject {
             return nil
         }
 
+        // /System altındaki uygulamalar SIP korumalıdır; taşınamaz, bu yüzden taranmaz da.
+        let standardizedPath = url.standardizedFileURL.path
+        if standardizedPath == "/System" || standardizedPath.hasPrefix("/System/") {
+            errorMessage = "Bu bir macOS sistem uygulaması (\(url.lastPathComponent)). SIP koruması altında olduğu için kaldırılamaz; tarama yapılmadı."
+            return nil
+        }
+
         guard FileManager.default.isReadableFile(atPath: url.path) else {
             errorMessage = "Uygulama okunamıyor."
             return nil

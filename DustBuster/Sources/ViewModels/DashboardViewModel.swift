@@ -191,7 +191,8 @@ class DashboardViewModel: ObservableObject {
         for candidate in candidates {
             let mark = candidate.isSelected ? "[x]" : "[ ]"
             let kind = candidate.isDirectory ? "klasör" : "dosya"
-            lines.append("\(mark) \(candidate.formattedSize) | \(kind) | \(candidate.displayName) | \(ReportExporter.tildePath(candidate.path))")
+            let flag = candidate.isSystemService ? " | Apple sistem servisi" : ""
+            lines.append("\(mark) \(candidate.formattedSize) | \(kind) | \(candidate.displayName)\(flag) | \(ReportExporter.tildePath(candidate.path))")
         }
         lines.append("")
 

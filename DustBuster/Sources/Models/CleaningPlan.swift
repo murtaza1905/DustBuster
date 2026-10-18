@@ -54,6 +54,8 @@ struct CleaningCandidate: Identifiable, Hashable {
     var isSelected: Bool
     let displayName: String
     let identity: FileIdentitySnapshot
+    /// Apple sistem servisi önbelleği: silmek güvenli ama macOS yeniden üretir; varsayılan seçimsiz
+    var isSystemService: Bool = false
 
     var path: String {
         url.path

@@ -248,8 +248,19 @@ struct CleanerReviewView: View {
                         .toggleStyle(CheckboxToggleStyle())
                         
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(item.displayName)
-                                .font(.body)
+                            HStack(spacing: 8) {
+                                Text(item.displayName)
+                                    .font(.body)
+                                if item.isSystemService {
+                                    Text("Apple sistem servisi — yeniden indirilir")
+                                        .font(.caption2)
+                                        .padding(.horizontal, 6)
+                                        .padding(.vertical, 2)
+                                        .background(Color.orange.opacity(0.15))
+                                        .foregroundColor(.orange)
+                                        .cornerRadius(4)
+                                }
+                            }
                             Text(item.path)
                                 .font(.caption)
                                 .foregroundColor(.secondary)

@@ -55,19 +55,34 @@ class CleanerManager: ObservableObject {
         "accounts",
         "login",
         "logindata",
-        "session",
         "sessions",
         "autofill"
     ]
 
-    /// Chromium tabanlı tarayıcılarda aranan cache klasör yapıları
-    private let chromiumCachePatterns: [String] = [
-        "Default/Cache",
-        "Default/Code Cache",
-        "Default/GPUCache",
-        "User Data/Default/Cache",
-        "User Data/Default/Code Cache",
-        "User Data/Default/GPUCache"
+    /// Apple sistem servislerinin önbellekleri: silmek güvenli ama macOS yeniden indirir/üretir.
+    /// Bu yüzden listelenir fakat varsayılan olarak seçimsiz gelir.
+    private let appleSystemCacheNames: Set<String> = [
+        "cloudkit", "geoservices", "animoji", "familycircled", "familycircle", "passkit",
+        "gamekit", "sharedimagecache", "mbuseragent", "jetpackcache", "amsdatamigratortool",
+        "askpermissiond", "trickplay", "arfilecache", "lsmimagecache", "ssu", "tvapp_bag",
+        "features_config", "menkaure.enabled"
+    ]
+
+    /// Chromium profil klasörü içindeki cache alt klasörleri (Default/, Profile N/ …)
+    private let chromiumProfileCacheFolders: [String] = [
+        "Cache", "Code Cache", "GPUCache"
+    ]
+
+    /// Chromium tarayıcı kökündeki (profil dışı) cache klasörleri
+    private let chromiumRootCacheFolders: [String] = [
+        "ShaderCache", "GrShaderCache", "GraphiteDawnCache", "DawnWebGPUCache", "DawnGraphiteCache"
+    ]
+
+    /// Profil klasörü yerine kökü doğrudan profil olarak kullanan Chromium tarayıcılar
+    /// (Electron uygulamaları da aynı yapıyı kullandığı için yalnızca bilinen tarayıcılar)
+    private let chromiumSingleProfileRoots: Set<String> = [
+        "com.operasoftware.opera", "com.operasoftware.operagx", "com.operasoftware.operaair",
+        "com.operasoftware.operadeveloper", "com.operasoftware.operanext"
     ]
 
     /// Gecko tabanlı tarayıcılar (Firefox ailesi) - ~/Library/Caches altında
@@ -82,10 +97,11 @@ class CleanerManager: ObservableObject {
         let home = NSHomeDirectory()
 
         // Genel, tüm uygulamalar için geçerli güvenli temizlik alanları
+        // /private/var/log bilinçli olarak kapsam dışı: root'a ait, Tam Disk Erişimi okuma verir
+        // ama silme yetkisi vermez; oradaki hiçbir öğe taşınamıyordu.
         self.baseAllowedPaths = [
             home + "/Library/Caches",   // Uygulama cache'leri
-            home + "/Library/Logs",     // Kullanıcı log'ları
-            "/private/var/log"          // Sistem log'ları (Full Disk Access ile)
+            home + "/Library/Logs"      // Kullanıcı log'ları
         ]
 
         // Gecko tabanlı tarayıcıların cache kökleri
@@ -96,10 +112,11 @@ class CleanerManager: ObservableObject {
             home + "/Library/Caches/Pale Moon/Profiles"
         ]
 
-        // Safari cache path'leri
+        // Safari cache path'leri: Safari sandbox'ta çalıştığı için gerçek cache konteynerin içinde;
+        // ~/Library/Caches/com.apple.Safari eski sürümler için kalıyor (genelde boş kabuk).
         self.safariCachePaths = [
-            home + "/Library/Caches/com.apple.Safari",
-            home + "/Library/Caches/com.apple.Safari/WebKitCache"
+            home + "/Library/Containers/com.apple.Safari/Data/Library/Caches/com.apple.Safari",
+            home + "/Library/Caches/com.apple.Safari"
         ]
 
         // Asla dokunulmaması gereken path kökleri
@@ -149,14 +166,8 @@ class CleanerManager: ObservableObject {
             let safariItems = self.scanSafariCaches()
             items.append(contentsOf: safariItems)
 
-            // 5) Temel path'leri tara (~/Library/Caches, ~/Library/Logs, /private/var/log)
+            // 5) Temel path'leri tara (~/Library/Caches, ~/Library/Logs)
             for basePath in self.baseAllowedPaths {
-                if basePath.hasPrefix("/private/var/log"),
-                   self.permissionManager.hasFullDiskAccess == false {
-                    print("Full Disk Access yok, /private/var/log taranmadı")
-                    continue
-                }
-
                 guard fileManager.fileExists(atPath: basePath) else { continue }
                 let url = URL(fileURLWithPath: basePath)
 
@@ -280,14 +291,30 @@ class CleanerManager: ObservableObject {
             return nil
         }
 
+        let isSystemService = isAppleSystemCache(path: item.path)
         return CleaningCandidate(
             url: item.url,
             size: item.size,
             isDirectory: item.isDirectory,
-            isSelected: item.isSelected,
+            isSelected: item.isSelected && !isSystemService,
             displayName: item.displayName,
-            identity: identity
+            identity: identity,
+            isSystemService: isSystemService
         )
+    }
+
+    /// ~/Library/Caches altındaki Apple sistem servisi önbelleği mi?
+    private func isAppleSystemCache(path: String) -> Bool {
+        let cachesRoot = NSHomeDirectory() + "/Library/Caches"
+        guard isPath(path, under: cachesRoot) else { return false }
+        let name = URL(fileURLWithPath: path).lastPathComponent.lowercased()
+        if name.hasPrefix("com.apple.") { return true }
+        return appleSystemCacheNames.contains(name)
+    }
+
+    /// Dizin sınırına saygılı önek karşılaştırması ("…/Caches/com.apple.Safari" ⊄ "…/Caches/com.apple.Safari.SafeBrowsing").
+    private func isPath(_ path: String, under root: String) -> Bool {
+        path == root || path.hasPrefix(root + "/")
     }
 
     private func buildHistoryEntries(from result: CleaningResult) -> [TrashHistoryEntry] {
@@ -379,35 +406,81 @@ class CleanerManager: ObservableObject {
     
     // MARK: - Dynamic Browser Detection
 
-    /// ~/Library/Application Support altındaki Chromium tabanlı tarayıcıları dinamik olarak tespit eder
+    /// ~/Library/Application Support altındaki Chromium tabanlı tarayıcıları dinamik olarak tespit eder.
+    /// İki seviye bakılır: `Google/Chrome`, `BraveSoftware/Brave-Browser` gibi geliştirici klasörü
+    /// içinde duran tarayıcılar da yakalanır. Bir klasör ancak `Local State` dosyası ve en az bir
+    /// profil klasörü (Default, Profile N, Guest Profile, System Profile) taşıyorsa tarayıcı sayılır;
+    /// tek profilli yapı kullanan Opera ailesi ad listesiyle tanınır.
     private func detectDynamicBrowserCaches() {
         dynamicBrowserCachePaths.removeAll()
         let home = NSHomeDirectory()
         let appSupportPath = home + "/Library/Application Support"
         let fileManager = FileManager.default
 
-        guard let contents = try? fileManager.contentsOfDirectory(atPath: appSupportPath) else {
+        guard let level1 = try? fileManager.contentsOfDirectory(atPath: appSupportPath) else {
             return
         }
 
-        for folderName in contents {
-            let folderPath = appSupportPath + "/" + folderName
-
-            // Her Chromium cache pattern'ini kontrol et
-            for pattern in chromiumCachePatterns {
-                let cachePath = folderPath + "/" + pattern
-
-                if fileManager.fileExists(atPath: cachePath) {
-                    // Bu bir Chromium tabanlı tarayıcı cache'i
-                    dynamicBrowserCachePaths.append(cachePath)
-                    #if DEBUG
-                    print("Chromium cache tespit edildi: \(cachePath)")
-                    #endif
+        var roots: [String] = []
+        for name in level1 where !name.hasPrefix(".") && !name.lowercased().hasPrefix("com.apple.") {
+            let path = appSupportPath + "/" + name
+            guard isDirectory(path) else { continue }
+            roots.append(path)
+            if let level2 = try? fileManager.contentsOfDirectory(atPath: path) {
+                for sub in level2 where !sub.hasPrefix(".") && !sub.lowercased().hasPrefix("com.apple.") {
+                    let subPath = path + "/" + sub
+                    if isDirectory(subPath) { roots.append(subPath) }
                 }
             }
         }
 
+        for root in roots {
+            collectChromiumCaches(browserRoot: root)
+        }
+
         logManager.log("Dinamik tarayıcı tespiti: \(dynamicBrowserCachePaths.count) Chromium cache bulundu", category: .cleanup, level: .info)
+    }
+
+    private func collectChromiumCaches(browserRoot: String) {
+        let fileManager = FileManager.default
+        guard let children = try? fileManager.contentsOfDirectory(atPath: browserRoot) else { return }
+
+        let hasLocalState = fileManager.fileExists(atPath: browserRoot + "/Local State")
+        let profileDirs = children.filter { name in
+            name == "Default" || name.hasPrefix("Profile ") || name == "Guest Profile" || name == "System Profile"
+        }
+
+        func addIfDirectory(_ path: String) {
+            guard isDirectory(path), !dynamicBrowserCachePaths.contains(path) else { return }
+            dynamicBrowserCachePaths.append(path)
+            #if DEBUG
+            print("Chromium cache tespit edildi: \(path)")
+            #endif
+        }
+
+        if hasLocalState && !profileDirs.isEmpty {
+            for profile in profileDirs {
+                for folder in chromiumProfileCacheFolders {
+                    addIfDirectory(browserRoot + "/" + profile + "/" + folder)
+                }
+            }
+            for folder in chromiumRootCacheFolders {
+                addIfDirectory(browserRoot + "/" + folder)
+            }
+            return
+        }
+
+        let rootName = URL(fileURLWithPath: browserRoot).lastPathComponent.lowercased()
+        if chromiumSingleProfileRoots.contains(rootName) {
+            for folder in chromiumProfileCacheFolders + chromiumRootCacheFolders {
+                addIfDirectory(browserRoot + "/" + folder)
+            }
+        }
+    }
+
+    private func isDirectory(_ path: String) -> Bool {
+        var isDir: ObjCBool = false
+        return FileManager.default.fileExists(atPath: path, isDirectory: &isDir) && isDir.boolValue
     }
 
     /// Chromium tabanlı tarayıcı cache'lerini tarar
@@ -508,13 +581,13 @@ class CleanerManager: ObservableObject {
 
                 // Tarayıcı cache'lerini hariç tut (zaten ayrıca eklendi)
                 if excludeBrowserCaches {
-                    // Safari cache'leri
-                    if safariCachePaths.contains(where: { path.hasPrefix($0) || $0.hasPrefix(path) }) {
+                    // Safari cache'leri (dizin sınırına saygılı: com.apple.Safari.SafeBrowsing hariç tutulmaz)
+                    if safariCachePaths.contains(where: { isPath(path, under: $0) || isPath($0, under: path) }) {
                         continue
                     }
 
                     // Gecko cache'leri
-                    if geckoBasePaths.contains(where: { path.hasPrefix($0) || $0.hasPrefix(path) }) {
+                    if geckoBasePaths.contains(where: { isPath(path, under: $0) || isPath($0, under: path) }) {
                         continue
                     }
 
@@ -536,17 +609,25 @@ class CleanerManager: ObservableObject {
         return results
     }
 
-    /// Dosya veya klasörün recursive boyutunu hesaplar.
+    /// Dosya veya klasörün recursive boyutunu hesaplar. Tekil dosyalar doğrudan ölçülür,
+    /// symlink'ler sayılmaz.
     private func getPathSize(url: URL) -> Int64 {
         let fileManager = FileManager.default
-        var size: Int64 = 0
+        let keys: Set<URLResourceKey> = [.isDirectoryKey, .isSymbolicLinkKey, .fileSizeKey]
 
-        if let enumerator = fileManager.enumerator(at: url, includingPropertiesForKeys: [.fileSizeKey]) {
+        guard let values = try? url.resourceValues(forKeys: keys) else { return 0 }
+        if values.isSymbolicLink == true { return 0 }
+        if values.isDirectory != true {
+            return Int64(values.fileSize ?? 0)
+        }
+
+        var size: Int64 = 0
+        if let enumerator = fileManager.enumerator(at: url, includingPropertiesForKeys: Array(keys)) {
             for case let fileURL as URL in enumerator {
-                if let resourceValues = try? fileURL.resourceValues(forKeys: [.fileSizeKey]),
-                   let fileSize = resourceValues.fileSize {
-                    size += Int64(fileSize)
-                }
+                guard let resourceValues = try? fileURL.resourceValues(forKeys: keys) else { continue }
+                if resourceValues.isSymbolicLink == true { continue }
+                if resourceValues.isDirectory == true { continue }
+                size += Int64(resourceValues.fileSize ?? 0)
             }
         }
         return size
@@ -568,13 +649,13 @@ class CleanerManager: ObservableObject {
         // 1) Mutlaka whitelist içindeki köklerden biriyle başlamalı
         //    (base paths + dinamik tespit edilen tarayıcı cache'leri + gecko + safari)
         let isUnderAllowedBase = allowedBasePaths.contains { allowed in
-            path.hasPrefix(allowed)
+            isPath(path, under: allowed)
         }
         let isGeckoCache = geckoBasePaths.contains { geckoBase in
-            path.hasPrefix(geckoBase)
+            isPath(path, under: geckoBase)
         }
         let isSafariCache = safariCachePaths.contains { safariPath in
-            path.hasPrefix(safariPath)
+            isPath(path, under: safariPath)
         }
 
         guard isUnderAllowedBase || isGeckoCache || isSafariCache else {
@@ -675,8 +756,8 @@ class CleanerManager: ObservableObject {
 
             for name in visible {
                 let path = basePath + "/" + name
-                let isBrowserRoot = safariCachePaths.contains { path.hasPrefix($0) || $0.hasPrefix(path) }
-                    || geckoBasePaths.contains { path.hasPrefix($0) || $0.hasPrefix(path) }
+                let isBrowserRoot = safariCachePaths.contains { isPath(path, under: $0) || isPath($0, under: path) }
+                    || geckoBasePaths.contains { isPath(path, under: $0) || isPath($0, under: path) }
                 if isBrowserRoot {
                     lines.append("AYRI    | tarayıcı cache, kendi bölümünde ele alındı | \(name)")
                     continue

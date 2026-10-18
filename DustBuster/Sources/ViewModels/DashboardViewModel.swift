@@ -174,6 +174,53 @@ class DashboardViewModel: ObservableObject {
         cleaningPlan = plan
     }
     
+    // MARK: - Rapor (.txt)
+
+    /// Tarama sonucunu, kapsamı ve konum bazlı kararları .txt olarak dışa aktarır.
+    func exportCleaningReport() {
+        var lines = ReportExporter.headerLines(title: "Sistem Temizliği Raporu")
+        lines.append("Tam Disk Erişimi: \(permissionManager.hasFullDiskAccess ? "var" : "yok")")
+        lines.append("")
+
+        lines.append("Taranan konumlar ve kurallar")
+        lines.append(contentsOf: cleanerManager.scanScopeLines())
+        lines.append("")
+
+        let candidates = (cleaningPlan?.candidates ?? []).sorted { $0.size > $1.size }
+        lines.append("Bulunan öğeler (\(candidates.count)) — Toplam \(totalScanSize), Seçili \(selectedScanSize) — [x] seçili, [ ] seçimsiz")
+        for candidate in candidates {
+            let mark = candidate.isSelected ? "[x]" : "[ ]"
+            let kind = candidate.isDirectory ? "klasör" : "dosya"
+            lines.append("\(mark) \(candidate.formattedSize) | \(kind) | \(candidate.displayName) | \(ReportExporter.tildePath(candidate.path))")
+        }
+        lines.append("")
+
+        if let result = cleaningResult {
+            lines.append("Son temizlik sonucu")
+            lines.append(result.summaryLine)
+            for note in result.notes {
+                lines.append("- " + note)
+            }
+            lines.append("")
+        }
+
+        lines.append("Konum bazlı karar listesi — LİSTE: plana girdi, ATLANDI: dışarıda kaldı (neden), AYRI: tarayıcı cache")
+        lines.append(contentsOf: cleanerManager.diagnosticListing(plan: cleaningPlan))
+
+        let text = lines.joined(separator: "\n") + "\n"
+        let fileName = ReportExporter.suggestedFileName(prefix: "DustBuster_Cleanup")
+
+        ReportExporter.save(text: text, suggestedName: fileName) { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case .success(let url):
+                LogManager.shared.log("Temizlik raporu kaydedildi: \(url.lastPathComponent)", category: .audit, level: .info)
+            case .failure(let error):
+                self.restoreErrorMessage = "Rapor kaydedilemedi: \(error.localizedDescription)"
+            }
+        }
+    }
+
     func openSettings() {
         permissionManager.requestFullDiskAccess()
     }

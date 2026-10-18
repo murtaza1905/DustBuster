@@ -689,6 +689,115 @@ final class UninstallerManager {
         )
     }
 
+    // MARK: - Rapor (dışa aktarma)
+
+    /// Kullanılan arama kriterlerinin okunabilir hali.
+    func describeSearchTerms(bundleId: String?, appName: String, appURL: URL) -> [String] {
+        let terms = buildSearchTerms(bundleId: bundleId, appName: appName, appURL: appURL)
+        var lines: [String] = []
+        lines.append("Bundle ID: " + (terms.bundleIds.isEmpty ? "-" : terms.bundleIds.joined(separator: ", ")))
+        if terms.nameTokenSets.isEmpty {
+            lines.append("Ad eşleşmesi: kullanılmadı (ad genel veya 4 karakterden kısa)")
+        } else {
+            let sets = terms.nameTokenSets.map { "[" + $0.joined(separator: " ") + "]" }
+            lines.append("Ad token'ları: " + sets.joined(separator: ", "))
+        }
+        lines.append("Apple uygulaması: " + (terms.isAppleApp ? "evet" : "hayır"))
+        lines.append("Sistem konumları (/Library): " + (includeSystemLocations ? "açık" : "kapalı"))
+        lines.append("Geniş tarama: " + (includeAggressiveLocations ? "açık" : "kapalı"))
+        return lines
+    }
+
+    /// Filtresiz ham liste: ~/Library'nin standart konumlarında, ayraçlar atıldığında adında
+    /// bundle ID'yi veya uygulama adını içeren TÜM yollar. Eşleştiricinin atladıklarını görmek için.
+    func rawMentions(bundleId: String?, appName: String, appURL: URL, limit: Int = 300) -> (needles: [String], paths: [String]) {
+        let terms = buildSearchTerms(bundleId: bundleId, appName: appName, appURL: appURL)
+
+        var needles: [String] = []
+        for bid in terms.bundleIds {
+            let squashed = SearchTerms.tokens(of: bid).joined()
+            if squashed.count >= 4 && !needles.contains(squashed) { needles.append(squashed) }
+        }
+        for set in terms.nameTokenSets {
+            let squashed = set.joined()
+            if squashed.count >= 4 && !needles.contains(squashed) { needles.append(squashed) }
+            for token in set where token.count >= 5 && !SearchTerms.genericNames.contains(token) && !needles.contains(token) {
+                needles.append(token)
+            }
+        }
+        guard !needles.isEmpty else { return (needles, []) }
+
+        let locations: [(String, Int)] = [
+            ("Application Support", 3),
+            ("Caches", 2),
+            ("Preferences", 1),
+            ("Preferences/ByHost", 1),
+            ("Logs", 2),
+            ("Saved Application State", 1),
+            ("Containers", 1),
+            ("Group Containers", 1),
+            ("LaunchAgents", 1),
+            ("HTTPStorages", 1),
+            ("WebKit", 1),
+            ("Cookies", 1),
+            ("Application Scripts", 1),
+            ("Internet Plug-Ins", 1),
+            ("PreferencePanes", 1),
+            ("QuickLook", 1),
+            ("Services", 1),
+            ("Spotlight", 1),
+            ("Frameworks", 1),
+            ("Mail/Bundles", 1),
+            ("Developer", 2)
+        ]
+
+        var found: [String] = []
+        var seen: Set<String> = []
+        for (subpath, depth) in locations {
+            let dir = homeLibrary.appendingPathComponent(subpath)
+            collectMentions(at: dir, needles: needles, maxDepth: depth, currentDepth: 0, into: &found, seen: &seen, limit: limit)
+            if found.count >= limit { break }
+        }
+        return (needles, found)
+    }
+
+    private func collectMentions(
+        at dir: URL,
+        needles: [String],
+        maxDepth: Int,
+        currentDepth: Int,
+        into found: inout [String],
+        seen: inout Set<String>,
+        limit: Int
+    ) {
+        guard currentDepth < maxDepth, found.count < limit else { return }
+        guard let contents = try? fileManager.contentsOfDirectory(
+            at: dir,
+            includingPropertiesForKeys: [.isDirectoryKey, .isSymbolicLinkKey],
+            options: [.skipsHiddenFiles]
+        ) else { return }
+
+        for itemURL in contents {
+            if found.count >= limit { return }
+            if isSymlink(itemURL) { continue }
+
+            let squashedName = SearchTerms.tokens(of: itemURL.lastPathComponent).joined()
+            if needles.contains(where: { squashedName.contains($0) }) {
+                let path = itemURL.path
+                if !seen.contains(path) {
+                    seen.insert(path)
+                    found.append(path)
+                }
+                continue
+            }
+
+            let isDir = (try? itemURL.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) ?? false
+            if isDir {
+                collectMentions(at: itemURL, needles: needles, maxDepth: maxDepth, currentDepth: currentDepth + 1, into: &found, seen: &seen, limit: limit)
+            }
+        }
+    }
+
     // MARK: - Size Calculation
 
     /// Boyut hesabı. Home dışındaki yollar yalnızca uygulama paketi (/Applications/…app) veya

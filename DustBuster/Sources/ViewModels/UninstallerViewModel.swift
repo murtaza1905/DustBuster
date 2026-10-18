@@ -321,6 +321,68 @@ final class UninstallerViewModel: ObservableObject {
         }
     }
 
+    // MARK: - Rapor (.txt)
+
+    /// Bulunan öğeleri, arama kriterlerini ve filtresiz ham listeyi .txt olarak dışa aktarır.
+    func exportReport() {
+        guard let appURL else { return }
+        let bundleId: String? = bundleIdentifier.isEmpty ? nil : bundleIdentifier
+        let appName = self.appName
+        let snapshot = items
+        let manager = self.manager
+
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            var lines = ReportExporter.headerLines(title: "Uygulama Kaldırma Raporu")
+            lines.append("Uygulama: \(appName)")
+            lines.append("Bundle ID: \(bundleId ?? "-")")
+            lines.append("Yol: \(appURL.path)")
+            lines.append("")
+
+            lines.append("Arama kriterleri")
+            for line in manager.describeSearchTerms(bundleId: bundleId, appName: appName, appURL: appURL) {
+                lines.append("- " + line)
+            }
+            lines.append("")
+
+            lines.append("Bulunan öğeler (\(snapshot.count)) — [x] seçili, [ ] seçimsiz")
+            for item in snapshot {
+                let isAppBundle = item.url.standardizedFileURL.path == appURL.standardizedFileURL.path
+                let size = item.sizeBytes ?? manager.computeSizeBytes(for: item.url, isAppBundle: isAppBundle)
+                let mark = item.isSelected ? "[x]" : "[ ]"
+                let strength = item.isStrongMatch ? "GÜÇLÜ" : "ZAYIF"
+                lines.append("\(mark) \(strength) | \(item.kind.rawValue) | \(ReportExporter.formatSize(size)) | \(ReportExporter.tildePath(item.url.path))")
+            }
+            lines.append("")
+
+            let raw = manager.rawMentions(bundleId: bundleId, appName: appName, appURL: appURL)
+            let needleText = raw.needles.map { "\"\($0)\"" }.joined(separator: " / ")
+            lines.append("Ham liste — ~/Library içinde adında \(needleText) geçen tüm yollar, filtresiz (\(raw.paths.count))")
+            if raw.paths.isEmpty {
+                lines.append("(yok)")
+            } else {
+                for path in raw.paths {
+                    lines.append(ReportExporter.tildePath(path))
+                }
+            }
+
+            let text = lines.joined(separator: "\n") + "\n"
+            let safeName = appName.replacingOccurrences(of: " ", with: "")
+            let fileName = ReportExporter.suggestedFileName(prefix: "DustBuster_Uninstall_\(safeName)")
+
+            DispatchQueue.main.async {
+                ReportExporter.save(text: text, suggestedName: fileName) { result in
+                    guard let self else { return }
+                    switch result {
+                    case .success(let url):
+                        self.logManager.log("Uninstaller raporu kaydedildi: \(url.lastPathComponent)", category: .audit, level: .info)
+                    case .failure(let error):
+                        self.errorMessage = "Rapor kaydedilemedi: \(error.localizedDescription)"
+                    }
+                }
+            }
+        }
+    }
+
     // MARK: - Private
 
     private func validate(appURL url: URL) -> (name: String, bundleId: String?)? {

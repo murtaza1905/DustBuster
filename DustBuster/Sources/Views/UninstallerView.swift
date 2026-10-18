@@ -323,6 +323,15 @@ struct UninstallerView: View {
             }
             Spacer()
             Button {
+                viewModel.exportReport()
+            } label: {
+                Label("Rapor (.txt)", systemImage: "doc.text")
+            }
+            .buttonStyle(.bordered)
+            .disabled(viewModel.appURL == nil || viewModel.isScanning)
+            .help("Bulunan öğeleri, arama kriterlerini ve ham listeyi metin dosyası olarak kaydet")
+
+            Button {
                 viewModel.moveSelectedToTrash()
             } label: {
                 HStack(spacing: 6) {

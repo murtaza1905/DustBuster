@@ -106,7 +106,7 @@ struct CleanerReviewView: View {
             Button("Vazgeç", role: .cancel) { }
         }
         .alert(
-            "Geri Al Hatası",
+            "İşlem Hatası",
             isPresented: Binding(
                 get: { viewModel.restoreErrorMessage != nil },
                 set: { _ in viewModel.restoreErrorMessage = nil }
@@ -325,6 +325,15 @@ struct CleanerReviewView: View {
             .keyboardShortcut(.cancelAction)
             
             Spacer()
+
+            Button {
+                viewModel.exportCleaningReport()
+            } label: {
+                Label("Rapor (.txt)", systemImage: "doc.text")
+            }
+            .buttonStyle(.bordered)
+            .disabled(plan == nil || viewModel.isScanning)
+            .help("Tarama sonucunu, kapsamı ve konum bazlı kararları metin dosyası olarak kaydet")
 
             Button {
                 viewModel.undoLastTransaction()

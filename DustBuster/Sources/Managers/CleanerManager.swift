@@ -557,6 +557,12 @@ class CleanerManager: ObservableObject {
     /// Tüm güvenlik kurallarını uygular.
     /// Sadece gerçekten silinmesi güvenli path'ler için true döner.
     private func isSafeToDelete(path: String) -> Bool {
+        safetyVerdict(path: path) == nil
+    }
+
+    /// Güvenlik kararı: nil ise silinebilir, değilse neden silinemeyeceğini açıklayan kısa metin.
+    /// (isSafeToDelete ve rapor çıktısı aynı kaynağı kullanır.)
+    func safetyVerdict(path: String) -> String? {
         let home = NSHomeDirectory()
 
         // 1) Mutlaka whitelist içindeki köklerden biriyle başlamalı
@@ -564,33 +570,26 @@ class CleanerManager: ObservableObject {
         let isUnderAllowedBase = allowedBasePaths.contains { allowed in
             path.hasPrefix(allowed)
         }
-
-        // Gecko cache path'leri için özel kontrol
         let isGeckoCache = geckoBasePaths.contains { geckoBase in
             path.hasPrefix(geckoBase)
         }
-
-        // Safari cache path'leri için özel kontrol
         let isSafariCache = safariCachePaths.contains { safariPath in
             path.hasPrefix(safariPath)
         }
 
-        guard isUnderAllowedBase || isGeckoCache || isSafariCache else { return false }
+        guard isUnderAllowedBase || isGeckoCache || isSafariCache else {
+            return "izin verilen kökler dışında"
+        }
 
         // 2) Asla dokunulmaması gereken köklerle başlamamalı
         //    Not: Safari cache ~/Library/Caches altında, ~/Library/Safari değil
-        if forbiddenPaths.contains(where: { forbidden in path.hasPrefix(forbidden) }) {
-            // Safari cache özel durumu - ~/Library/Safari yasak ama ~/Library/Caches/com.apple.Safari izinli
-            if isSafariCache {
-                // Safari cache'i için bu kontrolü atla
-            } else {
-                return false
-            }
+        if let forbidden = forbiddenPaths.first(where: { path.hasPrefix($0) }), !isSafariCache {
+            return "yasaklı kök: \(forbidden)"
         }
 
         // 3) Kullanıcı home veya root asla silinmesin
         if path == home || path == "/" {
-            return false
+            return "home veya kök dizin"
         }
 
         // 4) Application Support içindeyse sadece dinamik tespit edilen cache köklerinin altında olmalı
@@ -599,25 +598,102 @@ class CleanerManager: ObservableObject {
                 path.hasPrefix(allowedCache)
             }
             if !isInDynamicCache {
-                return false
+                return "Application Support içinde, tespit edilen tarayıcı cache kökü değil"
             }
         }
 
         // 5) ~/Library/Caches altında history/cookies/login gibi şüpheli keyword içeriyorsa silme
         let cachesRoot = home + "/Library/Caches"
         if path.hasPrefix(cachesRoot) {
-            if sensitiveKeywords.contains(where: { keyword in
-                path.localizedCaseInsensitiveContains(keyword)
-            }) {
-                return false
+            if let keyword = sensitiveKeywords.first(where: { path.localizedCaseInsensitiveContains($0) }) {
+                return "hassas kelime: \(keyword)"
             }
         }
 
         // 6) macOS "deletable" olarak işaretlemiyorsa silme
         if !FileManager.default.isDeletableFile(atPath: path) {
-            return false
+            return "macOS silinebilir işaretlemiyor"
         }
 
-        return true
+        return nil
+    }
+
+    // MARK: - Rapor (dışa aktarma)
+
+    /// Taranan konumlar ve uygulanan kurallar.
+    func scanScopeLines() -> [String] {
+        let fm = FileManager.default
+        var lines: [String] = []
+        for base in baseAllowedPaths {
+            lines.append("- \(base)" + (fm.fileExists(atPath: base) ? "" : " (yok)"))
+        }
+        lines.append("- Chromium cache kökleri, Application Support içinde tespit edilen (\(dynamicBrowserCachePaths.count)):")
+        for path in dynamicBrowserCachePaths {
+            lines.append("    \(path)")
+        }
+        let gecko = geckoBasePaths.filter { fm.fileExists(atPath: $0) }
+        lines.append("- Gecko profil kökleri, mevcut (\(gecko.count)):")
+        for path in gecko {
+            lines.append("    \(path)")
+        }
+        let safari = safariCachePaths.filter { fm.fileExists(atPath: $0) }
+        lines.append("- Safari cache yolları, mevcut (\(safari.count)):")
+        for path in safari {
+            lines.append("    \(path)")
+        }
+        lines.append("- Hassas anahtar kelimeler (~/Library/Caches altında engeller): " + sensitiveKeywords.joined(separator: ", "))
+        lines.append("- Yasaklı kökler: " + forbiddenPaths.joined(separator: ", "))
+        return lines
+    }
+
+    /// Her tarama kökünün üst düzey girdileri ve verilen karar (listelendi / atlandı + neden).
+    /// Eşleştiricinin neyi neden dışarıda bıraktığını görmek için.
+    func diagnosticListing(plan: CleaningPlan?) -> [String] {
+        let fm = FileManager.default
+        var lines: [String] = []
+
+        var planSizes: [String: Int64] = [:]
+        for candidate in plan?.candidates ?? [] {
+            planSizes[candidate.path] = candidate.size
+        }
+
+        for basePath in baseAllowedPaths {
+            guard fm.fileExists(atPath: basePath) else {
+                lines.append("\(basePath): yok")
+                lines.append("")
+                continue
+            }
+            guard let names = try? fm.contentsOfDirectory(atPath: basePath) else {
+                lines.append("\(basePath): okunamadı (Tam Disk Erişimi?)")
+                lines.append("")
+                continue
+            }
+
+            let visible = names.filter { !$0.hasPrefix(".") }
+                .sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
+            lines.append("\(basePath) — üst düzey girdiler (\(visible.count))")
+
+            for name in visible {
+                let path = basePath + "/" + name
+                let isBrowserRoot = safariCachePaths.contains { path.hasPrefix($0) || $0.hasPrefix(path) }
+                    || geckoBasePaths.contains { path.hasPrefix($0) || $0.hasPrefix(path) }
+                if isBrowserRoot {
+                    lines.append("AYRI    | tarayıcı cache, kendi bölümünde ele alındı | \(name)")
+                    continue
+                }
+                if let reason = safetyVerdict(path: path) {
+                    lines.append("ATLANDI | \(reason) | \(name)")
+                    continue
+                }
+                if let size = planSizes[path] {
+                    lines.append("LİSTE   | \(ByteCountFormatter.string(fromByteCount: size, countStyle: .file)) | \(name)")
+                } else {
+                    lines.append("ATLANDI | boyut 0, symlink veya kimlik alınamadı | \(name)")
+                }
+            }
+            lines.append("")
+        }
+
+        return lines
     }
 }

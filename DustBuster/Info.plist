@@ -4,10 +4,10 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string>DustBuster</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
-	<key>CFBundleIconFile</key>
-	<string></string>
 	<key>CFBundleIconName</key>
 	<string>AppIcon</string>
 	<key>CFBundleIdentifier</key>
@@ -22,14 +22,16 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.utilities</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
 	<key>NSAccentColorName</key>
 	<string>AccentColor</string>
 	<key>NSAppleEventsUsageDescription</key>
-	<string>DustBuster, uygulamalari ve kalinti dosyalarini guvenli sekilde Cop Kutusu'na tasimak icin Finder'a erisim ister.</string>
+	<string>DustBuster, uygulamaları ve kalıntı dosyalarını güvenli şekilde Çöp Kutusu'na taşımak için Finder'a erişim ister.</string>
 	<key>NSHumanReadableCopyright</key>
-	<string></string>
+	<string>Copyright © 2025–2026 Murat Onurcu. GPL-3.0.</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 </dict>

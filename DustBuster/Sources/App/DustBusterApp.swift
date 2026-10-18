@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct CleanAppApp: App {
+struct DustBusterApp: App {
     @StateObject private var permissionVM = AppPermissionViewModel()
     
     var body: some Scene {

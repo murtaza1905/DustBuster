@@ -1,4 +1,4 @@
-// Sources/ContentView.swift
+// Sources/App/ContentView.swift
 import SwiftUI
 
 struct ContentView: View {

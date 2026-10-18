@@ -1,36 +1,80 @@
 # DustBuster
 
-A safe system cleaner for macOS.
+A safe, privacy-first system cleaner for macOS. Built with SwiftUI.
 
 ## Features
 
-- **Browser Cache Cleaning** - Chrome, Safari, Firefox, Edge, Brave, Opera, Arc and other Chromium-based browsers
-- **Large File Detection** - Find and clean files over 250 MB
-- **App Uninstaller** - Remove apps and all their leftover files
-- **Running Apps Manager** - Quit or force quit applications
-- **System Monitor** - Track RAM, Disk and CPU usage
+- **Browser Cache Cleaning** – Safari, Firefox-family (Firefox, LibreWolf, Waterfox, Pale Moon) and every Chromium-based browser found on the system (Chrome, Brave, Edge, Opera, Vivaldi, Arc, …). History, cookies, passwords and bookmarks are never touched.
+- **System & App Caches / Logs** – `~/Library/Caches`, `~/Library/Logs`, `/private/var/log`
+- **Large File Finder** – files over 250 MB in Desktop, Documents, Downloads, Movies, Music, Pictures
+- **App Uninstaller** – drop a `.app`, review the bundle plus its `~/Library` leftovers, move them to Trash
+- **Running Apps** – quit or force-quit third-party apps
+- **System Monitor** – RAM, disk and CPU usage
+- **Undo** – everything goes to the Trash; the last cleanup and the last 50 trashed items can be restored from inside the app
 
 ## Requirements
 
-- macOS 26 (Tahoe) or later
-- Full Disk Access permission
+- macOS 14 (Sonoma) or later — Liquid Glass UI on macOS 26 (Tahoe), material fallback on older versions
+- Full Disk Access (System Settings › Privacy & Security › Full Disk Access)
+- Universal binary: Apple Silicon and Intel
 
-## Installation
+## Install
 
-1. Download the DMG from [Releases](https://github.com/murtaza1905/DustBuster/releases)
-2. Drag DustBuster.app to Applications folder
-3. Grant Full Disk Access in System Settings > Privacy & Security > Full Disk Access
+### Option A — Download
+
+1. Download the latest `.dmg` from [Releases](https://github.com/murtaza1905/DustBuster/releases)
+2. Drag **DustBuster.app** to **Applications**
+3. Grant Full Disk Access, then switch back to the app
+
+### Option B — Build from source (one command)
+
+Requires Xcode. No Homebrew needed — the script downloads XcodeGen on its own if it is missing.
+
+```bash
+cd ~/Desktop
+git clone https://github.com/murtaza1905/DustBuster.git
+cd ~/Desktop/DustBuster
+./scripts/install.sh
+```
+
+The script generates the Xcode project, builds a universal Release binary, ad-hoc signs it, installs it to `/Applications` and launches it.
+
+Other scripts:
+
+| Script | Purpose |
+|---|---|
+| `./scripts/install.sh` | Build + install to `/Applications` + launch |
+| `./scripts/uninstall.sh` | Remove the app and its preferences |
+| `./scripts/make-dmg.sh` | Build a universal `.dmg` into `dist/` |
+
+To open the project in Xcode instead: run `./scripts/install.sh` once (or `xcodegen generate`), then open `DustBuster.xcodeproj`.
+
+## Project layout
+
+```
+DustBuster/
+├── Info.plist
+├── Resources/Assets.xcassets      # App icon, accent color
+└── Sources/
+    ├── App/                       # App entry, navigation
+    ├── Managers/                  # Cleaning, uninstall, permissions, logging, monitoring
+    ├── Models/
+    ├── ViewModels/
+    └── Views/
+project.yml                        # XcodeGen project definition
+scripts/                           # install / uninstall / make-dmg
+```
 
 ## Privacy
 
-- All operations run locally on your device
-- No data is sent externally
-- Browser history, passwords and bookmarks are never touched
+- All operations run locally; nothing is sent anywhere
+- Logs stay on the device (os.log) and are sanitized of usernames, hostnames and home paths; export is manual only
+- Files are moved to the Trash, never deleted directly
 
 ## License
 
-GPL-3.0 License
+[GPL-3.0](LICENSE)
 
 ## Developer
 
-Murat Onurcu - muratonurcu@outlook.com
+Murat Onurcu – muratonurcu@outlook.com

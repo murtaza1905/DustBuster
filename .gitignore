@@ -1,6 +1,23 @@
+# macOS
 .DS_Store
-*.xcuserstate
+
+# Xcode — proje dosyası project.yml'den XcodeGen ile üretilir
+*.xcodeproj
+*.xcworkspace
 xcuserdata/
+*.xcuserstate
 DerivedData/
+
+# Derleme çıktıları
 build/
+*.log
+dist/
+*.dmg
+*.app
+
+# Yerel araçlar (install.sh'ın indirdiği XcodeGen)
+.tools/
+
+# Eski snapshot/rapor dosyaları
+*.zip
 *.moved-aside

@@ -1,0 +1,42 @@
+name: DustBuster
+
+options:
+  bundleIdPrefix: com.muratonurcu
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+  generateEmptySchemes: false
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "1.1.0"
+    CURRENT_PROJECT_VERSION: "2"
+
+targets:
+  DustBuster:
+    type: application
+    platform: macOS
+    deploymentTarget: "14.0"
+    sources:
+      - path: DustBuster/Sources
+      - path: DustBuster/Resources
+    settings:
+      base:
+        PRODUCT_NAME: DustBuster
+        PRODUCT_BUNDLE_IDENTIFIER: com.muratonurcu.DustBuster
+        GENERATE_INFOPLIST_FILE: "NO"
+        INFOPLIST_FILE: DustBuster/Info.plist
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        ENABLE_APP_SANDBOX: "NO"
+        ENABLE_HARDENED_RUNTIME: "YES"
+        CODE_SIGN_STYLE: Automatic
+        COMBINE_HIDPI_IMAGES: "YES"
+        SWIFT_EMIT_LOC_STRINGS: "YES"
+        DEAD_CODE_STRIPPING: "YES"
+      configs:
+        Release:
+          SWIFT_OPTIMIZATION_LEVEL: "-O"
+    scheme:
+      gatherCoverageData: false

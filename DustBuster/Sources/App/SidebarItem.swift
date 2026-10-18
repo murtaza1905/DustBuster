@@ -1,4 +1,4 @@
-// Sources/Views/SidebarItem.swift
+// Sources/App/SidebarItem.swift
 import Foundation
 
 enum SidebarItem: Hashable {

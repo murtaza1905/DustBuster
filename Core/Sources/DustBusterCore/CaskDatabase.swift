@@ -74,6 +74,10 @@ public final class CaskDatabase {
     private let byApp: [String: [Int]]
     private let byIdentifier: [String: [Int]]
     private let byName: [String: [Int]]
+    /// Joker içermeyen "~/…" kalıpları → sahibi cask'ler (başka uygulamaya ait dosyaları tanımak için)
+    private let ownersByExactPath: [String: [Int]]
+    /// Jokerli "~/…" kalıpları, jokerden önceki üst dizine göre gruplanmış
+    private let globOwnersByParent: [String: [(pattern: String, index: Int)]]
 
     public init(entries: [Entry], generated: String = "", source: String = "") {
         self.entries = entries
@@ -83,14 +87,55 @@ public final class CaskDatabase {
         var byApp: [String: [Int]] = [:]
         var byId: [String: [Int]] = [:]
         var byName: [String: [Int]] = [:]
+        var owners: [String: [Int]] = [:]
+        var globOwners: [String: [(pattern: String, index: Int)]] = [:]
         for (i, e) in entries.enumerated() {
             for app in e.apps { byApp[app.lowercased(), default: []].append(i) }
-            for id in e.quitIds + e.pkgutil + e.launchctl { byId[id.lowercased(), default: []].append(i) }
+            // `quit:` kimlikleri kullanılmaz: başka uygulamaları da (ör. bir eklenti kurucusunun kapattığı
+            // Chrome'u) kapsar; yalnızca paket kimlikleri ve launchd etiketleri uygulamayı tanımlar
+            for id in e.pkgutil + e.launchctl { byId[id.lowercased(), default: []].append(i) }
             for n in e.names { byName[CaskDatabase.squash(n), default: []].append(i) }
+            for p in e.leftoverPatterns where p.hasPrefix("~/") {
+                let lower = p.lowercased()
+                if Glob.hasWildcard(lower) {
+                    // Jokerden önceki sabit üst dizin: "~/library/preferences/notion.mail.id.*" → "~/library/preferences"
+                    let components = lower.split(separator: "/", omittingEmptySubsequences: false).map(String.init)
+                    guard let firstWild = components.firstIndex(where: Glob.hasWildcard), firstWild > 0 else { continue }
+                    let parent = components[0..<firstWild].joined(separator: "/")
+                    globOwners[parent, default: []].append((pattern: lower, index: i))
+                } else {
+                    owners[lower, default: []].append(i)
+                }
+            }
         }
         self.byApp = byApp
         self.byIdentifier = byId
         self.byName = byName
+        self.ownersByExactPath = owners
+        self.globOwnersByParent = globOwners
+    }
+
+    /// Yol, `excluding` dışındaki bir cask'in zap listesinde birebir geçiyorsa o cask'lerin token'larını döner.
+    /// "Notion Calendar" klasörünün Notion'a değil notion-calendar'a ait olduğunu böyle anlarız.
+    public func otherOwners(ofPath path: String, home: String, excluding tokens: Set<String>) -> [String] {
+        guard path.hasPrefix(home + "/") else { return [] }
+        let key = ("~" + String(path.dropFirst(home.count))).lowercased()
+        var indices: [Int] = ownersByExactPath[key] ?? []
+
+        // Jokerli kalıplar: yolun üst dizinlerinden birine kayıtlı kalıplar denenir
+        var parent = key
+        while let slash = parent.lastIndex(of: "/") {
+            parent = String(parent[..<slash])
+            if let candidates = globOwnersByParent[parent] {
+                for candidate in candidates where Glob.matches(candidate.pattern, key) {
+                    indices.append(candidate.index)
+                }
+            }
+            if parent == "~" { break }
+        }
+
+        var seen: Set<Int> = []
+        return indices.filter { seen.insert($0).inserted }.map { entries[$0].token }.filter { !tokens.contains($0) }
     }
 
     public convenience init(jsonData: Data) throws {
@@ -111,8 +156,9 @@ public final class CaskDatabase {
         SearchTerms.tokens(of: s).joined()
     }
 
-    /// Uygulamayı cask'lere eşler. Öncelik: .app dosya adı → bundle ID (yalnızca tek cask
-    /// talip ise) → görünen ad. Birden fazla cask aynı .app adını taşıyorsa (sürümler) birleşim alınır.
+    /// Uygulamayı cask'lere eşler. Öncelik: .app dosya adı → bundle ID (pkgutil/launchctl kaydı,
+    /// yalnızca tek cask talip ise) → görünen ad. Birden fazla cask aynı .app adını taşıyorsa
+    /// (sürümler) en özgül olanlar alınır.
     public func lookup(identity: AppIdentity) -> [Entry] {
         var indices: [Int] = []
 

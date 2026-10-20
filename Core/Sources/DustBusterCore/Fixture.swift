@@ -180,7 +180,8 @@ public struct Fixture: Codable, Equatable {
 
     /// Gerçek bir taramanın sonucundan "observed" durumunda bir vaka üretir.
     public static func capture(name: String, home: String, identity: AppIdentity, options: ScanOptions,
-                               result: ScanResult, rawMentions: [String], isDirectory: (String) -> Bool) -> Fixture {
+                               result: ScanResult, rawMentions: [String], isDirectory: (String) -> Bool,
+                               isEmptyDirectory: (String) -> Bool = { _ in false }) -> Fixture {
         var fixture = Fixture(
             name: name,
             status: "observed",
@@ -201,12 +202,19 @@ public struct Fixture: Codable, Equatable {
         fixture.identity.appPath = anonymize(identity.appPath)
 
         var tree: Set<String> = []
-        for f in result.findings where f.source != .appBundle {
-            tree.insert(anonymize(f.path) + (isDirectory(f.path) ? "/" : ""))
+        var empty: Set<String> = []
+        func place(_ path: String) {
+            if isDirectory(path) {
+                if isEmptyDirectory(path) { empty.insert(anonymize(path) + "/") } else { tree.insert(anonymize(path) + "/") }
+            } else {
+                tree.insert(anonymize(path))
+            }
         }
-        for p in rawMentions { tree.insert(anonymize(p) + (isDirectory(p) ? "/" : "")) }
-        for r in result.rejected { tree.insert(anonymize(r.path) + (isDirectory(r.path) ? "/" : "")) }
+        for f in result.findings where f.source != .appBundle { place(f.path) }
+        for p in rawMentions { place(p) }
+        for r in result.rejected { place(r.path) }
         fixture.tree = tree.sorted()
+        fixture.emptyDirs = empty.sorted()
         fixture.expect = Expectation(
             strong: result.findings.filter { $0.strength == .strong && $0.source != .appBundle }.map { anonymize($0.path) },
             weak: result.findings.filter { $0.strength == .weak }.map { anonymize($0.path) },

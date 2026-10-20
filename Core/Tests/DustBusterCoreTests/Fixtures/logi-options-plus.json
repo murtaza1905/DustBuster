@@ -4,7 +4,10 @@
   ],
   "expect": {
     "absent": [
+      "/Library/Application Support/Logi",
+      "/Library/Application Support/Logitech.localized/LogiOptionsPlus",
       "~/Library/Application Support/Logic",
+      "~/Library/Application Support/Logitech/Logitech Options",
       "~/Library/Caches/com.apple.logic10",
       "~/Library/Caches/com.logi.optionsplus.installer",
       "~/Library/Preferences/com.apple.loginwindow.plist"
@@ -13,10 +16,16 @@
       "logi-options+"
     ],
     "strong": [
+      "/Applications/Utilities/Logi Options+ Driver Installer.bundle",
       "~/Library/Application Support/Logi",
       "~/Library/Application Support/LogiOptionsPlus",
+      "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.logi.optionsplus.driverhost.sfl4",
       "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.logi.optionsplus.sfl4",
+      "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.logi.pluginservice.sfl4",
+      "~/Library/HTTPStorages/LogiPluginServiceNative",
       "~/Library/Logs/xlog_logitech",
+      "~/Library/Preferences/com.logi.cp-dev-mgr.plist",
+      "~/Library/Preferences/com.logi.lps.settings.plist",
       "~/Library/Preferences/com.logi.optionsplus.driverhost.plist",
       "~/Library/Preferences/com.logi.optionsplus.plist",
       "~/Library/Preferences/com.logi.pluginservice.plist"
@@ -30,13 +39,15 @@
     "appGroups": [],
     "appPath": "/Applications/logioptionsplus.app",
     "bundleId": "com.logi.optionsplus",
-    "embeddedBundleIds": [],
-    "executableName": null,
+    "embeddedBundleIds": [
+      "com.logi.optionsplus.helper"
+    ],
+    "executableName": "logioptionsplus",
     "name": "Logi Options+",
     "teamId": null
   },
-  "name": "Logi Options+ — Homebrew'un bildiği gizli kalıntılar (xlog_logitech, pluginservice), 'logi' ⊂ 'login/logic' tuzağı",
-  "notes": "Rapor 2026-10-20. Son Belgeler kaydı (sfl4) geniş tarama kapalıyken yalnızca Homebrew verisiyle bulunur.",
+  "name": "Logi Options+ — Homebrew'un bildiği gizli kalıntılar, sürücü kurucu .bundle, 'logi' ⊂ 'login/logic' tuzağı",
+  "notes": "Rapor 2026-10-20 build 7. /Library yolları sistem taraması kapalıyken listelenmez; 'Logitech Options' eski uygulama (logitech-options cask) ayrı tutulur.",
   "options": {
     "includeAggressiveLocations": false,
     "includeSystemLocations": false,
@@ -45,14 +56,23 @@
   "schema": 1,
   "status": "curated",
   "tree": [
+    "/Applications/Utilities/Logi Options+ Driver Installer.bundle/",
+    "/Library/Application Support/Logi/",
+    "/Library/Application Support/Logitech.localized/LogiOptionsPlus/",
     "~/Library/Application Support/CrashReporter/logioptionsplus_agent_7214F14B-116C-5737-A4C1-6F18619B1E3F.plist",
     "~/Library/Application Support/Logi/",
     "~/Library/Application Support/LogiOptionsPlus/",
     "~/Library/Application Support/Logic/",
+    "~/Library/Application Support/Logitech/Logitech Options/",
+    "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.logi.optionsplus.driverhost.sfl4",
     "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.logi.optionsplus.sfl4",
+    "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.logi.pluginservice.sfl4",
     "~/Library/Caches/com.apple.logic10/",
+    "~/Library/HTTPStorages/LogiPluginServiceNative/",
     "~/Library/Logs/xlog_logitech/",
     "~/Library/Preferences/com.apple.loginwindow.plist",
+    "~/Library/Preferences/com.logi.cp-dev-mgr.plist",
+    "~/Library/Preferences/com.logi.lps.settings.plist",
     "~/Library/Preferences/com.logi.optionsplus.driverhost.plist",
     "~/Library/Preferences/com.logi.optionsplus.plist",
     "~/Library/Preferences/com.logi.pluginservice.plist"

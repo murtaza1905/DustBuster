@@ -115,7 +115,18 @@ public final class LeftoverScanner {
         if deep.count > options.maxReasonableResults {
             dropped = deep.count
         } else {
-            for f in deep { collected.add(f) }
+            let matched = Set(tokens)
+            for f in deep {
+                // Ad benzerliğiyle bulunan yol başka bir uygulamanın Homebrew kaydında geçiyorsa o uygulamaya aittir
+                if f.strength == .weak, options.useCaskDatabase, let db = caskDatabase {
+                    let owners = db.otherOwners(ofPath: f.path, home: home, excluding: matched)
+                    if !owners.isEmpty {
+                        collected.reject(f.path, "başka uygulamaya ait (Homebrew: \(owners.joined(separator: ", ")))")
+                        continue
+                    }
+                }
+                collected.add(f)
+            }
         }
         return collected.result(droppedDeep: dropped, caskTokens: tokens)
     }
@@ -223,7 +234,7 @@ public final class LeftoverScanner {
     /// Diskte var, symlink değil ve (dizinse) boş değil.
     private func isUsable(_ path: String) -> Bool {
         guard fs.exists(path), !fs.isSymlink(path) else { return false }
-        if fs.isDirectory(path), let names = fs.contents(ofDirectory: path), names.isEmpty { return false }
+        if fs.isEffectivelyEmptyDirectory(path) { return false }
         return true
     }
 
@@ -269,7 +280,8 @@ public final class LeftoverScanner {
         guard !entries.isEmpty else { return [] }
         let appPath = identity.appPath
         for hit in db.expand(entries: entries, home: home, fs: fs) {
-            if hit.path == appPath { continue }
+            // Uygulamanın kendisi ve içi ayrı ele alınır
+            if hit.path == appPath || hit.path.hasPrefix(appPath + "/") { continue }
             switch PathClassifier.admit(path: hit.path, home: home, options: options) {
             case .accepted(let strength, let note):
                 guard isUsable(hit.path) else { collector.reject(hit.path, "boş klasör veya symlink"); continue }

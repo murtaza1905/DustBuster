@@ -141,7 +141,11 @@ public enum PathClassifier {
             return .accepted(.weak, note: "tüm kullanıcılara ortak — kontrol et")
         }
         if path.hasPrefix("/Applications/") || path.hasPrefix(home + "/Applications/") {
-            return .rejected(reason: "uygulama paketi (ayrı ele alınır)")
+            // Yalnızca veritabanı buraya yol önerir (ör. sürücü kurucu .bundle); .app paketleri kabul edilmez
+            if path.lowercased().hasSuffix(".app") {
+                return .rejected(reason: "başka bir uygulama paketi")
+            }
+            return .accepted(.strong, note: "Uygulamalar klasöründe ek bileşen")
         }
         if path.hasPrefix(home + "/") {
             return .rejected(reason: "kullanıcı verisi (Belgeler, Masaüstü vb.)")

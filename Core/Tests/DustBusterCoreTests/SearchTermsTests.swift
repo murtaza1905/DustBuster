@@ -119,5 +119,29 @@ final class SearchTermsTests: XCTestCase {
         XCTAssertEqual(PathClassifier.admit(path: "\(home)/.zoomus", home: home, options: opts), .accepted(.weak, note: "ev dizininde gizli klasör — kontrol et"))
         XCTAssertEqual(PathClassifier.admit(path: "/Library/Logs/x", home: home, options: opts), .rejected(reason: "sistem konumu (/Library) — 'Sistem dosyalarını da tara' kapalı"))
         XCTAssertEqual(PathClassifier.admit(path: "/Library/Logs/x", home: home, options: ScanOptions(includeSystemLocations: true)), .accepted(.strong, note: "admin yetkisi gerekebilir"))
+        XCTAssertEqual(PathClassifier.admit(path: "/Applications/Utilities/Logi Options+ Driver Installer.bundle", home: home, options: opts), .accepted(.strong, note: "Uygulamalar klasöründe ek bileşen"))
+        XCTAssertEqual(PathClassifier.admit(path: "/Applications/Other.app", home: home, options: opts), .rejected(reason: "başka bir uygulama paketi"))
+    }
+
+    func testOtherOwnersFromCaskDatabase() throws {
+        let db = try XCTUnwrap(CaskDatabase.bundled())
+        let home = "/Users/test"
+        XCTAssertEqual(db.otherOwners(ofPath: "\(home)/Library/Application Support/Notion Calendar", home: home, excluding: ["notion"]), ["notion-calendar"])
+        XCTAssertEqual(db.otherOwners(ofPath: "\(home)/Library/Preferences/notion.mail.id.plist", home: home, excluding: ["notion"]), ["notion-mail"])
+        XCTAssertTrue(db.otherOwners(ofPath: "\(home)/Library/Caches/notion-updater", home: home, excluding: ["notion"]).isEmpty, "aşırı geniş kalıplar sahiplik kanıtı sayılmaz")
+        XCTAssertTrue(db.otherOwners(ofPath: "\(home)/Library/Application Support/Notion", home: home, excluding: ["notion"]).isEmpty)
+    }
+
+    func testEffectivelyEmptyDirectory() {
+        let fs = VirtualFileSystem(paths: [
+            "/x/onlyEmptySubdirs/a/b/",
+            "/x/onlyEmptySubdirs/c/",
+            "/x/hasFile/a/file.txt",
+            "/x/empty/"
+        ])
+        XCTAssertTrue(fs.isEffectivelyEmptyDirectory("/x/onlyEmptySubdirs"))
+        XCTAssertTrue(fs.isEffectivelyEmptyDirectory("/x/empty"))
+        XCTAssertFalse(fs.isEffectivelyEmptyDirectory("/x/hasFile"))
+        XCTAssertFalse(fs.isEffectivelyEmptyDirectory("/x/hasFile/a/file.txt"))
     }
 }

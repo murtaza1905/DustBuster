@@ -41,6 +41,13 @@ public enum Glob {
         let components = pat.split(separator: "/", omittingEmptySubsequences: true).map(String.init)
         guard !components.isEmpty else { return [] }
 
+        // "…/Caches/*" gibi son bileşeni neredeyse salt joker olan kalıplar bir klasörün tamamını
+        // sahiplenir; veritabanı temizliği bunları eler, burada da ikinci bir emniyet.
+        if let last = components.last, hasWildcard(last) {
+            let literal = last.filter { $0 != "*" && $0 != "?" }
+            if literal.count < 3 { return [] }
+        }
+
         if !components.contains(where: hasWildcard) {
             return fs.exists(pat) ? [pat] : []
         }

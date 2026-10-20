@@ -1,0 +1,38 @@
+{
+  "emptyDirs": [],
+  "expect": {
+    "absent": [
+      "~/Library/Caches/com.apple.appstore",
+      "~/Library/Preferences/com.apple.panel.plist"
+    ],
+    "caskTokens": [],
+    "strong": [
+      "~/Library/Preferences/com.panelguard.app.plist"
+    ],
+    "weak": []
+  },
+  "home": "/Users/test",
+  "identity": {
+    "appGroups": [],
+    "appPath": "/Applications/PanelGuard.app",
+    "bundleId": "com.panelguard.app",
+    "embeddedBundleIds": [],
+    "executableName": "PanelGuard",
+    "name": "PanelGuard",
+    "teamId": null
+  },
+  "name": "PanelGuard — küçük yerel uygulama, yalnızca tercih dosyası",
+  "notes": "Rapor 2026-10-20 build 7.",
+  "options": {
+    "includeAggressiveLocations": false,
+    "includeSystemLocations": false,
+    "useCaskDatabase": true
+  },
+  "schema": 1,
+  "status": "curated",
+  "tree": [
+    "~/Library/Caches/com.apple.appstore/",
+    "~/Library/Preferences/com.apple.panel.plist",
+    "~/Library/Preferences/com.panelguard.app.plist"
+  ]
+}

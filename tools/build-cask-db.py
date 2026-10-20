@@ -176,10 +176,46 @@ def flatten_strings(v):
     return []
 
 
+STANDARD_LIBRARY_DIRS = {
+    "application scripts", "application support", "caches", "containers", "cookies",
+    "group containers", "httpstorages", "launchagents", "launchdaemons", "logs",
+    "preferences", "preferencepanes", "privilegedhelpertools", "saved application state",
+    "webkit", "frameworks", "internet plug-ins", "services", "spotlight", "quicklook",
+    "byhost", "diagnosticreports", "crashreporter",
+}
+
+
 def clean_path(p):
     p = re.sub(r"#\{[^}]*\}", "*", p)
     p = p.replace("**", "*")
-    return p.strip()
+    p = p.strip()
+    # "~/Library/Caches/*" gibi son bileşeni salt joker olan kalıplar tehlikelidir:
+    # standart bir Library klasörünün altındaysa atılır, değilse üst klasörün kendisine indirgenir
+    # ("~/Library/Logs/Company Portal/*" → "~/Library/Logs/Company Portal").
+    if not (p.startswith("/") or p.startswith("~")):
+        return ""
+    comps = [c for c in p.split("/") if c]
+    if comps:
+        last = comps[-1]
+        literal = re.sub(r"[*?]", "", last)
+        # "*.plist", "*.savedState" gibi yalnızca uzantıyla ayırt edilen kalıplar bir klasörün tamamını
+        # sahiplenir; "*.com.microsoft.teams" (takım-ID öneki) veya "*.ZoomClient3rd" gibi özgül olanlar kalır
+        if last[:1] in "*?":
+            rest = last.lstrip("*?")
+            ext = rest.split(".")[-1].lower() if "." in rest else ""
+            generic_ext = {"plist", "savedstate", "sfl", "sfl2", "sfl3", "sfl4", "log", "txt", "json", "xml", "db",
+                           "sqlite", "dat", "cache", "lock", "pid", "ips", "diag", "crash", "bin", "app", "bundle",
+                           "zip", "dmg", "pkg", "tmp", "old", "bak"}
+            if rest.count(".") < 2 and (len(rest) < 8 or ext in generic_ext):
+                return ""
+        if ("*" in last or "?" in last) and len(literal) < 3:
+            parent_comps = comps[:-1]
+            parent_name = parent_comps[-1].lower() if parent_comps else ""
+            if not parent_comps or parent_name in STANDARD_LIBRARY_DIRS or parent_name in ("library", "~", "users", "shared"):
+                return ""
+            prefix = "/" if p.startswith("/") else ""
+            return prefix + "/".join(parent_comps)
+    return p
 
 
 STANZA_RE = re.compile(r"(?m)^[ \t]*(zap|uninstall)[ \t]+")
@@ -196,7 +232,7 @@ def parse_cask(text):
     names = [n for n in NAME_RE.findall(text)]
     apps = []
     for a in APP_RE.findall(text):
-        a = clean_path(a)
+        a = re.sub(r"#\{[^}]*\}", "*", a).strip()
         base = a.split("/")[-1]
         if base and base not in apps:
             apps.append(base)

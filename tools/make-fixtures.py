@@ -129,28 +129,37 @@ logi_strong = [
     "~/Library/Preferences/com.logi.optionsplus.driverhost.plist",
     "~/Library/Preferences/com.logi.optionsplus.plist",
     "~/Library/Preferences/com.logi.pluginservice.plist",
+    "~/Library/Preferences/com.logi.cp-dev-mgr.plist",
+    "~/Library/Preferences/com.logi.lps.settings.plist",
     "~/Library/Application Support/LogiOptionsPlus/",
     "~/Library/Application Support/Logi/",
     "~/Library/Logs/xlog_logitech/",
+    "~/Library/HTTPStorages/LogiPluginServiceNative/",
+    "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.logi.optionsplus.sfl4",
+    "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.logi.optionsplus.driverhost.sfl4",
+    "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.logi.pluginservice.sfl4",
+    "/Applications/Utilities/Logi Options+ Driver Installer.bundle/",
 ]
 logi_weak = ["~/Library/Application Support/CrashReporter/logioptionsplus_agent_7214F14B-116C-5737-A4C1-6F18619B1E3F.plist"]
 logi_empty = ["~/Library/Caches/com.logi.optionsplus.installer/"]
-logi_strong.append("~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.logi.optionsplus.sfl4")
 logi_absent = [
     "~/Library/Preferences/com.apple.loginwindow.plist",
     "~/Library/Application Support/Logic/",
     "~/Library/Caches/com.apple.logic10/",
+    "/Library/Application Support/Logi/",
+    "/Library/Application Support/Logitech.localized/LogiOptionsPlus/",
+    "~/Library/Application Support/Logitech/Logitech Options/",
 ] + logi_empty
 fixture(
-    "logi-options-plus.json", "Logi Options+ — Homebrew'un bildiği gizli kalıntılar (xlog_logitech, pluginservice), 'logi' ⊂ 'login/logic' tuzağı",
-    identity("Logi Options+", "com.logi.optionsplus", "/Applications/logioptionsplus.app"),
+    "logi-options-plus.json", "Logi Options+ — Homebrew'un bildiği gizli kalıntılar, sürücü kurucu .bundle, 'logi' ⊂ 'login/logic' tuzağı",
+    identity("Logi Options+", "com.logi.optionsplus", "/Applications/logioptionsplus.app", "logioptionsplus", embedded=["com.logi.optionsplus.helper"]),
     tree=logi_strong + logi_weak + [p for p in logi_absent if p not in logi_empty],
     strong=[p.rstrip("/") for p in logi_strong],
     weak=logi_weak,
     absent=[p.rstrip("/") for p in logi_absent],
     empty=logi_empty,
     casks=["logi-options+"],
-    notes="Rapor 2026-10-20. Son Belgeler kaydı (sfl4) geniş tarama kapalıyken yalnızca Homebrew verisiyle bulunur.",
+    notes="Rapor 2026-10-20 build 7. /Library yolları sistem taraması kapalıyken listelenmez; 'Logitech Options' eski uygulama (logitech-options cask) ayrı tutulur.",
 )
 
 # ---------------------------------------------------------------- PdfCraft / ArtCraft (aynı geliştirici)
@@ -197,6 +206,47 @@ fixture(
     absent=["~/Library/Preferences/com.apple.Accessibility.plist", "~/Library/Preferences/com.apple.AccessibilityHearingNearby.plist",
             "~/Library/Caches/com.apple.appstore", "~/Library/Application Support/App Store", "~/Library/Caches/com.apple.appstoreagent"],
     notes="Rapor 2026-10-18.",
+)
+
+# ---------------------------------------------------------------- Notion (Electron; kardeş uygulamalar Notion Calendar / Notion Mail)
+notion_strong = [
+    "~/Library/Preferences/notion.id.plist",
+    "~/Library/Preferences/ByHost/notion.id.ShipIt.7214F14B-116C-5737-A4C1-6F18619B1E3F.plist",
+    "~/Library/Application Support/Notion/",
+    "~/Library/Application Support/Caches/notion-updater/",
+    "~/Library/Caches/notion.id/",
+    "~/Library/Caches/notion.id.ShipIt/",
+    "~/Library/Logs/Notion/",
+    "~/Library/HTTPStorages/notion.id/",
+    "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/notion.id.sfl4",
+]
+notion_weak = ["~/Library/Caches/notion-updater/"]
+notion_absent = [
+    "~/Library/Application Support/Notion Calendar/",
+    "~/Library/Application Support/Notion Mail/",
+    "~/Library/Logs/Notion Mail/",
+    "~/Library/Preferences/com.cron.electron.plist",
+    "~/Library/Preferences/notion.mail.id.plist",
+]
+fixture(
+    "notion.json", "Notion — Electron güncelleyici cache'i zayıf; Notion Calendar/Mail başka uygulama (Homebrew negatif kanıt)",
+    identity("Notion", "notion.id", "/Applications/Notion.app", "Notion", embedded=["notion.id.helper"]),
+    tree=notion_strong + notion_weak + notion_absent,
+    strong=[p.rstrip("/") for p in notion_strong],
+    weak=[p.rstrip("/") for p in notion_weak],
+    absent=[p.rstrip("/") for p in notion_absent],
+    casks=["notion"],
+    notes="Rapor 2026-10-20 build 7. 'Notion Calendar' ad benzerliğiyle zayıf çıkardı; notion-calendar cask'i sahiplendiği için elenir.",
+)
+
+# ---------------------------------------------------------------- PanelGuard (kendi uygulaması, Homebrew'da yok)
+fixture(
+    "panelguard.json", "PanelGuard — küçük yerel uygulama, yalnızca tercih dosyası",
+    identity("PanelGuard", "com.panelguard.app", "/Applications/PanelGuard.app", "PanelGuard"),
+    tree=["~/Library/Preferences/com.panelguard.app.plist", "~/Library/Preferences/com.apple.panel.plist", "~/Library/Caches/com.apple.appstore/"],
+    strong=["~/Library/Preferences/com.panelguard.app.plist"],
+    absent=["~/Library/Preferences/com.apple.panel.plist", "~/Library/Caches/com.apple.appstore"],
+    notes="Rapor 2026-10-20 build 7.",
 )
 
 # ---------------------------------------------------------------- Brave (Chromium, geliştirici klasörü, yalnızca Homebrew ile bilinen cache)

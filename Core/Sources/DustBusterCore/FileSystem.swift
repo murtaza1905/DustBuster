@@ -14,6 +14,30 @@ public extension ScanFileSystem {
     func isRegularDirectory(_ path: String) -> Bool {
         isDirectory(path) && !isSymlink(path)
     }
+
+    /// Dizin, içinde (sınırlı derinlikte) hiç dosya barındırmıyorsa "boş" sayılır.
+    /// Yalnızca boş alt klasörlerden oluşan bir ağaç da boştur; listede "Zero KB" gürültüsü yaratır.
+    func isEffectivelyEmptyDirectory(_ path: String, maxDepth: Int = 6, maxEntries: Int = 400) -> Bool {
+        guard isDirectory(path) else { return false }
+        var visited = 0
+        var stack: [(String, Int)] = [(path, 0)]
+        while let item = stack.popLast() {
+            let (dir, depth) = item
+            guard let names = contents(ofDirectory: dir) else { continue }
+            for name in names {
+                visited += 1
+                if visited > maxEntries { return false }
+                let child = dir + "/" + name
+                if isSymlink(child) { continue }
+                if isDirectory(child) {
+                    if depth + 1 < maxDepth { stack.append((child, depth + 1)) }
+                } else {
+                    return false
+                }
+            }
+        }
+        return true
+    }
 }
 
 /// FileManager üzerinden gerçek disk.

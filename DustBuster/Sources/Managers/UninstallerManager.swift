@@ -141,7 +141,9 @@ final class UninstallerManager {
         guard let result = lastScanResult, let identity = lastIdentity else { return nil }
         let mentions = makeScanner().rawMentions(identity: identity).paths
         return Fixture.capture(name: name, home: home, identity: identity, options: options,
-                               result: result, rawMentions: mentions, isDirectory: { fs.isRegularDirectory($0) })
+                               result: result, rawMentions: mentions,
+                               isDirectory: { fs.isRegularDirectory($0) },
+                               isEmptyDirectory: { fs.isEffectivelyEmptyDirectory($0) })
     }
 
     // MARK: - Boyut

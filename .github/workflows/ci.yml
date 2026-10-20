@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  core-tests:
+    name: Core tests (fixtures)
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - name: Swift version
+        run: swift --version
+      - name: Run DustBusterCore tests
+        working-directory: Core
+        run: swift test --parallel 2>&1 | tee ../core-tests.log
+      - name: Upload test log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: core-tests-log
+          path: core-tests.log
+
+  app-build:
+    name: Build app (universal, unsigned)
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Generate Xcode project
+        run: xcodegen generate --quiet
+      - name: Build
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project DustBuster.xcodeproj \
+            -scheme DustBuster \
+            -configuration Release \
+            -derivedDataPath build \
+            ARCHS="arm64 x86_64" \
+            ONLY_ACTIVE_ARCH=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            DEVELOPMENT_TEAM="" \
+            build 2>&1 | tee build.log | grep -E "error:|warning: unused|BUILD (SUCCEEDED|FAILED)"
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcodebuild-log
+          path: build.log
+      - name: Package app
+        run: |
+          ditto -c -k --keepParent "build/Build/Products/Release/DustBuster.app" DustBuster-ci.zip
+      - name: Upload app
+        uses: actions/upload-artifact@v4
+        with:
+          name: DustBuster-unsigned
+          path: DustBuster-ci.zip

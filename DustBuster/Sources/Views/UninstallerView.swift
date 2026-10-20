@@ -1,5 +1,6 @@
 import SwiftUI
 import UniformTypeIdentifiers
+import DustBusterCore
 
 struct UninstallerView: View {
     @StateObject private var viewModel = UninstallerViewModel()
@@ -234,8 +235,19 @@ struct UninstallerView: View {
                                         .background(Color.secondary.opacity(0.15))
                                         .cornerRadius(4)
 
+                                    if item.isFromDatabase {
+                                        Text("Homebrew")
+                                            .font(.caption2)
+                                            .padding(.horizontal, 6)
+                                            .padding(.vertical, 2)
+                                            .background(Color.green.opacity(0.15))
+                                            .foregroundColor(.green)
+                                            .cornerRadius(4)
+                                            .help(item.note)
+                                    }
+
                                     if !item.isStrongMatch {
-                                        Text("İsim benzerliği — kontrol et")
+                                        Text(item.isFromDatabase ? "Kontrol et" : "İsim benzerliği — kontrol et")
                                             .font(.caption2)
                                             .padding(.horizontal, 6)
                                             .padding(.vertical, 2)
@@ -317,7 +329,7 @@ struct UninstallerView: View {
                     }
                 }
                 
-                Text("Tarama kapsamı: uygulama paketi ve ~/Library altındaki güvenli yollar.")
+                Text("Kaynaklar: bundle ID, uygulama adı ve gömülü Homebrew Cask veritabanı (ağ erişimi yok).")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -330,6 +342,15 @@ struct UninstallerView: View {
             .buttonStyle(.bordered)
             .disabled(viewModel.appURL == nil || viewModel.isScanning)
             .help("Bulunan öğeleri, arama kriterlerini ve ham listeyi metin dosyası olarak kaydet")
+
+            Button {
+                viewModel.exportFixture()
+            } label: {
+                Label("Test vakası", systemImage: "checkmark.seal")
+            }
+            .buttonStyle(.bordered)
+            .disabled(viewModel.appURL == nil || viewModel.isScanning)
+            .help("Bu taramayı test korpusuna eklenecek JSON vakası olarak kaydet")
 
             Button {
                 viewModel.moveSelectedToTrash()
@@ -540,6 +561,14 @@ struct UninstallerView: View {
             return "system.settings"
         case .systemFrameworks:
             return "cube.box.badge.gearshape"
+        case .systemLogs:
+            return "doc.text.fill"
+        case .systemCaches:
+            return "archivebox.fill"
+        case .homeDotfile:
+            return "eye.slash.fill"
+        case .sharedUsers:
+            return "person.2.fill"
         case .other:
             return "questionmark.folder.fill"
         }

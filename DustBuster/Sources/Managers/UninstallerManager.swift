@@ -1,203 +1,10 @@
 // Sources/Managers/UninstallerManager.swift
 
 import Foundation
+import DustBusterCore
 
-enum UninstallItemKind: String {
-    case appBundle = "Uygulama Paketi"
-    case applicationSupport = "Application Support"
-    case caches = "Caches"
-    case preferences = "Preferences"
-    case preferencesByHost = "Preferences (ByHost)"
-    case logs = "Logs"
-    case savedState = "Saved Application State"
-    case containers = "Containers"
-    case groupContainers = "Group Containers"
-    case launchAgents = "Launch Agents"
-    case httpStorages = "HTTP Storages"
-    case webKit = "WebKit"
-    case cookies = "Cookies"
-    case crashReports = "Crash Reports"
-    case applicationScripts = "Application Scripts"
-    case internetPlugins = "Internet Plug-Ins"
-    case preferencePanes = "Preference Panes"
-    case quickLook = "QuickLook"
-    case screenSavers = "Screen Savers"
-    case services = "Services"
-    case spotlight = "Spotlight"
-    case inputMethods = "Input Methods"
-    case frameworks = "Frameworks"
-    case colorPickers = "Color Pickers"
-    case addressBookPlugins = "Address Book Plug-Ins"
-    // Ek kullanıcı konumları
-    case mailBundles = "Mail Bundles"
-    case developer = "Developer"
-    // Sistem seviyesi konumlar (/Library/)
-    case systemAppSupport = "System Application Support"
-    case systemLaunchAgents = "System Launch Agents"
-    case systemLaunchDaemons = "System Launch Daemons"
-    case privilegedHelpers = "Privileged Helper Tools"
-    case systemPreferences = "System Preferences"
-    case systemFrameworks = "System Frameworks"
-    case recentDocuments = "Recent Documents"
-    case other = "Diğer"
-}
-
-// MARK: - Eşleştirme
-
-/// Bir kalıntının uygulamaya ne kadar güvenle bağlandığı.
-enum UninstallMatchStrength {
-    /// Bundle ID eşleşmesi veya uygulama adıyla birebir aynı ad → varsayılan seçili
-    case strong
-    /// Uygulama adı, daha uzun bir adın parçası olarak geçiyor → kullanıcı kontrol etsin, seçimsiz
-    case weak
-}
-
-/// Arama kriterleri. Yalnızca iki şey eşleşir:
-///  1) Bundle ID (tam, alt paket, grup veya takım-ID önekli biçimleri)
-///  2) Uygulama adı — kelime sınırıyla (alt dize araması yapılmaz)
-/// Geliştirici öneki (`ai.storyteller`), bundle ID'nin son parçası (`app`) veya telif
-/// hakkındaki şirket adı gibi aynı geliştiricinin BAŞKA uygulamalarını da yakalayan
-/// terimler bilinçli olarak kullanılmaz.
-struct SearchTerms {
-    /// Küçük harfli bundle ID'ler (ana uygulama; yardımcılar ayrı tutulur)
-    let bundleIds: [String]
-    /// Uygulama adı varyantları, küçük harfli ve token'lara ayrılmış
-    let nameTokenSets: [[String]]
-    /// Uygulama Apple'ın mı? Değilse `com.apple.*` adları asla eşleşmez.
-    let isAppleApp: Bool
-
-    static let minNameLength = 4
-
-    /// Tek başına bir uygulamayı tanımlamayan, çok sayıda yanlış eşleşme üreten adlar.
-    static let genericNames: Set<String> = [
-        "app", "apps", "application", "helper", "helpers", "launcher", "agent", "daemon",
-        "update", "updater", "updates", "installer", "install", "uninstaller", "setup",
-        "client", "server", "service", "services", "mac", "macos", "osx", "apple",
-        "system", "library", "tool", "tools", "utility", "utilities", "manager",
-        "player", "viewer", "reader", "editor", "browser", "chat", "mail", "music",
-        "photos", "photo", "video", "notes", "finder", "safari", "preview", "calendar",
-        "terminal", "console", "settings", "preferences", "support", "cache", "caches",
-        "logs", "log", "data", "default", "test", "demo", "beta", "alpha", "pro", "lite",
-        "free", "plus", "studio", "office", "home", "cloud", "sync", "drive", "backup",
-        "menu", "bar", "widget", "dock", "launch", "login", "core", "base", "main",
-        "new", "old", "temp", "tmp", "user", "users", "shared", "common", "google",
-        "microsoft", "adobe", "mozilla", "chrome", "firefox", "edge", "opera"
-    ]
-
-    /// Aynı uygulamanın ayrı dağıtım kanalları (Chrome Canary, X Beta…) ayrı uygulama sayılır.
-    static let channelWords: Set<String> = [
-        "canary", "beta", "dev", "nightly", "alpha", "insiders", "insider", "preview", "rc"
-    ]
-
-    static func tokens(of text: String) -> [String] {
-        text.lowercased()
-            .split(whereSeparator: { !$0.isLetter && !$0.isNumber })
-            .map(String.init)
-    }
-
-    /// `name` içinde `bid.` ifadesinden hemen sonra gelen bileşen; yoksa "".
-    static func component(after bid: String, in name: String) -> String {
-        guard let range = name.range(of: bid + ".") else { return "" }
-        let rest = name[range.upperBound...]
-        return rest.split(separator: ".").first.map(String.init) ?? ""
-    }
-
-    /// Arama kökünden itibaren göreli yol ("Google/Chrome"); kök dışındaysa yalnızca son bileşen.
-    static func relativePath(of url: URL, under root: URL) -> String {
-        let path = url.path
-        let rootPath = root.path
-        if path.hasPrefix(rootPath + "/") {
-            return String(path.dropFirst(rootPath.count + 1))
-        }
-        return url.lastPathComponent
-    }
-
-    /// Uygulama adı ve varyantlarından token kümeleri üretir; genel/kısa adları eler.
-    static func makeNameTokenSets(appName: String, extraNames: [String]) -> [[String]] {
-        var sets: [[String]] = []
-        for raw in [appName] + extraNames {
-            let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-            guard trimmed.count >= minNameLength else { continue }
-            let toks = tokens(of: trimmed)
-            guard !toks.isEmpty else { continue }
-            let squashed = toks.joined()
-            guard squashed.count >= minNameLength else { continue }
-            guard !genericNames.contains(squashed) else { continue }
-            guard squashed.rangeOfCharacter(from: .letters) != nil else { continue }
-            if !sets.contains(toks) { sets.append(toks) }
-            if toks.count > 1 && !sets.contains([squashed]) { sets.append([squashed]) }
-        }
-        return sets
-    }
-
-    static func containsContiguous(_ needle: [String], in haystack: [String]) -> Bool {
-        guard !needle.isEmpty, needle.count <= haystack.count else { return false }
-        let last = haystack.count - needle.count
-        for start in 0...last where Array(haystack[start..<(start + needle.count)]) == needle {
-            return true
-        }
-        return false
-    }
-
-    func matchesBundleId(_ name: String) -> Bool {
-        let n = name.lowercased()
-        for bid in bundleIds {
-            let isMatch = n == bid
-                || n.hasPrefix(bid + ".")
-                || n.hasSuffix("." + bid)
-                || n.contains("." + bid + ".")
-            guard isMatch else { continue }
-            // com.google.chrome.canary → Chrome'un değil, Canary'nin dosyası
-            let next = SearchTerms.component(after: bid, in: n)
-            if SearchTerms.channelWords.contains(next) { continue }
-            return true
-        }
-        return false
-    }
-
-    /// Verilen yolun (arama köküne göre göreli, ör. "Google/Chrome") uygulamaya ait olup
-    /// olmadığını ve eşleşme gücünü döner. Tek bileşenli adlar da aynı yoldan geçer.
-    func match(_ relativePath: String, isDirectory: Bool = false) -> UninstallMatchStrength? {
-        let lower = relativePath.lowercased()
-        let lastComponent = lower.split(separator: "/").last.map(String.init) ?? lower
-
-        // Apple'a ait adlar: kaldırılan uygulama Apple'ın değilse asla eşleşmez
-        if !isAppleApp && (lastComponent == "com.apple" || lastComponent.hasPrefix("com.apple.")) {
-            return nil
-        }
-
-        if matchesBundleId(lastComponent) {
-            return .strong
-        }
-
-        guard !nameTokenSets.isEmpty else { return nil }
-
-        // Yolun tamamının token'ları: "Google/Chrome" → [google, chrome]
-        let pathTokens = SearchTerms.tokens(of: lower)
-        guard !pathTokens.isEmpty else { return nil }
-
-        // Son bileşenin token'ları; dosya ise uzantı atılır ("PdfCraft.log" → "pdfcraft")
-        var lastTokens = SearchTerms.tokens(of: lastComponent)
-        if !isDirectory, let dot = lastComponent.lastIndex(of: "."), dot != lastComponent.startIndex {
-            lastTokens = SearchTerms.tokens(of: String(lastComponent[..<dot]))
-        }
-
-        for termTokens in nameTokenSets where lastTokens == termTokens || pathTokens == termTokens {
-            return .strong
-        }
-
-        // "Chrome Canary", "X Beta" gibi kanal türevleri ayrı uygulamadır
-        for token in lastTokens where SearchTerms.channelWords.contains(token) {
-            let termHasIt = nameTokenSets.contains { $0.contains(token) }
-            if !termHasIt { return nil }
-        }
-
-        for termTokens in nameTokenSets where SearchTerms.containsContiguous(termTokens, in: pathTokens) {
-            return .weak
-        }
-        return nil
-    }
-}
+/// Arayüzde kullanılan konum türü: çekirdekteki LeftoverKind'ın kendisi.
+typealias UninstallItemKind = LeftoverKind
 
 struct UninstallItem: Identifiable {
     let id = UUID()
@@ -209,663 +16,152 @@ struct UninstallItem: Identifiable {
     var isSelected: Bool
     /// false ise yalnızca ad benzerliğiyle bulunmuştur; UI bunu etiketler ve seçimsiz gösterir
     let isStrongMatch: Bool
+    /// Bulgunun kaynağı (Homebrew, bundle ID, ad…)
+    let source: Finding.Source
+
+    var isFromDatabase: Bool { source == .cask }
 }
 
-/// Scans for leftover files related to an app under ~/Library and prepares uninstall items.
+/// Uygulama katmanı: Info.plist ve gömülü paketlerden kimliği çıkarır, çekirdek tarayıcıyı
+/// gerçek diskte çalıştırır, sonuçları arayüz öğelerine çevirir ve boyut hesaplar.
+/// Eşleştirme mantığının tamamı DustBusterCore içindedir ve testlerle korunur.
 final class UninstallerManager {
-    /// Bu sayının üzerinde sonuç dönerse tarama "patlamış" kabul edilir; liste gösterilmez.
-    static let maxReasonableResults = 100
+    static let maxReasonableResults = ScanOptions().maxReasonableResults
 
     private let fileManager = FileManager.default
-    private let homeLibrary: URL
-    private let systemLibrary: URL
-    private let home: URL
+    private let home: String
+    private let fs = RealFileSystem()
+    private let caskDatabase: CaskDatabase?
 
     /// Sistem seviyesi konumları da taramak için true yap (/Library/)
     var includeSystemLocations: Bool = false
     /// WebKit / Developer / Frameworks vb. geniş tarama konumlarını dahil etmek için
     var includeAggressiveLocations: Bool = false
+    /// Homebrew Cask veritabanını kullan
+    var useCaskDatabase: Bool = true
+
+    /// Son taramanın çekirdek sonucu (rapor ve test vakası dışa aktarımı için)
+    private(set) var lastScanResult: ScanResult?
+    private(set) var lastIdentity: AppIdentity?
 
     init() {
-        home = fileManager.homeDirectoryForCurrentUser
-        homeLibrary = home.appendingPathComponent("Library")
-        systemLibrary = URL(fileURLWithPath: "/Library")
+        home = fileManager.homeDirectoryForCurrentUser.path
+        caskDatabase = CaskDatabase.bundled()
+    }
+
+    var options: ScanOptions {
+        ScanOptions(includeSystemLocations: includeSystemLocations,
+                    includeAggressiveLocations: includeAggressiveLocations,
+                    useCaskDatabase: useCaskDatabase)
+    }
+
+    var databaseDescription: String {
+        guard let db = caskDatabase else { return "Homebrew veritabanı: yüklenemedi" }
+        return "Homebrew veritabanı: \(db.count) cask, \(db.generated), \(db.source)"
+    }
+
+    private func makeScanner() -> LeftoverScanner {
+        LeftoverScanner(home: home, fs: fs, caskDatabase: caskDatabase, options: options)
+    }
+
+    // MARK: - Kimlik
+
+    func makeIdentity(appURL: URL, bundleId: String?, appName: String) -> AppIdentity {
+        AppIdentity(
+            name: appName,
+            bundleId: bundleId,
+            appPath: appURL.path,
+            executableName: getExecutableName(from: appURL),
+            embeddedBundleIds: embeddedBundleIdentifiers(in: appURL)
+        )
+    }
+
+    // MARK: - Tarama
+
+    func buildItemsFast(appURL: URL, bundleId: String?, appName: String) -> [UninstallItem] {
+        let identity = makeIdentity(appURL: appURL, bundleId: bundleId, appName: appName)
+        let result = makeScanner().scanFast(identity: identity)
+        return result.findings.compactMap(makeItem)
+    }
+
+    func buildItemsDeep(appURL: URL, bundleId: String?, appName: String) -> [UninstallItem] {
+        let identity = makeIdentity(appURL: appURL, bundleId: bundleId, appName: appName)
+        let result = makeScanner().scan(identity: identity)
+        lastScanResult = result
+        lastIdentity = identity
+        return result.findings.compactMap(makeItem)
     }
 
     func buildItems(appURL: URL, bundleId: String?, appName: String) -> [UninstallItem] {
         buildItemsDeep(appURL: appURL, bundleId: bundleId, appName: appName)
     }
 
-    /// Yalnızca bundle ID / tam ad ile birebir bilinen yolları kontrol eder (hızlı, kesin).
-    func buildItemsFast(appURL: URL, bundleId: String?, appName: String) -> [UninstallItem] {
-        var items: [UninstallItem] = []
-        var seenPaths: Set<String> = []
-
-        if let appItem = makeAppBundleItem(appURL: appURL) {
-            items.append(appItem)
-            seenPaths.insert(appURL.path)
-        }
-
-        let terms = buildSearchTerms(bundleId: bundleId, appName: appName, appURL: appURL)
-        let fastCandidates = findFastCandidates(terms: terms, bundleId: bundleId, appName: appName)
-        for candidate in fastCandidates {
-            let path = candidate.url.path
-            guard !seenPaths.contains(path) else { continue }
-            seenPaths.insert(path)
-
-            if let item = buildItem(for: candidate) {
-                items.append(item)
-            }
-        }
-
-        return sortItems(items)
-    }
-
-    /// ~/Library altındaki konumları tarar; eşleşme gücüne göre seçili/seçimsiz öğeler üretir.
-    func buildItemsDeep(appURL: URL, bundleId: String?, appName: String) -> [UninstallItem] {
-        var items: [UninstallItem] = []
-        var seenPaths: Set<String> = []
-
-        if let appItem = makeAppBundleItem(appURL: appURL) {
-            items.append(appItem)
-            seenPaths.insert(appURL.path)
-        }
-
-        let searchTerms = buildSearchTerms(bundleId: bundleId, appName: appName, appURL: appURL)
-        let candidates = findAllCandidates(searchTerms: searchTerms, bundleId: bundleId, appURL: appURL)
-
-        for candidate in candidates {
-            let path = candidate.url.path
-            guard !seenPaths.contains(path) else { continue }
-            seenPaths.insert(path)
-
-            if let item = buildItem(for: candidate) {
-                items.append(item)
-            }
-        }
-
-        return sortItems(items)
-    }
-
-    private func kindRank(_ kind: UninstallItemKind) -> Int {
-        switch kind {
-        case .appBundle: return 0
-        case .preferences, .preferencesByHost: return 1
-        case .applicationSupport: return 2
-        case .containers, .groupContainers: return 3
-        case .caches: return 4
-        case .logs: return 5
-        case .savedState: return 6
-        case .launchAgents: return 7
-        default: return 50
-        }
-    }
-
-    private func sortItems(_ items: [UninstallItem]) -> [UninstallItem] {
-        items.sorted {
-            if $0.isStrongMatch != $1.isStrongMatch { return $0.isStrongMatch }
-            let a = kindRank($0.kind), b = kindRank($1.kind)
-            if a != b { return a < b }
-            return $0.displayName.localizedCaseInsensitiveCompare($1.displayName) == .orderedAscending
-        }
-    }
-
-    // MARK: - Search Terms
-
-    private func buildSearchTerms(bundleId: String?, appName: String, appURL: URL) -> SearchTerms {
-        var bundleIds: [String] = []
-        if let bid = bundleId?.lowercased(), !bid.isEmpty {
-            bundleIds.append(bid)
-        }
-
-        var extraNames: [String] = []
-        if let executableName = getExecutableName(from: appURL), executableName != appName {
-            extraNames.append(executableName)
-        }
-        let fileNameWithoutExt = appURL.deletingPathExtension().lastPathComponent
-        if fileNameWithoutExt != appName {
-            extraNames.append(fileNameWithoutExt)
-        }
-
-        let isApple = bundleId?.lowercased().hasPrefix("com.apple.") ?? false
-
-        return SearchTerms(
-            bundleIds: bundleIds,
-            nameTokenSets: SearchTerms.makeNameTokenSets(appName: appName, extraNames: extraNames),
-            isAppleApp: isApple
-        )
-    }
-
-    // MARK: - Candidate Finding
-
-    private struct Candidate {
-        let url: URL
-        let kind: UninstallItemKind
-        let note: String
-        let strength: UninstallMatchStrength
-    }
-
-    private func findFastCandidates(terms: SearchTerms, bundleId: String?, appName: String) -> [Candidate] {
-        var results: [Candidate] = []
-        let lib = homeLibrary
-
-        func addIfExists(_ url: URL, kind: UninstallItemKind, note: String) {
-            guard fileManager.fileExists(atPath: url.path) else { return }
-            results.append(Candidate(url: url, kind: kind, note: note, strength: .strong))
-        }
-
-        guard let bundleId, !bundleId.isEmpty else { return results }
-
-        // Uygulama adı genel/kısa ise ("Reader", "App") ad bazlı yollar kullanılmaz
-        let useAppName = !terms.nameTokenSets.isEmpty
-
-        addIfExists(lib.appendingPathComponent("Preferences").appendingPathComponent("\(bundleId).plist"),
-                    kind: .preferences,
-                    note: "Fast: Preferences")
-
-        addIfExists(lib.appendingPathComponent("Saved Application State").appendingPathComponent("\(bundleId).savedState"),
-                    kind: .savedState,
-                    note: "Fast: Saved State")
-
-        addIfExists(lib.appendingPathComponent("Containers").appendingPathComponent(bundleId),
-                    kind: .containers,
-                    note: "Fast: Containers")
-
-        addIfExists(lib.appendingPathComponent("Application Support").appendingPathComponent(bundleId),
-                    kind: .applicationSupport,
-                    note: "Fast: App Support (bundleId)")
-        if useAppName {
-            addIfExists(lib.appendingPathComponent("Application Support").appendingPathComponent(appName),
-                        kind: .applicationSupport,
-                        note: "Fast: App Support (appName)")
-        }
-
-        addIfExists(lib.appendingPathComponent("Caches").appendingPathComponent(bundleId),
-                    kind: .caches,
-                    note: "Fast: Caches (bundleId)")
-        if useAppName {
-            addIfExists(lib.appendingPathComponent("Caches").appendingPathComponent(appName),
-                        kind: .caches,
-                        note: "Fast: Caches (appName)")
-        }
-
-        addIfExists(lib.appendingPathComponent("Logs").appendingPathComponent(bundleId),
-                    kind: .logs,
-                    note: "Fast: Logs (bundleId)")
-        if useAppName {
-            addIfExists(lib.appendingPathComponent("Logs").appendingPathComponent(appName),
-                        kind: .logs,
-                        note: "Fast: Logs (appName)")
-        }
-
-        addIfExists(lib.appendingPathComponent("HTTPStorages").appendingPathComponent(bundleId),
-                    kind: .httpStorages,
-                    note: "Fast: HTTPStorages")
-
-        addIfExists(lib.appendingPathComponent("WebKit").appendingPathComponent(bundleId),
-                    kind: .webKit,
-                    note: "Fast: WebKit")
-
-        let byHost = lib.appendingPathComponent("Preferences/ByHost")
-        if let urls = try? fileManager.contentsOfDirectory(at: byHost, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles]) {
-            for url in urls where terms.matchesBundleId(url.lastPathComponent) {
-                results.append(Candidate(url: url, kind: .preferencesByHost, note: "Fast: ByHost", strength: .strong))
-            }
-        }
-
-        let group = lib.appendingPathComponent("Group Containers")
-        if let urls = try? fileManager.contentsOfDirectory(at: group, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles]) {
-            for url in urls where terms.matchesBundleId(url.lastPathComponent) {
-                results.append(Candidate(url: url, kind: .groupContainers, note: "Fast: Group Containers", strength: .strong))
-            }
-        }
-
-        let launchAgents = lib.appendingPathComponent("LaunchAgents")
-        if let urls = try? fileManager.contentsOfDirectory(at: launchAgents, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles]) {
-            for url in urls where terms.matchesBundleId(url.lastPathComponent) {
-                results.append(Candidate(url: url, kind: .launchAgents, note: "Fast: LaunchAgents", strength: .strong))
-            }
-        }
-
-        return results
-    }
-
-    private func findAllCandidates(searchTerms: SearchTerms, bundleId: String?, appURL: URL) -> [Candidate] {
-        var candidates: [Candidate] = []
-
-        let baseLocations: [(String, UninstallItemKind, Bool)] = [
-            ("Application Support", .applicationSupport, true),
-            ("Caches", .caches, true),
-            ("Preferences", .preferences, false),
-            ("Logs", .logs, true),
-            ("Saved Application State", .savedState, false),
-            ("Containers", .containers, false),
-            ("Group Containers", .groupContainers, false),
-            ("LaunchAgents", .launchAgents, false),
-            ("HTTPStorages", .httpStorages, false),
-            ("Cookies", .cookies, false),
-            ("Application Scripts", .applicationScripts, false),
-            ("Caches/com.apple.nsurlsessiond/Downloads", .caches, false),
-        ]
-
-        let aggressiveLocations: [(String, UninstallItemKind, Bool)] = [
-            ("WebKit", .webKit, true),
-            ("Internet Plug-Ins", .internetPlugins, false),
-            ("PreferencePanes", .preferencePanes, false),
-            ("QuickLook", .quickLook, false),
-            ("Screen Savers", .screenSavers, false),
-            ("Services", .services, false),
-            ("Spotlight", .spotlight, false),
-            ("Input Methods", .inputMethods, false),
-            ("Frameworks", .frameworks, true),
-            ("ColorPickers", .colorPickers, false),
-            ("Address Book Plug-Ins", .addressBookPlugins, false),
-            ("Mail/Bundles", .mailBundles, false),
-            ("Developer", .developer, true),
-            ("Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments", .recentDocuments, false),
-        ]
-
-        let searchLocations = baseLocations + (includeAggressiveLocations ? aggressiveLocations : [])
-
-        for (subpath, kind, recursive) in searchLocations {
-            let dirURL = homeLibrary.appendingPathComponent(subpath)
-            guard fileManager.fileExists(atPath: dirURL.path) else { continue }
-
-            let found = searchDirectory(
-                root: dirURL,
-                at: dirURL,
-                searchTerms: searchTerms,
-                kind: kind,
-                recursive: recursive,
-                maxDepth: recursive ? 3 : 1
-            )
-            candidates.append(contentsOf: found)
-        }
-
-        // Preferences/ByHost özel arama
-        candidates.append(contentsOf: searchByHost(searchTerms: searchTerms))
-
-        // Crash Reports
-        candidates.append(contentsOf: searchCrashReports(searchTerms: searchTerms))
-
-        // Gömülü yardımcı uygulamaların launchd kalıntıları
-        candidates.append(contentsOf: findEmbeddedHelperApps(appURL: appURL, baseTerms: searchTerms))
-
-        // Installer receipts
-        candidates.append(contentsOf: searchInstallerReceipts(searchTerms: searchTerms, bundleId: bundleId))
-
-        // Sistem seviyesi konumlar (sadece includeSystemLocations true ise)
-        if includeSystemLocations {
-            candidates.append(contentsOf: searchSystemLocations(searchTerms: searchTerms))
-        }
-
-        return candidates
-    }
-
-    private func searchDirectory(
-        root: URL,
-        at url: URL,
-        searchTerms: SearchTerms,
-        kind: UninstallItemKind,
-        recursive: Bool,
-        maxDepth: Int,
-        currentDepth: Int = 0
-    ) -> [Candidate] {
-        var results: [Candidate] = []
-
-        guard currentDepth < maxDepth else { return results }
-        guard isInsideHomeLibrary(url) else { return results }
-
-        guard let contents = try? fileManager.contentsOfDirectory(
-            at: url,
-            includingPropertiesForKeys: [.isDirectoryKey, .isSymbolicLinkKey],
-            options: [.skipsHiddenFiles]
-        ) else { return results }
-
-        for itemURL in contents {
-            if isSymlink(itemURL) { continue }
-
-            let itemName = itemURL.lastPathComponent
-            let isDir = (try? itemURL.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) ?? false
-            // Köke göre göreli yol: "Google/Chrome" gibi iç içe geliştirici klasörlerini yakalar
-            let relativePath = SearchTerms.relativePath(of: itemURL, under: root)
-
-            if let strength = searchTerms.match(relativePath, isDirectory: isDir) {
-                results.append(Candidate(
-                    url: itemURL,
-                    kind: kind,
-                    note: url.lastPathComponent,
-                    strength: strength
-                ))
-            } else if recursive && isDir {
-                // Apple klasörlerinin içine inme (uygulama Apple'ın değilse)
-                if !searchTerms.isAppleApp && itemName.lowercased().hasPrefix("com.apple.") { continue }
-
-                let subResults = searchDirectory(
-                    root: root,
-                    at: itemURL,
-                    searchTerms: searchTerms,
-                    kind: kind,
-                    recursive: true,
-                    maxDepth: maxDepth,
-                    currentDepth: currentDepth + 1
-                )
-                results.append(contentsOf: subResults)
-            }
-        }
-
-        return results
-    }
-
-    private func searchByHost(searchTerms: SearchTerms) -> [Candidate] {
-        let byHostDir = homeLibrary.appendingPathComponent("Preferences/ByHost")
-        guard let contents = try? fileManager.contentsOfDirectory(
-            at: byHostDir,
-            includingPropertiesForKeys: [.isSymbolicLinkKey],
-            options: [.skipsHiddenFiles]
-        ) else { return [] }
-
-        return contents.compactMap { url -> Candidate? in
-            guard !isSymlink(url) else { return nil }
-            guard let strength = searchTerms.match(url.lastPathComponent, isDirectory: false) else { return nil }
-            return Candidate(
-                url: url,
-                kind: .preferencesByHost,
-                note: "Preferences/ByHost",
-                strength: strength
-            )
-        }
-    }
-
-    private func searchCrashReports(searchTerms: SearchTerms) -> [Candidate] {
-        var results: [Candidate] = []
-
-        let crashDirs = [
-            homeLibrary.appendingPathComponent("Logs/DiagnosticReports"),
-            homeLibrary.appendingPathComponent("Logs/CrashReporter")
-        ]
-
-        for crashDir in crashDirs {
-            guard let contents = try? fileManager.contentsOfDirectory(
-                at: crashDir,
-                includingPropertiesForKeys: nil,
-                options: [.skipsHiddenFiles]
-            ) else { continue }
-
-            for url in contents {
-                guard let strength = searchTerms.match(url.lastPathComponent, isDirectory: false) else { continue }
-                results.append(Candidate(
-                    url: url,
-                    kind: .crashReports,
-                    note: crashDir.lastPathComponent,
-                    strength: strength
-                ))
-            }
-        }
-
-        return results
-    }
-
-    // MARK: - System Locations Search
-
-    /// /Library/ altındaki sistem seviyesi konumları tarar (yalnızca güçlü eşleşme).
-    /// Güvenlik: /System/, /usr/, /bin/, /sbin/, /private/ (receipts hariç) ASLA taranmaz
-    private func searchSystemLocations(searchTerms: SearchTerms) -> [Candidate] {
-        var results: [Candidate] = []
-
-        let systemLocations: [(String, UninstallItemKind, Bool)] = [
-            ("Application Support", .systemAppSupport, true),
-            ("LaunchAgents", .systemLaunchAgents, false),
-            ("LaunchDaemons", .systemLaunchDaemons, false),
-            ("PrivilegedHelperTools", .privilegedHelpers, false),
-            ("Preferences", .systemPreferences, false),
-            ("Frameworks", .systemFrameworks, true),
-        ]
-
-        for (subpath, kind, recursive) in systemLocations {
-            let dirURL = systemLibrary.appendingPathComponent(subpath)
-            guard fileManager.fileExists(atPath: dirURL.path) else { continue }
-
-            let found = searchSystemDirectory(
-                root: dirURL,
-                at: dirURL,
-                searchTerms: searchTerms,
-                kind: kind,
-                recursive: recursive,
-                maxDepth: recursive ? 2 : 1
-            )
-            results.append(contentsOf: found)
-        }
-
-        return results
-    }
-
-    private func searchSystemDirectory(
-        root: URL,
-        at url: URL,
-        searchTerms: SearchTerms,
-        kind: UninstallItemKind,
-        recursive: Bool,
-        maxDepth: Int,
-        currentDepth: Int = 0
-    ) -> [Candidate] {
-        var results: [Candidate] = []
-
-        guard currentDepth < maxDepth else { return results }
-
-        let path = url.path
-        let forbiddenPrefixes = ["/System", "/usr", "/bin", "/sbin", "/private"]
-        for forbidden in forbiddenPrefixes where path.hasPrefix(forbidden) {
-            return results
-        }
-
-        guard path.hasPrefix("/Library") else { return results }
-
-        guard let contents = try? fileManager.contentsOfDirectory(
-            at: url,
-            includingPropertiesForKeys: [.isDirectoryKey, .isSymbolicLinkKey],
-            options: [.skipsHiddenFiles]
-        ) else { return results }
-
-        for itemURL in contents {
-            if isSymlink(itemURL) { continue }
-
-            let itemName = itemURL.lastPathComponent
-            let isDir = (try? itemURL.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) ?? false
-            let relativePath = SearchTerms.relativePath(of: itemURL, under: root)
-
-            if searchTerms.match(relativePath, isDirectory: isDir) == .strong {
-                results.append(Candidate(
-                    url: itemURL,
-                    kind: kind,
-                    note: "/Library/\(url.lastPathComponent)",
-                    strength: .strong
-                ))
-            } else if recursive && isDir {
-                if !searchTerms.isAppleApp && itemName.lowercased().hasPrefix("com.apple.") { continue }
-                let subResults = searchSystemDirectory(
-                    root: root,
-                    at: itemURL,
-                    searchTerms: searchTerms,
-                    kind: kind,
-                    recursive: true,
-                    maxDepth: maxDepth,
-                    currentDepth: currentDepth + 1
-                )
-                results.append(contentsOf: subResults)
-            }
-        }
-
-        return results
-    }
-
-    // MARK: - Item Building
-
-    private func makeAppBundleItem(appURL: URL) -> UninstallItem? {
-        if isSymlink(appURL) { return nil }
-
+    private func makeItem(_ finding: Finding) -> UninstallItem? {
+        let url = URL(fileURLWithPath: finding.path)
+        guard fileManager.fileExists(atPath: finding.path) else { return nil }
+        let strong = finding.strength == .strong
         return UninstallItem(
-            url: appURL,
-            displayName: appURL.lastPathComponent,
-            kind: .appBundle,
-            note: "Uygulama Paketi",
+            url: url,
+            displayName: url.lastPathComponent,
+            kind: finding.kind,
+            note: finding.note,
             sizeBytes: nil,
-            isSelected: true,
-            isStrongMatch: true
+            isSelected: finding.isSelectedByDefault,
+            isStrongMatch: strong,
+            source: finding.source
         )
     }
 
-    private func buildItem(for candidate: Candidate) -> UninstallItem? {
-        let isValidLocation = isInsideHomeLibrary(candidate.url) || isInsideSystemLibrary(candidate.url)
-        guard isValidLocation else { return nil }
-        guard fileManager.fileExists(atPath: candidate.url.path) else { return nil }
-        guard !isSymlink(candidate.url) else { return nil }
+    // MARK: - Rapor
 
-        let strong = candidate.strength == .strong
-        return UninstallItem(
-            url: candidate.url,
-            displayName: candidate.url.lastPathComponent,
-            kind: candidate.kind,
-            note: candidate.note,
-            sizeBytes: nil,
-            isSelected: strong,
-            isStrongMatch: strong
-        )
-    }
-
-    // MARK: - Rapor (dışa aktarma)
-
-    /// Kullanılan arama kriterlerinin okunabilir hali.
     func describeSearchTerms(bundleId: String?, appName: String, appURL: URL) -> [String] {
-        let terms = buildSearchTerms(bundleId: bundleId, appName: appName, appURL: appURL)
-        var lines: [String] = []
-        lines.append("Bundle ID: " + (terms.bundleIds.isEmpty ? "-" : terms.bundleIds.joined(separator: ", ")))
-        if terms.nameTokenSets.isEmpty {
-            lines.append("Ad eşleşmesi: kullanılmadı (ad genel veya 4 karakterden kısa)")
-        } else {
-            let sets = terms.nameTokenSets.map { "[" + $0.joined(separator: " ") + "]" }
-            lines.append("Ad token'ları: " + sets.joined(separator: ", "))
+        let identity = makeIdentity(appURL: appURL, bundleId: bundleId, appName: appName)
+        var lines = SearchTerms(identity: identity).describe()
+        if !identity.embeddedBundleIds.isEmpty {
+            lines.append("Gömülü yardımcı ID'leri: " + identity.embeddedBundleIds.joined(separator: ", "))
         }
-        lines.append("Apple uygulaması: " + (terms.isAppleApp ? "evet" : "hayır"))
         lines.append("Sistem konumları (/Library): " + (includeSystemLocations ? "açık" : "kapalı"))
         lines.append("Geniş tarama: " + (includeAggressiveLocations ? "açık" : "kapalı"))
+        lines.append(databaseDescription)
+        if let tokens = lastScanResult?.caskTokens, !tokens.isEmpty {
+            lines.append("Eşleşen cask: " + tokens.joined(separator: ", "))
+        } else {
+            lines.append("Eşleşen cask: yok")
+        }
         return lines
     }
 
-    /// Filtresiz ham liste: ~/Library'nin standart konumlarında, ayraçlar atıldığında adında
-    /// bundle ID'yi veya uygulama adını içeren TÜM yollar. Eşleştiricinin atladıklarını görmek için.
     func rawMentions(bundleId: String?, appName: String, appURL: URL, limit: Int = 300) -> (needles: [String], paths: [String]) {
-        let terms = buildSearchTerms(bundleId: bundleId, appName: appName, appURL: appURL)
-
-        var needles: [String] = []
-        for bid in terms.bundleIds {
-            let squashed = SearchTerms.tokens(of: bid).joined()
-            if squashed.count >= 4 && !needles.contains(squashed) { needles.append(squashed) }
-        }
-        for set in terms.nameTokenSets {
-            let squashed = set.joined()
-            if squashed.count >= 4 && !needles.contains(squashed) { needles.append(squashed) }
-            for token in set where token.count >= 5 && !SearchTerms.genericNames.contains(token) && !needles.contains(token) {
-                needles.append(token)
-            }
-        }
-        guard !needles.isEmpty else { return (needles, []) }
-
-        let locations: [(String, Int)] = [
-            ("Application Support", 3),
-            ("Caches", 2),
-            ("Preferences", 1),
-            ("Preferences/ByHost", 1),
-            ("Logs", 2),
-            ("Saved Application State", 1),
-            ("Containers", 1),
-            ("Group Containers", 1),
-            ("LaunchAgents", 1),
-            ("HTTPStorages", 1),
-            ("WebKit", 1),
-            ("Cookies", 1),
-            ("Application Scripts", 1),
-            ("Internet Plug-Ins", 1),
-            ("PreferencePanes", 1),
-            ("QuickLook", 1),
-            ("Services", 1),
-            ("Spotlight", 1),
-            ("Frameworks", 1),
-            ("Mail/Bundles", 1),
-            ("Developer", 2)
-        ]
-
-        var found: [String] = []
-        var seen: Set<String> = []
-        for (subpath, depth) in locations {
-            let dir = homeLibrary.appendingPathComponent(subpath)
-            collectMentions(root: dir, at: dir, needles: needles, maxDepth: depth, currentDepth: 0, into: &found, seen: &seen, limit: limit)
-            if found.count >= limit { break }
-        }
-        return (needles, found)
+        let identity = makeIdentity(appURL: appURL, bundleId: bundleId, appName: appName)
+        return makeScanner().rawMentions(identity: identity, limit: limit)
     }
 
-    private func collectMentions(
-        root: URL,
-        at dir: URL,
-        needles: [String],
-        maxDepth: Int,
-        currentDepth: Int,
-        into found: inout [String],
-        seen: inout Set<String>,
-        limit: Int
-    ) {
-        guard currentDepth < maxDepth, found.count < limit else { return }
-        guard let contents = try? fileManager.contentsOfDirectory(
-            at: dir,
-            includingPropertiesForKeys: [.isDirectoryKey, .isSymbolicLinkKey],
-            options: [.skipsHiddenFiles]
-        ) else { return }
-
-        for itemURL in contents {
-            if found.count >= limit { return }
-            if isSymlink(itemURL) { continue }
-
-            // Köke göre göreli yol sıkıştırılır: "Google/Chrome" → "googlechrome"
-            let squashedName = SearchTerms.tokens(of: SearchTerms.relativePath(of: itemURL, under: root)).joined()
-            if needles.contains(where: { squashedName.contains($0) }) {
-                let path = itemURL.path
-                if !seen.contains(path) {
-                    seen.insert(path)
-                    found.append(path)
-                }
-                continue
-            }
-
-            let isDir = (try? itemURL.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) ?? false
-            if isDir {
-                collectMentions(root: root, at: itemURL, needles: needles, maxDepth: maxDepth, currentDepth: currentDepth + 1, into: &found, seen: &seen, limit: limit)
-            }
-        }
+    /// Son taramadan test vakası üretir (Core/Tests/Fixtures biçimi).
+    func captureFixture(name: String) -> Fixture? {
+        guard let result = lastScanResult, let identity = lastIdentity else { return nil }
+        let mentions = makeScanner().rawMentions(identity: identity).paths
+        return Fixture.capture(name: name, home: home, identity: identity, options: options,
+                               result: result, rawMentions: mentions, isDirectory: { fs.isRegularDirectory($0) })
     }
 
-    // MARK: - Size Calculation
+    // MARK: - Boyut
 
     /// Boyut hesabı. Home dışındaki yollar yalnızca uygulama paketi (/Applications/…app) veya
     /// /Library altı ise hesaplanır.
     func computeSizeBytes(for url: URL, isAppBundle: Bool = false) -> Int64? {
-        let allowOutsideHome = isAppBundle || isInsideSystemLibrary(url)
+        let allowOutsideHome = isAppBundle || isInsideSystemLibrary(url) || url.path.hasPrefix("/Users/Shared/")
         return sizeOfItem(at: url, allowOutsideHome: allowOutsideHome)
     }
 
     private func sizeOfItem(at url: URL, allowOutsideHome: Bool) -> Int64? {
         let standardized = url.standardizedFileURL
-        if !allowOutsideHome && !standardized.path.hasPrefix(home.path) {
+        if !allowOutsideHome && !standardized.path.hasPrefix(home) {
             return nil
         }
 
         let keys: Set<URLResourceKey> = [
-            .isDirectoryKey,
-            .isSymbolicLinkKey,
-            .totalFileAllocatedSizeKey,
-            .fileAllocatedSizeKey,
-            .totalFileSizeKey,
-            .fileSizeKey
+            .isDirectoryKey, .isSymbolicLinkKey,
+            .totalFileAllocatedSizeKey, .fileAllocatedSizeKey, .totalFileSizeKey, .fileSizeKey
         ]
 
         guard let values = try? standardized.resourceValues(forKeys: keys) else { return nil }
@@ -879,62 +175,31 @@ final class UninstallerManager {
     }
 
     private func sizeOfDirectory(at url: URL, keys: Set<URLResourceKey>) -> Int64 {
-        guard let enumerator = fileManager.enumerator(
-            at: url,
-            includingPropertiesForKeys: Array(keys),
-            options: [],
-            errorHandler: nil
-        ) else { return 0 }
-
+        guard let enumerator = fileManager.enumerator(at: url, includingPropertiesForKeys: Array(keys), options: [], errorHandler: nil) else { return 0 }
         var total: Int64 = 0
-
         for case let fileURL as URL in enumerator {
             guard let values = try? fileURL.resourceValues(forKeys: keys) else { continue }
-            // Symlink'ler sayılmaz; enumerator onları zaten izlemez, skipDescendants çağrılmaz
-            // (symlink üzerinde skipDescendants, komşu gerçek klasörlerin atlanmasına yol açıyordu)
             if values.isSymbolicLink == true { continue }
             if values.isDirectory == true { continue }
-
             total += fileSize(from: values)
         }
-
         return total
     }
 
     private func fileSize(from values: URLResourceValues) -> Int64 {
-        // Allocated size daha doğru (disk üzerindeki gerçek boyut)
-        if let allocated = values.totalFileAllocatedSize, allocated > 0 {
-            return Int64(allocated)
-        }
-        if let allocated = values.fileAllocatedSize, allocated > 0 {
-            return Int64(allocated)
-        }
-        if let size = values.totalFileSize {
-            return Int64(size)
-        }
-        if let size = values.fileSize {
-            return Int64(size)
-        }
+        if let allocated = values.totalFileAllocatedSize, allocated > 0 { return Int64(allocated) }
+        if let allocated = values.fileAllocatedSize, allocated > 0 { return Int64(allocated) }
+        if let size = values.totalFileSize { return Int64(size) }
+        if let size = values.fileSize { return Int64(size) }
         return 0
     }
 
-    // MARK: - Helpers
-
-    private func isInsideHomeLibrary(_ url: URL) -> Bool {
-        url.standardizedFileURL.path.hasPrefix(homeLibrary.path)
-    }
+    // MARK: - Yardımcılar
 
     private func isInsideSystemLibrary(_ url: URL) -> Bool {
         let path = url.standardizedFileURL.path
-        // Sadece /Library/ altını kabul et, /System/Library/ vs. değil
         return path.hasPrefix("/Library/") && !path.hasPrefix("/Library/Apple")
     }
-
-    private func isSymlink(_ url: URL) -> Bool {
-        (try? url.resourceValues(forKeys: [.isSymbolicLinkKey]).isSymbolicLink) ?? false
-    }
-
-    // MARK: - Info.plist Helpers
 
     private func getExecutableName(from appURL: URL) -> String? {
         let plistURL = appURL.appendingPathComponent("Contents/Info.plist")
@@ -945,117 +210,28 @@ final class UninstallerManager {
         return plist["CFBundleExecutable"] as? String
     }
 
-    // MARK: - Embedded Helper Apps
-
-    /// Paketin içindeki yardımcı uygulamaların (LoginItems, XPC vb.) bundle ID'leriyle
-    /// yalnızca launchd konumlarını tarar. Yardımcı ID'leri genel aramaya karıştırılmaz;
-    /// Sparkle gibi paylaşılan çerçevelerin önbellekleri başka uygulamalara da ait olabilir.
-    private func findEmbeddedHelperApps(appURL: URL, baseTerms: SearchTerms) -> [Candidate] {
-        var results: [Candidate] = []
-
+    /// Paket içindeki yardımcı uygulamaların (LoginItems, LaunchServices, Helpers, XPC, appex) bundle ID'leri.
+    private func embeddedBundleIdentifiers(in appURL: URL) -> [String] {
         let helperPaths = [
             "Contents/Library/LoginItems",
             "Contents/Library/LaunchServices",
             "Contents/Helpers",
-            "Contents/XPCServices"
+            "Contents/XPCServices",
+            "Contents/PlugIns",
+            "Contents/Frameworks"
         ]
-
+        var ids: [String] = []
         for helperPath in helperPaths {
-            let helperDir = appURL.appendingPathComponent(helperPath)
-            guard fileManager.fileExists(atPath: helperDir.path) else { continue }
-
-            guard let contents = try? fileManager.contentsOfDirectory(
-                at: helperDir,
-                includingPropertiesForKeys: nil,
-                options: [.skipsHiddenFiles]
-            ) else { continue }
-
+            let dir = appURL.appendingPathComponent(helperPath)
+            guard let contents = try? fileManager.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles]) else { continue }
             for itemURL in contents {
                 let ext = itemURL.pathExtension.lowercased()
-                guard ext == "app" || ext == "xpc" else { continue }
-
-                guard let helperBundle = Bundle(url: itemURL),
-                      let helperBundleId = helperBundle.bundleIdentifier?.lowercased(),
-                      !helperBundleId.isEmpty else { continue }
-
-                // Apple veya tamamen ilgisiz görünen yardımcı ID'leri atla
-                if !baseTerms.isAppleApp && helperBundleId.hasPrefix("com.apple.") { continue }
-
-                let helperTerms = SearchTerms(bundleIds: [helperBundleId], nameTokenSets: [], isAppleApp: baseTerms.isAppleApp)
-                results.append(contentsOf: searchLaunchItemsForHelper(searchTerms: helperTerms))
-            }
-        }
-
-        return results
-    }
-
-    private func searchLaunchItemsForHelper(searchTerms: SearchTerms) -> [Candidate] {
-        var results: [Candidate] = []
-
-        var launchDirs: [(URL, UninstallItemKind)] = [
-            (homeLibrary.appendingPathComponent("LaunchAgents"), .launchAgents),
-        ]
-
-        if includeSystemLocations {
-            launchDirs.append((URL(fileURLWithPath: "/Library/LaunchAgents"), .systemLaunchAgents))
-            launchDirs.append((URL(fileURLWithPath: "/Library/LaunchDaemons"), .systemLaunchDaemons))
-        }
-
-        for (dirURL, kind) in launchDirs {
-            guard fileManager.fileExists(atPath: dirURL.path) else { continue }
-
-            guard let contents = try? fileManager.contentsOfDirectory(
-                at: dirURL,
-                includingPropertiesForKeys: nil,
-                options: [.skipsHiddenFiles]
-            ) else { continue }
-
-            for plistURL in contents where plistURL.pathExtension == "plist" {
-                if searchTerms.matchesBundleId(plistURL.lastPathComponent) {
-                    results.append(Candidate(
-                        url: plistURL,
-                        kind: kind,
-                        note: "Helper: \(dirURL.lastPathComponent)",
-                        strength: .strong
-                    ))
+                guard ["app", "xpc", "appex"].contains(ext) else { continue }
+                if let id = Bundle(url: itemURL)?.bundleIdentifier, !id.isEmpty, !ids.contains(id) {
+                    ids.append(id)
                 }
             }
         }
-
-        return results
-    }
-
-    // MARK: - Installer Receipts
-
-    private func searchInstallerReceipts(searchTerms: SearchTerms, bundleId: String?) -> [Candidate] {
-        guard includeSystemLocations else { return [] }
-
-        var results: [Candidate] = []
-        let receiptsDir = URL(fileURLWithPath: "/private/var/db/receipts")
-
-        guard fileManager.fileExists(atPath: receiptsDir.path) else { return results }
-
-        guard let contents = try? fileManager.contentsOfDirectory(
-            at: receiptsDir,
-            includingPropertiesForKeys: nil,
-            options: [.skipsHiddenFiles]
-        ) else { return results }
-
-        for url in contents {
-            let ext = url.pathExtension.lowercased()
-            guard ext == "bom" || ext == "plist" else { continue }
-
-            let receiptBase = url.deletingPathExtension().lastPathComponent
-            guard searchTerms.match(receiptBase, isDirectory: false) == .strong else { continue }
-
-            results.append(Candidate(
-                url: url,
-                kind: .other,
-                note: "Installer Receipt",
-                strength: .strong
-            ))
-        }
-
-        return results
+        return ids
     }
 }

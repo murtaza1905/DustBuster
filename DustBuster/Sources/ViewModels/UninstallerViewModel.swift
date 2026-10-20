@@ -2,6 +2,7 @@ import Foundation
 import AppKit
 import UniformTypeIdentifiers
 import Combine
+import DustBusterCore
 
 struct UninstallResultSummary {
     let moved: Int
@@ -350,9 +351,21 @@ final class UninstallerViewModel: ObservableObject {
                 let size = item.sizeBytes ?? manager.computeSizeBytes(for: item.url, isAppBundle: isAppBundle)
                 let mark = item.isSelected ? "[x]" : "[ ]"
                 let strength = item.isStrongMatch ? "GÜÇLÜ" : "ZAYIF"
-                lines.append("\(mark) \(strength) | \(item.kind.rawValue) | \(ReportExporter.formatSize(size)) | \(ReportExporter.tildePath(item.url.path))")
+                lines.append("\(mark) \(strength) | \(item.source.rawValue) | \(item.kind.rawValue) | \(ReportExporter.formatSize(size)) | \(ReportExporter.tildePath(item.url.path)) | \(item.note)")
             }
             lines.append("")
+
+            if let scan = manager.lastScanResult {
+                lines.append("Kabul edilmeyen yollar (\(scan.rejected.count)) — veritabanı/kurallar tarafından önerilip güvenlik kuralıyla elenenler")
+                if scan.rejected.isEmpty {
+                    lines.append("(yok)")
+                } else {
+                    for r in scan.rejected {
+                        lines.append("\(ReportExporter.tildePath(r.path)) | \(r.reason)")
+                    }
+                }
+                lines.append("")
+            }
 
             let raw = manager.rawMentions(bundleId: bundleId, appName: appName, appURL: appURL)
             let needleText = raw.needles.map { "\"\($0)\"" }.joined(separator: " / ")
@@ -380,6 +393,38 @@ final class UninstallerViewModel: ObservableObject {
                     }
                 }
             }
+        }
+    }
+
+    /// Son taramayı Core/Tests/Fixtures biçiminde test vakası olarak dışa aktarır.
+    func exportFixture() {
+        guard appURL != nil, !isScanning else { return }
+        let appLabel = appName.isEmpty ? "Uygulama" : appName
+        guard let fixture = manager.captureFixture(name: "\(appLabel) — gözlem \(Date().formatted(date: .numeric, time: .shortened))") else {
+            errorMessage = "Test vakası üretilemedi: önce bir tarama tamamlanmalı."
+            return
+        }
+        do {
+            let data = try fixture.jsonData()
+            let safeName = appLabel.lowercased().replacingOccurrences(of: " ", with: "-")
+            let fileName = "fixture-\(safeName).json"
+            let panel = NSSavePanel()
+            panel.nameFieldStringValue = fileName
+            panel.allowedContentTypes = [.json]
+            panel.isExtensionHidden = false
+            panel.canCreateDirectories = true
+            panel.message = "Ev dizini yolu anonimleştirilir (~). Dosyayı Core/Tests/Fixtures altına koyup beklentiyi doğrulayın."
+            panel.begin { [weak self] response in
+                guard response == .OK, let url = panel.url else { return }
+                do {
+                    try data.write(to: url, options: .atomic)
+                    self?.logManager.log("Test vakası kaydedildi: \(url.lastPathComponent)", category: .audit, level: .info)
+                } catch {
+                    self?.errorMessage = "Test vakası kaydedilemedi: \(error.localizedDescription)"
+                }
+            }
+        } catch {
+            errorMessage = "Test vakası üretilemedi: \(error.localizedDescription)"
         }
     }
 
@@ -448,15 +493,15 @@ final class UninstallerViewModel: ObservableObject {
             let deep = self.manager.buildItemsDeep(appURL: appURL, bundleId: bundleId, appName: appName)
             DispatchQueue.main.async {
                 guard currentGeneration == self.scanGeneration else { return }
-                let limit = UninstallerManager.maxReasonableResults
-                if deep.count > limit {
+                let dropped = self.manager.lastScanResult?.droppedDeepCount ?? 0
+                if dropped > 0 {
                     // Güvenlik eşiği: bu kadar sonuç ancak eşleştirme hatasıyla çıkar.
-                    // Yalnızca bundle ID ile birebir bulunan (hızlı tarama) öğeler listede kalır.
-                    self.errorMessage = "Tarama \(deep.count) öğe buldu; bu sayı güvenlik sınırının (\(limit)) üzerinde. Yalnızca bundle ID ile birebir eşleşen öğeler listelendi."
-                    self.logManager.log("Uninstaller: tarama sınırı aşıldı (\(deep.count) > \(limit)), derin sonuçlar atıldı", category: .audit, level: .warning)
-                } else {
-                    self.items = self.mergeByPathKeepingExisting(existing: self.items, incoming: deep)
+                    // Çekirdek derin sonuçları attı; yalnızca kesin yollar ve veritabanı bulguları kaldı.
+                    let limit = UninstallerManager.maxReasonableResults
+                    self.errorMessage = "Dizin taraması \(dropped) öğe buldu; bu sayı güvenlik sınırının (\(limit)) üzerinde. Yalnızca birebir bilinen yollar ve Homebrew veritabanı bulguları listelendi."
+                    self.logManager.log("Uninstaller: tarama sınırı aşıldı (\(dropped) > \(limit)), derin sonuçlar atıldı", category: .audit, level: .warning)
                 }
+                self.items = self.mergeByPathKeepingExisting(existing: self.items, incoming: deep)
                 self.isScanning = false
             }
         }

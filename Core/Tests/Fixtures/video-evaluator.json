@@ -1,0 +1,41 @@
+{
+  "emptyDirs": [
+    "~/Library/Application Scripts/com.koraybirand.Video-Evaluator/"
+  ],
+  "expect": {
+    "absent": [
+      "~/Library/Application Scripts/com.koraybirand.Video-Evaluator",
+      "~/Library/Caches/com.apple.VideoConference",
+      "~/Library/Logs/Video"
+    ],
+    "caskTokens": [],
+    "strong": [
+      "~/Library/Containers/com.koraybirand.Video-Evaluator"
+    ],
+    "weak": []
+  },
+  "home": "/Users/test",
+  "identity": {
+    "appGroups": [],
+    "appPath": "/Applications/Video Evaluator.app",
+    "bundleId": "com.koraybirand.Video-Evaluator",
+    "embeddedBundleIds": [],
+    "executableName": "Video Evaluator",
+    "name": "Video Evaluator",
+    "teamId": null
+  },
+  "name": "Video Evaluator — sandbox konteyneri, 'video' genel kelimesi",
+  "notes": "Rapor 2026-10-20.",
+  "options": {
+    "includeAggressiveLocations": false,
+    "includeSystemLocations": false,
+    "useCaskDatabase": true
+  },
+  "schema": 1,
+  "status": "curated",
+  "tree": [
+    "~/Library/Caches/com.apple.VideoConference/",
+    "~/Library/Containers/com.koraybirand.Video-Evaluator/",
+    "~/Library/Logs/Video/"
+  ]
+}

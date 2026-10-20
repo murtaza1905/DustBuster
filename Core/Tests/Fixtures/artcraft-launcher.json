@@ -1,0 +1,42 @@
+{
+  "emptyDirs": [],
+  "expect": {
+    "absent": [
+      "~/Library/Application Support/PdfCraft",
+      "~/Library/Preferences/ai.storyteller.pdfcraft.plist"
+    ],
+    "caskTokens": [
+      "artcraft-launcher"
+    ],
+    "strong": [
+      "~/Library/Application Support/ai.storyteller.artcraft-launcher",
+      "~/Library/Caches/ArtCraft Launcher"
+    ],
+    "weak": []
+  },
+  "home": "/Users/test",
+  "identity": {
+    "appGroups": [],
+    "appPath": "/Applications/ArtCraft Launcher.app",
+    "bundleId": "ai.storyteller.artcraft-launcher",
+    "embeddedBundleIds": [],
+    "executableName": "ArtCraft Launcher",
+    "name": "ArtCraft Launcher",
+    "teamId": null
+  },
+  "name": "ArtCraft Launcher — iki kelimeli ad, bundle ID'de tire",
+  "notes": "Rapor 2026-10-20. Homebrew kaydı var (artcraft-launcher).",
+  "options": {
+    "includeAggressiveLocations": false,
+    "includeSystemLocations": false,
+    "useCaskDatabase": true
+  },
+  "schema": 1,
+  "status": "curated",
+  "tree": [
+    "~/Library/Application Support/PdfCraft/",
+    "~/Library/Application Support/ai.storyteller.artcraft-launcher/",
+    "~/Library/Caches/ArtCraft Launcher/",
+    "~/Library/Preferences/ai.storyteller.pdfcraft.plist"
+  ]
+}

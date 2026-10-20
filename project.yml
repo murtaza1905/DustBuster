@@ -10,8 +10,12 @@ options:
 settings:
   base:
     SWIFT_VERSION: "5.0"
-    MARKETING_VERSION: "1.1.0"
-    CURRENT_PROJECT_VERSION: "5"
+    MARKETING_VERSION: "1.2.0"
+    CURRENT_PROJECT_VERSION: "6"
+
+packages:
+  DustBusterCore:
+    path: Core
 
 targets:
   DustBuster:
@@ -21,6 +25,8 @@ targets:
     sources:
       - path: DustBuster/Sources
       - path: DustBuster/Resources
+    dependencies:
+      - package: DustBusterCore
     settings:
       base:
         PRODUCT_NAME: DustBuster

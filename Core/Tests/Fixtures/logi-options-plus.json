@@ -1,0 +1,60 @@
+{
+  "emptyDirs": [
+    "~/Library/Caches/com.logi.optionsplus.installer/"
+  ],
+  "expect": {
+    "absent": [
+      "~/Library/Application Support/Logic",
+      "~/Library/Caches/com.apple.logic10",
+      "~/Library/Caches/com.logi.optionsplus.installer",
+      "~/Library/Preferences/com.apple.loginwindow.plist"
+    ],
+    "caskTokens": [
+      "logi-options+"
+    ],
+    "strong": [
+      "~/Library/Application Support/Logi",
+      "~/Library/Application Support/LogiOptionsPlus",
+      "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.logi.optionsplus.sfl4",
+      "~/Library/Logs/xlog_logitech",
+      "~/Library/Preferences/com.logi.optionsplus.driverhost.plist",
+      "~/Library/Preferences/com.logi.optionsplus.plist",
+      "~/Library/Preferences/com.logi.pluginservice.plist"
+    ],
+    "weak": [
+      "~/Library/Application Support/CrashReporter/logioptionsplus_agent_7214F14B-116C-5737-A4C1-6F18619B1E3F.plist"
+    ]
+  },
+  "home": "/Users/test",
+  "identity": {
+    "appGroups": [],
+    "appPath": "/Applications/logioptionsplus.app",
+    "bundleId": "com.logi.optionsplus",
+    "embeddedBundleIds": [],
+    "executableName": null,
+    "name": "Logi Options+",
+    "teamId": null
+  },
+  "name": "Logi Options+ — Homebrew'un bildiği gizli kalıntılar (xlog_logitech, pluginservice), 'logi' ⊂ 'login/logic' tuzağı",
+  "notes": "Rapor 2026-10-20. Son Belgeler kaydı (sfl4) geniş tarama kapalıyken yalnızca Homebrew verisiyle bulunur.",
+  "options": {
+    "includeAggressiveLocations": false,
+    "includeSystemLocations": false,
+    "useCaskDatabase": true
+  },
+  "schema": 1,
+  "status": "curated",
+  "tree": [
+    "~/Library/Application Support/CrashReporter/logioptionsplus_agent_7214F14B-116C-5737-A4C1-6F18619B1E3F.plist",
+    "~/Library/Application Support/Logi/",
+    "~/Library/Application Support/LogiOptionsPlus/",
+    "~/Library/Application Support/Logic/",
+    "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.logi.optionsplus.sfl4",
+    "~/Library/Caches/com.apple.logic10/",
+    "~/Library/Logs/xlog_logitech/",
+    "~/Library/Preferences/com.apple.loginwindow.plist",
+    "~/Library/Preferences/com.logi.optionsplus.driverhost.plist",
+    "~/Library/Preferences/com.logi.optionsplus.plist",
+    "~/Library/Preferences/com.logi.pluginservice.plist"
+  ]
+}

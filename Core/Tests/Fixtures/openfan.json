@@ -1,0 +1,46 @@
+{
+  "emptyDirs": [],
+  "expect": {
+    "absent": [
+      "~/Library/Application Support/App Store",
+      "~/Library/Caches/com.apple.appstore",
+      "~/Library/Caches/com.apple.appstoreagent",
+      "~/Library/Preferences/com.apple.Accessibility.plist",
+      "~/Library/Preferences/com.apple.AccessibilityHearingNearby.plist"
+    ],
+    "caskTokens": [],
+    "strong": [
+      "~/Library/Application Support/OpenFan",
+      "~/Library/Preferences/com.openfan.app.plist"
+    ],
+    "weak": []
+  },
+  "home": "/Users/test",
+  "identity": {
+    "appGroups": [],
+    "appPath": "/Applications/OpenFan.app",
+    "bundleId": "com.openfan.app",
+    "embeddedBundleIds": [],
+    "executableName": "OpenFan",
+    "name": "OpenFan",
+    "teamId": null
+  },
+  "name": "OpenFan — 'app' ⊂ 'apple' tuzağı (ilk sürümde 2.220 yanlış pozitif)",
+  "notes": "Rapor 2026-10-18.",
+  "options": {
+    "includeAggressiveLocations": false,
+    "includeSystemLocations": false,
+    "useCaskDatabase": true
+  },
+  "schema": 1,
+  "status": "curated",
+  "tree": [
+    "~/Library/Application Support/App Store/",
+    "~/Library/Application Support/OpenFan/",
+    "~/Library/Caches/com.apple.appstore/",
+    "~/Library/Caches/com.apple.appstoreagent/",
+    "~/Library/Preferences/com.apple.Accessibility.plist",
+    "~/Library/Preferences/com.apple.AccessibilityHearingNearby.plist",
+    "~/Library/Preferences/com.openfan.app.plist"
+  ]
+}

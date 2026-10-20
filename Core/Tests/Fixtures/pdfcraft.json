@@ -1,0 +1,42 @@
+{
+  "emptyDirs": [],
+  "expect": {
+    "absent": [
+      "~/Library/Application Support/ai.storyteller.artcraft-launcher",
+      "~/Library/Caches/ArtCraft Launcher"
+    ],
+    "caskTokens": [
+      "pdfcraft"
+    ],
+    "strong": [
+      "~/Library/Application Support/PdfCraft",
+      "~/Library/Preferences/ai.storyteller.pdfcraft.plist"
+    ],
+    "weak": []
+  },
+  "home": "/Users/test",
+  "identity": {
+    "appGroups": [],
+    "appPath": "/Applications/PdfCraft.app",
+    "bundleId": "ai.storyteller.pdfcraft",
+    "embeddedBundleIds": [],
+    "executableName": "PdfCraft",
+    "name": "PdfCraft",
+    "teamId": null
+  },
+  "name": "PdfCraft — aynı geliştiricinin diğer uygulaması listelenmez",
+  "notes": "Rapor 2026-10-20. Homebrew kaydı var (pdfcraft); ~/.local/share/pdfcraft zayıf olarak gelir.",
+  "options": {
+    "includeAggressiveLocations": false,
+    "includeSystemLocations": false,
+    "useCaskDatabase": true
+  },
+  "schema": 1,
+  "status": "curated",
+  "tree": [
+    "~/Library/Application Support/PdfCraft/",
+    "~/Library/Application Support/ai.storyteller.artcraft-launcher/",
+    "~/Library/Caches/ArtCraft Launcher/",
+    "~/Library/Preferences/ai.storyteller.pdfcraft.plist"
+  ]
+}

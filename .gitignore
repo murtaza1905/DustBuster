@@ -22,3 +22,8 @@ dist/
 # Eski snapshot/rapor dosyaları
 *.zip
 *.moved-aside
+
+# Swift Package (Core)
+.build/
+.swiftpm/
+Package.resolved

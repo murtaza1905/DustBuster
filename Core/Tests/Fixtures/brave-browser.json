@@ -1,0 +1,46 @@
+{
+  "emptyDirs": [],
+  "expect": {
+    "absent": [
+      "~/Library/Application Support/BraveSoftware/Brave-Browser-Beta",
+      "~/Library/Application Support/Google/Chrome"
+    ],
+    "caskTokens": [
+      "brave-browser"
+    ],
+    "strong": [
+      "~/Library/Application Support/BraveSoftware/Brave-Browser",
+      "~/Library/Caches/BraveSoftware/Brave-Browser",
+      "~/Library/Caches/com.brave.Browser",
+      "~/Library/Preferences/com.brave.Browser.plist"
+    ],
+    "weak": []
+  },
+  "home": "/Users/test",
+  "identity": {
+    "appGroups": [],
+    "appPath": "/Applications/Brave Browser.app",
+    "bundleId": "com.brave.Browser",
+    "embeddedBundleIds": [],
+    "executableName": "Brave Browser",
+    "name": "Brave Browser",
+    "teamId": null
+  },
+  "name": "Brave — BraveSoftware/Brave-Browser geliştirici klasörü, Beta kanalı ayrı uygulama",
+  "notes": "Sentetik vaka; Homebrew zap listesinden.",
+  "options": {
+    "includeAggressiveLocations": false,
+    "includeSystemLocations": false,
+    "useCaskDatabase": true
+  },
+  "schema": 1,
+  "status": "curated",
+  "tree": [
+    "~/Library/Application Support/BraveSoftware/Brave-Browser-Beta/",
+    "~/Library/Application Support/BraveSoftware/Brave-Browser/",
+    "~/Library/Application Support/Google/Chrome/",
+    "~/Library/Caches/BraveSoftware/Brave-Browser/",
+    "~/Library/Caches/com.brave.Browser/",
+    "~/Library/Preferences/com.brave.Browser.plist"
+  ]
+}

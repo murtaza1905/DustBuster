@@ -19,9 +19,12 @@
     "strong": [
       "~/Library/Application Support/Google/Chrome",
       "~/Library/Caches/Google/Chrome",
+      "~/Library/Google/Google Chrome Brand.plist",
       "~/Library/Google/GoogleSoftwareUpdate",
       "~/Library/LaunchAgents/com.google.keystone.agent.plist",
-      "~/Library/Preferences/com.google.Chrome.plist"
+      "~/Library/LaunchAgents/com.google.keystone.xpcservice.plist",
+      "~/Library/Preferences/com.google.Chrome.plist",
+      "~/Library/Preferences/com.google.Keystone.Agent.plist"
     ],
     "weak": [
       "~/Library/Logs/DiagnosticReports/ExcUserFault_Google Chrome-2026-10-14-140258.ips"
@@ -38,7 +41,7 @@
     "teamId": null
   },
   "name": "Google Chrome — geliştirici klasörü içinde veri, kanal türevi, Keystone",
-  "notes": "Rapor 2026-10-20. ~/Library/Google ve keystone yalnızca Homebrew verisiyle bulunur.",
+  "notes": "Rapor 2026-10-20 (build 6 gözlemiyle birleştirildi). ~/Library/Google ve Keystone yalnızca Homebrew verisiyle bulunur.",
   "options": {
     "includeAggressiveLocations": false,
     "includeSystemLocations": false,
@@ -54,11 +57,14 @@
     "~/Library/Caches/Google/GoogleUpdater/",
     "~/Library/Caches/com.apple.Safari/",
     "~/Library/Caches/com.google.GoogleUpdater/",
+    "~/Library/Google/Google Chrome Brand.plist",
     "~/Library/Google/GoogleSoftwareUpdate/",
     "~/Library/LaunchAgents/com.google.keystone.agent.plist",
+    "~/Library/LaunchAgents/com.google.keystone.xpcservice.plist",
     "~/Library/Logs/DiagnosticReports/ExcUserFault_Google Chrome-2026-10-14-140258.ips",
     "~/Library/Preferences/com.apple.Accessibility.plist",
     "~/Library/Preferences/com.google.Chrome.canary.plist",
-    "~/Library/Preferences/com.google.Chrome.plist"
+    "~/Library/Preferences/com.google.Chrome.plist",
+    "~/Library/Preferences/com.google.Keystone.Agent.plist"
   ]
 }

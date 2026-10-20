@@ -488,6 +488,7 @@ final class UninstallerViewModel: ObservableObject {
             DispatchQueue.main.async {
                 guard currentGeneration == self.scanGeneration else { return }
                 self.items = fast
+                self.requestSizesForAllItems()
             }
 
             let deep = self.manager.buildItemsDeep(appURL: appURL, bundleId: bundleId, appName: appName)
@@ -503,6 +504,7 @@ final class UninstallerViewModel: ObservableObject {
                 }
                 self.items = self.mergeByPathKeepingExisting(existing: self.items, incoming: deep)
                 self.isScanning = false
+                self.requestSizesForAllItems()
             }
         }
     }
@@ -540,6 +542,14 @@ final class UninstallerViewModel: ObservableObject {
         }
     }
 
+    /// Listedeki tüm öğeler için boyut hesabını başlatır. Satırların `onAppear`'ına
+    /// güvenmek yetmiyordu: ekrana girmeyen satırlar hiç hesaplanmıyor, toplam takılı kalıyordu.
+    func requestSizesForAllItems() {
+        for item in items where item.sizeBytes == nil {
+            requestSize(for: item.id)
+        }
+    }
+
     func requestSize(for itemId: UUID) {
         guard let index = items.firstIndex(where: { $0.id == itemId }) else { return }
         if items[index].sizeBytes != nil { return }
@@ -563,11 +573,12 @@ final class UninstallerViewModel: ObservableObject {
             OperationQueue.main.addOperation {
                 guard currentGeneration == self.scanGeneration else { return }
                 self.sizeInFlight.remove(path)
-                if let size {
-                    self.sizeCache[path] = size
-                    if let targetIndex = self.items.firstIndex(where: { $0.id == itemId }) {
-                        self.items[targetIndex].sizeBytes = size
-                    }
+                // Hesaplanamayan boyut (izin yok, kapsam dışı) 0 sayılır; aksi halde toplam
+                // "Hesaplanıyor…" durumunda takılı kalıyordu.
+                let resolved = size ?? 0
+                self.sizeCache[path] = resolved
+                if let targetIndex = self.items.firstIndex(where: { $0.id == itemId }) {
+                    self.items[targetIndex].sizeBytes = resolved
                 }
             }
         }

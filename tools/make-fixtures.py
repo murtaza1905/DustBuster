@@ -53,10 +53,13 @@ os.makedirs(OUT, exist_ok=True)
 # ---------------------------------------------------------------- Google Chrome
 chrome_strong = [
     "~/Library/Preferences/com.google.Chrome.plist",
+    "~/Library/Preferences/com.google.Keystone.Agent.plist",
     "~/Library/Application Support/Google/Chrome/",
     "~/Library/Caches/Google/Chrome/",
     "~/Library/Google/GoogleSoftwareUpdate/",
+    "~/Library/Google/Google Chrome Brand.plist",
     "~/Library/LaunchAgents/com.google.keystone.agent.plist",
+    "~/Library/LaunchAgents/com.google.keystone.xpcservice.plist",
 ]
 chrome_weak = ["~/Library/Logs/DiagnosticReports/ExcUserFault_Google Chrome-2026-10-14-140258.ips"]
 chrome_absent = [
@@ -78,7 +81,7 @@ fixture(
     absent=[p.rstrip("/") for p in chrome_absent],
     empty=["~/Library/Caches/com.apple.nsurlsessiond/Downloads/com.google.Chrome/"],
     casks=["google-chrome"],
-    notes="Rapor 2026-10-20. ~/Library/Google ve keystone yalnızca Homebrew verisiyle bulunur.",
+    notes="Rapor 2026-10-20 (build 6 gözlemiyle birleştirildi). ~/Library/Google ve Keystone yalnızca Homebrew verisiyle bulunur.",
 )
 
 # ---------------------------------------------------------------- Microsoft Teams
@@ -109,13 +112,16 @@ teams_absent = [
 ] + teams_empty
 fixture(
     "microsoft-teams.json", "Microsoft Teams — takım-ID önekli grup konteyneri, paylaşılan Office/AutoUpdate",
-    identity("Microsoft Teams", "com.microsoft.teams2", "/Applications/Microsoft Teams.app", "MSTeams"),
+    identity("Microsoft Teams", "com.microsoft.teams2", "/Applications/Microsoft Teams.app", "MSTeams",
+             embedded=["com.microsoft.teams2.helper", "com.microsoft.teams2.modulehost", "com.microsoft.teams2.notificationcenter2",
+                       "com.microsoft.teams2.teamsswitcher", "com.microsoft.teams2.notificationcenter", "com.microsoft.vcxpc",
+                       "com.microsoft.teams2.widgetextension"]),
     tree=teams_strong + [p for p in teams_absent if p not in teams_empty],
     strong=[p.rstrip("/") for p in teams_strong],
     absent=[p.rstrip("/") for p in teams_absent],
     empty=teams_empty,
     casks=["microsoft-teams"],
-    notes="Rapor 2026-10-20. UBF8T346G9.com.microsoft.teams Homebrew zap ile güçlü; boş Application Scripts dizinleri listelenmez.",
+    notes="Rapor 2026-10-20 (build 6 gözlemiyle birleştirildi). UBF8T346G9.com.microsoft.teams Homebrew zap ile güçlü; boş Application Scripts dizinleri listelenmez.",
 )
 
 # ---------------------------------------------------------------- Logi Options+

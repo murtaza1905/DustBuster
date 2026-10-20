@@ -38,13 +38,21 @@
     "appGroups": [],
     "appPath": "/Applications/Microsoft Teams.app",
     "bundleId": "com.microsoft.teams2",
-    "embeddedBundleIds": [],
+    "embeddedBundleIds": [
+      "com.microsoft.teams2.helper",
+      "com.microsoft.teams2.modulehost",
+      "com.microsoft.teams2.notificationcenter2",
+      "com.microsoft.teams2.teamsswitcher",
+      "com.microsoft.teams2.notificationcenter",
+      "com.microsoft.vcxpc",
+      "com.microsoft.teams2.widgetextension"
+    ],
     "executableName": "MSTeams",
     "name": "Microsoft Teams",
     "teamId": null
   },
   "name": "Microsoft Teams — takım-ID önekli grup konteyneri, paylaşılan Office/AutoUpdate",
-  "notes": "Rapor 2026-10-20. UBF8T346G9.com.microsoft.teams Homebrew zap ile güçlü; boş Application Scripts dizinleri listelenmez.",
+  "notes": "Rapor 2026-10-20 (build 6 gözlemiyle birleştirildi). UBF8T346G9.com.microsoft.teams Homebrew zap ile güçlü; boş Application Scripts dizinleri listelenmez.",
   "options": {
     "includeAggressiveLocations": false,
     "includeSystemLocations": false,

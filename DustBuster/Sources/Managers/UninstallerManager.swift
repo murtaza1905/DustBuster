@@ -136,7 +136,7 @@ final class UninstallerManager {
         return makeScanner().rawMentions(identity: identity, limit: limit)
     }
 
-    /// Son taramadan test vakası üretir (Core/Tests/Fixtures biçimi).
+    /// Son taramadan test vakası üretir (Core/Tests/DustBusterCoreTests/Fixtures biçimi).
     func captureFixture(name: String) -> Fixture? {
         guard let result = lastScanResult, let identity = lastIdentity else { return nil }
         let mentions = makeScanner().rawMentions(identity: identity).paths

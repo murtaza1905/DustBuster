@@ -1,7 +1,7 @@
 import XCTest
 @testable import DustBusterCore
 
-/// Tests/Fixtures altındaki her vaka sanal diskte çalıştırılır ve beklentiyle karşılaştırılır.
+/// Tests/DustBusterCoreTests/Fixtures altındaki her vaka sanal diskte çalıştırılır ve beklentiyle karşılaştırılır.
 /// Yeni bir vaka eklemek için JSON dosyasını klasöre koymak yeterlidir; kod değişmez.
 final class FixtureTests: XCTestCase {
     static let database = CaskDatabase.bundled()

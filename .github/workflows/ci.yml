@@ -5,6 +5,9 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: write
+
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
@@ -20,16 +23,34 @@ jobs:
       - name: Run DustBusterCore tests
         working-directory: Core
         run: |
-          set -o pipefail
+          set +e
           swift test 2>&1 | tee ../core-tests.log
-          # Hiç test koşmadıysa da başarısız say
-          grep -E "Executed [1-9][0-9]* tests, with 0 failures" ../core-tests.log | tail -1 | tee -a "$GITHUB_STEP_SUMMARY"
-      - name: Upload test log
+          status=${PIPESTATUS[0]}
+          summary=$(grep -E "Executed [0-9]+ tests" ../core-tests.log | tail -1)
+          echo "### Core tests" >> "$GITHUB_STEP_SUMMARY"
+          echo "${summary:-no test summary line}" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$status" != "0" ] || ! echo "$summary" | grep -qE "Executed [1-9][0-9]* tests, with 0 failures"; then
+            grep -nE "error:|XCTAssert|failed \(| failed |Fatal error|başarısız|beklenen|Listelenmemesi" ../core-tests.log | head -40 | while IFS= read -r line; do
+              echo "::error::${line}"
+            done
+            exit 1
+          fi
+      - name: Publish log to ci-logs branch
         if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: core-tests-log
-          path: core-tests.log
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p /tmp/cilogs
+          cp core-tests.log /tmp/cilogs/ 2>/dev/null || echo "no log" > /tmp/cilogs/core-tests.log
+          cd /tmp/cilogs
+          echo "run=${{ github.run_id }} sha=${{ github.sha }} job=core-tests date=$(date -u +%FT%TZ)" > RUN.txt
+          git init -q
+          git checkout -q -b ci-logs-core-tests
+          git config user.name "ci"
+          git config user.email "ci@users.noreply.github.com"
+          git add -A
+          git commit -q -m "core-tests log for ${{ github.sha }}"
+          git push -q -f "https://x-access-token:${TOKEN}@github.com/${{ github.repository }}.git" ci-logs-core-tests:ci-logs-core-tests
 
   app-build:
     name: Build app (universal, unsigned)
@@ -42,7 +63,7 @@ jobs:
         run: xcodegen generate --quiet
       - name: Build
         run: |
-          set -o pipefail
+          set +e
           xcodebuild \
             -project DustBuster.xcodeproj \
             -scheme DustBuster \
@@ -53,16 +74,31 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             DEVELOPMENT_TEAM="" \
-            build 2>&1 | tee build.log | grep -E "error:|warning: unused|BUILD (SUCCEEDED|FAILED)"
-      - name: Upload build log
+            build > build.log 2>&1
+          status=$?
+          grep -E "error:|BUILD (SUCCEEDED|FAILED)" build.log | tail -30
+          if [ "$status" != "0" ]; then
+            grep -nE "error:" build.log | head -40 | while IFS= read -r line; do echo "::error::${line}"; done
+            exit 1
+          fi
+      - name: Publish log to ci-logs branch
         if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: xcodebuild-log
-          path: build.log
-      - name: Package app
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          ditto -c -k --keepParent "build/Build/Products/Release/DustBuster.app" DustBuster-ci.zip
+          mkdir -p /tmp/cilogs
+          cp build.log /tmp/cilogs/ 2>/dev/null || echo "no log" > /tmp/cilogs/build.log
+          cd /tmp/cilogs
+          echo "run=${{ github.run_id }} sha=${{ github.sha }} job=app-build date=$(date -u +%FT%TZ)" > RUN.txt
+          git init -q
+          git checkout -q -b ci-logs-app-build
+          git config user.name "ci"
+          git config user.email "ci@users.noreply.github.com"
+          git add -A
+          git commit -q -m "app-build log for ${{ github.sha }}"
+          git push -q -f "https://x-access-token:${TOKEN}@github.com/${{ github.repository }}.git" ci-logs-app-build:ci-logs-app-build
+      - name: Package app
+        run: ditto -c -k --keepParent "build/Build/Products/Release/DustBuster.app" DustBuster-ci.zip
       - name: Upload app
         uses: actions/upload-artifact@v4
         with:

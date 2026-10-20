@@ -396,7 +396,7 @@ final class UninstallerViewModel: ObservableObject {
         }
     }
 
-    /// Son taramayı Core/Tests/Fixtures biçiminde test vakası olarak dışa aktarır.
+    /// Son taramayı Core/Tests/DustBusterCoreTests/Fixtures biçiminde test vakası olarak dışa aktarır.
     func exportFixture() {
         guard appURL != nil, !isScanning else { return }
         let appLabel = appName.isEmpty ? "Uygulama" : appName
@@ -413,7 +413,7 @@ final class UninstallerViewModel: ObservableObject {
             panel.allowedContentTypes = [.json]
             panel.isExtensionHidden = false
             panel.canCreateDirectories = true
-            panel.message = "Ev dizini yolu anonimleştirilir (~). Dosyayı Core/Tests/Fixtures altına koyup beklentiyi doğrulayın."
+            panel.message = "Ev dizini yolu anonimleştirilir (~). Dosyayı Core/Tests/DustBusterCoreTests/Fixtures altına koyup beklentiyi doğrulayın."
             panel.begin { [weak self] response in
                 guard response == .OK, let url = panel.url else { return }
                 do {

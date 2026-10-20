@@ -67,7 +67,7 @@ Matching lives in a UI-independent Swift package (`Core/`) and runs in four laye
 3. **Directory scan** — bundle-ID and whole-word name matching inside `~/Library`, including vendor folders (`Google/Chrome`). Name-only hits are listed **unselected** and labelled.
 4. **Safety rules** — other apps from the same vendor, channel variants (Canary/Beta), `com.apple.*` paths for non-Apple apps, protected user data (Keychains, Mail, Documents…) and empty folders are never listed.
 
-Every real-world scan can be exported from the app as a JSON test case (**Test vakası**) and dropped into `Core/Tests/Fixtures/`; the test suite replays it against a virtual `~/Library`. CI runs the suite and builds the app on every push.
+Every real-world scan can be exported from the app as a JSON test case (**Test vakası**) and dropped into `Core/Tests/DustBusterCoreTests/Fixtures/`; the test suite replays it against a virtual `~/Library`. CI runs the suite and builds the app on every push.
 
 ```bash
 cd ~/Desktop/DustBuster/Core

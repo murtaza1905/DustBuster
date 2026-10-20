@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Core/Tests/Fixtures altındaki vaka dosyalarını üretir. Vakalar 2026-10-18/20 tarihli gerçek
+Core/Tests/DustBusterCoreTests/Fixtures altındaki vaka dosyalarını üretir. Vakalar 2026-10-18/20 tarihli gerçek
 taramalardan alınmış, negatif kontrollerle (listelenmemesi gereken yollar) genişletilmiştir.
 
 Kullanım: python3 tools/make-fixtures.py
@@ -8,7 +8,7 @@ Kullanım: python3 tools/make-fixtures.py
 import json
 import os
 
-OUT = os.path.join(os.path.dirname(__file__), "..", "Core", "Tests", "Fixtures")
+OUT = os.path.join(os.path.dirname(__file__), "..", "Core", "Tests", "DustBusterCoreTests", "Fixtures")
 
 
 def identity(name, bundle_id, app_path, executable=None, embedded=None):

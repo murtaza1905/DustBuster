@@ -115,6 +115,7 @@ public final class LeftoverScanner {
         let tokens = entries.map { $0.token }
         let matched = addConditionHits(identity: identity, caskTokens: tokens, into: &collected)
         applyExclusions(conditions: matched, to: &collected)
+        downgradeVendorFolders(identity: identity, in: &collected)
         return collected.result(droppedDeep: 0, caskTokens: tokens, conditionIds: matched.map { $0.id })
     }
 
@@ -151,7 +152,7 @@ public final class LeftoverScanner {
             for f in deep {
                 // Ad benzerliğiyle bulunan yol başka bir uygulamanın Homebrew kaydında geçiyorsa o uygulamaya aittir
                 if f.strength == .weak, !collected.contains(f.path), options.useCaskDatabase, let db = caskDatabase {
-                    let owners = db.otherOwners(ofPath: f.path, home: home, excluding: matched)
+                    let owners = db.otherOwners(ofPath: f.path, home: home, excluding: matched, identity: identity)
                     if !owners.isEmpty {
                         collected.reject(f.path, "başka uygulamaya ait (Homebrew: \(owners.joined(separator: ", ")))")
                         continue
@@ -161,6 +162,7 @@ public final class LeftoverScanner {
             }
         }
         applyExclusions(conditions: matchedConditions, to: &collected)
+        downgradeVendorFolders(identity: identity, in: &collected)
         return collected.result(droppedDeep: dropped, caskTokens: tokens, receiptIds: receiptIds,
                                 conditionIds: matchedConditions.map { $0.id })
     }
@@ -233,6 +235,11 @@ public final class LeftoverScanner {
         var paths: [String] { order }
 
         func contains(_ path: String) -> Bool { byPath[path] != nil }
+
+        mutating func downgrade(_ path: String, note: String) {
+            guard let f = byPath[path], f.strength == .strong else { return }
+            byPath[path] = Finding(path: f.path, kind: f.kind, source: f.source, strength: .weak, note: "\(f.note) — \(note)")
+        }
 
         mutating func remove(_ path: String, reason: String) {
             guard byPath.removeValue(forKey: path) != nil else { return }
@@ -334,7 +341,7 @@ public final class LeftoverScanner {
                 var strength = admitted
                 var label = "Homebrew: \(hit.token)" + (note.map { " — \($0)" } ?? "")
                 // Aynı yolu başka cask'ler de sahipleniyorsa (ortak güncelleyici, satıcı kimlik grubu) paylaşılıyordur
-                let others = db.otherOwners(ofPath: hit.path, home: home, excluding: matchedTokens)
+                let others = db.otherOwners(ofPath: hit.path, home: home, excluding: matchedTokens, identity: identity)
                 if !others.isEmpty {
                     strength = .weak
                     label += " — paylaşılan (\(others.prefix(3).joined(separator: ", "))), kontrol et"
@@ -368,6 +375,29 @@ public final class LeftoverScanner {
             }
         }
         return matched
+    }
+
+    /// Bundle ID'deki satıcı adı: "com.microsoft.word" → "microsoft", "notion.id" → "notion".
+    static func vendorToken(identity: AppIdentity) -> String? {
+        let parts = (identity.bundleId ?? "").lowercased().split(separator: ".").map(String.init)
+        let vendor: String
+        if parts.count >= 3 { vendor = parts[1] } else if parts.count == 2 { vendor = parts[0] } else { return nil }
+        return SearchTerms.tokens(of: vendor).joined()
+    }
+
+    /// "~/Library/Application Support/Microsoft" gibi satıcı adını taşıyan klasörler aynı satıcının diğer
+    /// ürünleriyle paylaşılır; uygulamanın adı satıcı adının kendisi değilse seçimsiz bırakılır.
+    private func downgradeVendorFolders(identity: AppIdentity, in collector: inout Collector) {
+        guard let vendor = LeftoverScanner.vendorToken(identity: identity), vendor.count >= 3 else { return }
+        let nameSquashed = SearchTerms.tokens(of: identity.name).joined()
+        guard nameSquashed != vendor else { return }
+        let prefix = homeLibrary + "/"
+        for path in collector.paths where path.hasPrefix(prefix) {
+            let rel = path.dropFirst(prefix.count).split(separator: "/").map(String.init)
+            guard rel.count == 1 || rel.count == 2, let last = rel.last else { continue }
+            guard SearchTerms.tokens(of: last).joined() == vendor else { continue }
+            collector.downgrade(path, note: "satıcı klasörü, aynı satıcının diğer ürünleri de kullanıyor olabilir — kontrol et")
+        }
     }
 
     private func applyExclusions(conditions matched: [AppCondition], to collector: inout Collector) {
@@ -406,7 +436,11 @@ public final class LeftoverScanner {
         let specific = LeftoverScanner.appSpecificTokens(identity: identity)
         var out: [Finding] = []
         for group in identity.appGroups where !group.isEmpty {
-            let isSpecific = !Set(SearchTerms.tokens(of: group)).isDisjoint(with: specific)
+            let groupTokens = SearchTerms.tokens(of: group)
+            // "OfficeExcelWidget" gibi birleşik grup adlarında uygulama adı alt dize olarak aranır (≥ 4 karakter);
+            // grup adları uygulamanın kendi beyanı olduğu için alt dize burada güvenlidir
+            let isSpecific = !Set(groupTokens).isDisjoint(with: specific)
+                || groupTokens.contains { g in specific.contains { $0.count >= 4 && g.count > $0.count && g.contains($0) } }
             for (sub, note) in [("Group Containers", "Group Containers"), ("Application Scripts", "Application Scripts")] {
                 let path = "\(homeLibrary)/\(sub)/\(group)"
                 guard isUsable(path) else { continue }

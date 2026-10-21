@@ -20,7 +20,6 @@
     ],
     "strong": [
       "/Applications/Utilities/Logi Options+ Driver Installer.bundle",
-      "~/Library/Application Support/Logi",
       "~/Library/Application Support/LogiOptionsPlus",
       "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.logi.optionsplus.driverhost.sfl4",
       "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.logi.optionsplus.sfl4",
@@ -33,7 +32,8 @@
       "~/Library/Preferences/com.logi.pluginservice.plist"
     ],
     "weak": [
-      "~/Library/Application Support/CrashReporter/logioptionsplus_agent_7214F14B-116C-5737-A4C1-6F18619B1E3F.plist"
+      "~/Library/Application Support/CrashReporter/logioptionsplus_agent_7214F14B-116C-5737-A4C1-6F18619B1E3F.plist",
+      "~/Library/Application Support/Logi"
     ]
   },
   "home": "/Users/test",
@@ -53,7 +53,7 @@
   },
   "launchdPrograms": null,
   "name": "Logi Options+ — Homebrew'un bildiği gizli kalıntılar, sürücü kurucu .bundle, 'logi' ⊂ 'login/logic' tuzağı",
-  "notes": "Rapor 2026-10-20 build 7. /Library yolları sistem taraması kapalıyken listelenmez; 'Logitech Options' eski uygulama (logitech-options cask) ayrı tutulur.",
+  "notes": "Rapor 2026-10-20 build 7. /Library yolları sistem taraması kapalıyken listelenmez; 'Logitech Options' eski uygulama (logitech-options cask) ayrı tutulur. Satıcı klasörü ~/Library/Application Support/Logi diğer Logi ürünleriyle ortak olabileceğinden seçimsiz.",
   "options": {
     "includeAggressiveLocations": false,
     "includeSystemLocations": false,

@@ -1,0 +1,81 @@
+{
+  "emptyDirs": [
+    "~/Library/Application Scripts/UBF8T346G9.OfficeExcelWidget/",
+    "~/Library/Application Scripts/com.microsoft.Excel.widgetextension/",
+    "~/Library/Application Scripts/com.microsoft.Excel/",
+    "~/Library/Application Scripts/com.microsoft.Powerpoint/",
+    "~/Library/Application Scripts/com.microsoft.Word/",
+    "~/Library/Group Containers/UBF8T346G9.OfficeOneDriveSyncIntegration/",
+    "~/Library/Group Containers/UBF8T346G9.OfficeOsfWebHost/"
+  ],
+  "expect": {
+    "absent": [
+      "~/Library/Containers/com.microsoft.Powerpoint",
+      "~/Library/Containers/com.microsoft.Word",
+      "/Applications/Microsoft PowerPoint.app",
+      "/Applications/Microsoft Word.app"
+    ],
+    "caskTokens": [
+      "microsoft-excel"
+    ],
+    "strong": [
+      "~/Library/Containers/com.microsoft.Excel",
+      "~/Library/Containers/com.microsoft.Excel.widgetextension",
+      "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.microsoft.excel.sfl4",
+      "~/Library/Group Containers/UBF8T346G9.OfficeExcelWidget"
+    ],
+    "weak": [
+      "~/Library/Group Containers/UBF8T346G9.com.microsoft.oneauth",
+      "~/Library/Group Containers/UBF8T346G9.group.com.microsoft.shared",
+      "~/Library/Group Containers/UBF8T346G9.ms",
+      "~/Library/Group Containers/UBF8T346G9.Office"
+    ]
+  },
+  "home": "/Users/test",
+  "identity": {
+    "appGroups": [
+      "UBF8T346G9.Office",
+      "UBF8T346G9.ms",
+      "UBF8T346G9.com.microsoft.entrabroker",
+      "UBF8T346G9.com.microsoft.oneauth",
+      "UBF8T346G9.group.com.microsoft.shared",
+      "UBF8T346G9.OfficeOsfWebHost",
+      "UBF8T346G9.OfficeOneDriveSyncIntegration",
+      "UBF8T346G9.OfficeExcelWidget"
+    ],
+    "appPath": "/Applications/Microsoft Excel.app",
+    "bundleId": "com.microsoft.Excel",
+    "embeddedBundleIds": [
+      "com.microsoft.Excel.widgetextension"
+    ],
+    "executableName": "Microsoft Excel",
+    "icloudContainers": [],
+    "isSandboxed": true,
+    "name": "Microsoft Excel",
+    "receiptIds": [],
+    "teamId": "UBF8T346G9"
+  },
+  "name": "Microsoft Excel — paket cask yerine tekil cask, kardeş uygulamalar listelenmez",
+  "notes": "Rapor 2026-10-21 build 11. Excel.app adı yalnızca Office paket cask'lerinde geçer; zap listesi doğrudan com.microsoft.Excel'i anan microsoft-excel seçilir. PowerPoint/Word konteynerleri, Office ortak grupları seçimsiz.",
+  "options": {
+    "includeAggressiveLocations": false,
+    "includeSystemLocations": false,
+    "useCaskDatabase": true
+  },
+  "schema": 1,
+  "status": "curated",
+  "tree": [
+    "/Applications/Microsoft PowerPoint.app/",
+    "/Applications/Microsoft Word.app/",
+    "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.microsoft.excel.sfl4",
+    "~/Library/Containers/com.microsoft.Excel.widgetextension/",
+    "~/Library/Containers/com.microsoft.Excel/",
+    "~/Library/Containers/com.microsoft.Powerpoint/",
+    "~/Library/Containers/com.microsoft.Word/",
+    "~/Library/Group Containers/UBF8T346G9.Office/",
+    "~/Library/Group Containers/UBF8T346G9.OfficeExcelWidget/",
+    "~/Library/Group Containers/UBF8T346G9.com.microsoft.oneauth/",
+    "~/Library/Group Containers/UBF8T346G9.group.com.microsoft.shared/",
+    "~/Library/Group Containers/UBF8T346G9.ms/"
+  ]
+}

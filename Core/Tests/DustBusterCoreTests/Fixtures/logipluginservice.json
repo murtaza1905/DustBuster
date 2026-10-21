@@ -1,0 +1,43 @@
+{
+  "emptyDirs": [],
+  "expect": {
+    "absent": [
+      "~/Library/HTTPStorages/LogiPluginServiceNative"
+    ],
+    "caskTokens": [],
+    "strong": [
+      "~/Library/Preferences/com.logi.pluginservice.plist",
+      "~/Library/Application Support/Logi/LogiPluginService",
+      "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.logi.pluginservice.sfl4"
+    ],
+    "weak": []
+  },
+  "home": "/Users/test",
+  "identity": {
+    "appGroups": [],
+    "appPath": "/Applications/Utilities/LogiPluginService.app",
+    "bundleId": "com.logi.pluginservice",
+    "embeddedBundleIds": [],
+    "executableName": "LogiPluginService",
+    "icloudContainers": [],
+    "isSandboxed": false,
+    "name": "LogiPluginService",
+    "receiptIds": [],
+    "teamId": "QED4VVPZWA"
+  },
+  "name": "LogiPluginService — Options+ cask'inin sahiplendiği yol listelenmez",
+  "notes": "Rapor 2026-10-21 build 11. HTTPStorages/LogiPluginServiceNative ad önekiyle zayıf eşleşir ama logi-options+ cask'i bu yolu sahiplendiği için (başka uygulama) elenir.",
+  "options": {
+    "includeAggressiveLocations": false,
+    "includeSystemLocations": false,
+    "useCaskDatabase": true
+  },
+  "schema": 1,
+  "status": "curated",
+  "tree": [
+    "~/Library/Application Support/Logi/LogiPluginService/",
+    "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.logi.pluginservice.sfl4",
+    "~/Library/HTTPStorages/LogiPluginServiceNative/",
+    "~/Library/Preferences/com.logi.pluginservice.plist"
+  ]
+}

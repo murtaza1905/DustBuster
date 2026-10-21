@@ -172,4 +172,64 @@ final class SearchTermsTests: XCTestCase {
         XCTAssertFalse(fs.isEffectivelyEmptyDirectory("/x/hasFile"))
         XCTAssertFalse(fs.isEffectivelyEmptyDirectory("/x/hasFile/a/file.txt"))
     }
+
+    func testLongNamePrefixMatchesWeakly() {
+        let logi = terms(bundleId: "com.logi.pluginservice", name: "LogiPluginService")
+        XCTAssertEqual(logi.match("LogiPluginServiceNative", isDirectory: true), .weak)
+        XCTAssertEqual(logi.match("LogiPluginService", isDirectory: true), .strong)
+        let short = terms(bundleId: "com.foo.app", name: "Noteful")
+        XCTAssertNil(short.match("Notefulness", isDirectory: true), "8 karakterden kısa adlarda önek eşleşmesi yok")
+        let xcode = terms(bundleId: "com.apple.dt.Xcode", name: "Xcode")
+        XCTAssertNil(xcode.match("com.apple.dt.xcodebuild", isDirectory: true))
+    }
+
+    func testCaskLookupPrefersSpecificPkgCaskOverSuite() throws {
+        let db = try XCTUnwrap(CaskDatabase.bundled())
+        let excel = AppIdentity(name: "Microsoft Excel", bundleId: "com.microsoft.Excel", appPath: "/Applications/Microsoft Excel.app")
+        XCTAssertEqual(db.lookup(identity: excel).map { $0.token }, ["microsoft-excel"])
+        let word = AppIdentity(name: "Microsoft Word", bundleId: "com.microsoft.Word", appPath: "/Applications/Microsoft Word.app")
+        XCTAssertEqual(db.lookup(identity: word).map { $0.token }, ["microsoft-word"])
+        let ppt = AppIdentity(name: "Microsoft PowerPoint", bundleId: "com.microsoft.Powerpoint", appPath: "/Applications/Microsoft PowerPoint.app")
+        XCTAssertEqual(db.lookup(identity: ppt).map { $0.token }, ["microsoft-powerpoint"])
+        XCTAssertEqual(CaskDatabase.bundleLikeComponents(ofPattern: "~/Library/Containers/com.microsoft.Excel*"), ["com.microsoft.excel"])
+        XCTAssertEqual(CaskDatabase.bundleLikeComponents(ofPattern: "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.microsoft.word.sfl*"), ["com.microsoft.word"])
+        XCTAssertTrue(CaskDatabase.bundleLikeComponents(ofPattern: "~/Library/Application Support/Microsoft").isEmpty)
+    }
+
+    func testSameAppCasksAreNotOtherOwners() throws {
+        let db = try XCTUnwrap(CaskDatabase.bundled())
+        let home = "/Users/test"
+        let ppt = AppIdentity(name: "Microsoft PowerPoint", bundleId: "com.microsoft.Powerpoint", appPath: "/Applications/Microsoft PowerPoint.app")
+        XCTAssertTrue(db.otherOwners(ofPath: "\(home)/Library/Containers/com.microsoft.Powerpoint", home: home, excluding: ["microsoft-powerpoint"], identity: ppt).isEmpty,
+                      "Office paketi PowerPoint.app'i taşıdığı için aynı uygulamadır")
+        let chrome = AppIdentity(name: "Google Chrome", bundleId: "com.google.Chrome", appPath: "/Applications/Google Chrome.app")
+        let keystone = db.otherOwners(ofPath: "\(home)/Library/LaunchAgents/com.google.keystone.agent.plist", home: home, excluding: ["google-chrome"], identity: chrome)
+        XCTAssertTrue(keystone.contains("google-chrome@beta"), "Chrome Beta ayrı uygulamadır, Keystone paylaşılır: \(keystone)")
+    }
+
+    func testVendorFolderIsNeverAutoSelected() {
+        let home = "/Users/test"
+        let fs = VirtualFileSystem(paths: [
+            "\(home)/Library/Application Support/Microsoft/MSTeams/x",
+            "\(home)/Library/Application Support/Microsoft Word/x",
+            "\(home)/Library/Application Support/Notion/x",
+            "/Applications/Microsoft Word.app/Contents/Info.plist",
+            "/Applications/Notion.app/Contents/Info.plist"
+        ])
+        let word = AppIdentity(name: "Microsoft Word", bundleId: "com.microsoft.Word", appPath: "/Applications/Microsoft Word.app")
+        let wordResult = LeftoverScanner(home: home, fs: fs, caskDatabase: nil).scan(identity: word)
+        XCTAssertEqual(wordResult.findings.first { $0.path == "\(home)/Library/Application Support/Microsoft Word" }?.strength, .strong)
+        XCTAssertFalse(wordResult.contains(path: "\(home)/Library/Application Support/Microsoft"), "ad eşleşmesi satıcı klasörünü bulmaz")
+        let forced = AppConditions(conditions: [AppCondition(id: "word", bundleIds: ["com.microsoft.Word"],
+                                                            include: [AppCondition.Include(path: "~/Library/Application Support/Microsoft")])])
+        let forcedResult = LeftoverScanner(home: home, fs: fs, caskDatabase: nil, conditions: forced).scan(identity: word)
+        let vendor = forcedResult.findings.first { $0.path == "\(home)/Library/Application Support/Microsoft" }
+        XCTAssertEqual(vendor?.strength, .weak, "kaynağı ne olursa olsun satıcı klasörü seçimsiz")
+        XCTAssertTrue(vendor?.note.contains("satıcı klasörü") ?? false)
+        let notion = AppIdentity(name: "Notion", bundleId: "notion.id", appPath: "/Applications/Notion.app")
+        let notionResult = LeftoverScanner(home: home, fs: fs, caskDatabase: nil).scan(identity: notion)
+        XCTAssertEqual(notionResult.findings.first { $0.path == "\(home)/Library/Application Support/Notion" }?.strength, .strong, "uygulamanın adı satıcı adının kendisiyse klasör onundur")
+        XCTAssertEqual(LeftoverScanner.vendorToken(identity: word), "microsoft")
+        XCTAssertEqual(LeftoverScanner.vendorToken(identity: notion), "notion")
+    }
 }

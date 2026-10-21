@@ -25,6 +25,8 @@ public struct SearchTerms: Equatable {
     public let isAppleApp: Bool
 
     public static let minNameLength = 4
+    /// Önek eşleşmesi (ad + ek) yalnızca bu uzunluktan uzun adlar için yapılır
+    public static let minPrefixLength = 8
 
     /// Tek başına bir uygulamayı tanımlamayan, çok sayıda yanlış eşleşme üreten adlar.
     public static let genericNames: Set<String> = [
@@ -176,6 +178,16 @@ public struct SearchTerms: Equatable {
         // ("Google/Chrome Remote Desktop/Default" Chrome'a ait değildir)
         for termTokens in nameTokenSets where SearchTerms.containsContiguous(termTokens, in: lastTokens) {
             return .weak
+        }
+
+        // Uzun ve özgül bir ad (≥ 8 karakter) daha uzun bir token'ın başlangıcıysa ("LogiPluginServiceNative")
+        // zayıf eşleşir; kısa adlar için bu kural yoktur ("app" ⊂ "apple" hatasını yeniden üretmemek için)
+        for termTokens in nameTokenSets where termTokens.count == 1 {
+            let squashed = termTokens[0]
+            guard squashed.count >= SearchTerms.minPrefixLength else { continue }
+            if lastTokens.contains(where: { $0.count > squashed.count && $0.hasPrefix(squashed) }) {
+                return .weak
+            }
         }
         return nil
     }

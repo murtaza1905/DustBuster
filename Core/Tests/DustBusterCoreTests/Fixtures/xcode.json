@@ -1,10 +1,10 @@
 {
-  "containerIdentifiers" : null,
-  "emptyDirs" : [
+  "containerIdentifiers": null,
+  "emptyDirs": [
     "~/Library/Developer/XCPGDevices/"
   ],
-  "expect" : {
-    "absent" : [
+  "expect": {
+    "absent": [
       "~/Library/Caches/com.apple.appstore",
       "~/Library/Caches/com.apple.helpd",
       "~/Library/Application Support/Xcodes",
@@ -13,61 +13,59 @@
       "~/Library/Developer/XCPGDevices",
       "~/Library/MobileDevice/Provisioning Profiles"
     ],
-    "caskTokens" : [
-
-    ],
-    "strong" : [
-      "~/Library/Preferences/com.apple.dt.Xcode.plist",
-      "~/Library/Preferences/com.apple.dt.xcodebuild.plist",
-      "~/Library/Preferences/com.apple.dt.Instruments.plist",
+    "caskTokens": [],
+    "strong": [
+      "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.apple.dt.xcode.sfl4",
       "~/Library/Caches/com.apple.dt.Xcode",
       "~/Library/Caches/com.apple.dt.xcodebuild",
-      "~/Library/Saved Application State/com.apple.dt.Xcode.savedState",
-      "~/Library/Developer/Xcode",
       "~/Library/Developer/CoreSimulator",
       "~/Library/Developer/XCTestDevices",
+      "~/Library/Developer/Xcode",
+      "~/Library/HTTPStorages/com.apple.dt.xcodebuild",
       "~/Library/Logs/CoreSimulator",
-      "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.apple.dt.xcode.sfl4"
+      "~/Library/Preferences/com.apple.dt.Instruments.plist",
+      "~/Library/Preferences/com.apple.dt.Xcode.plist",
+      "~/Library/Preferences/com.apple.dt.xcodebuild.plist",
+      "~/Library/Saved Application State/com.apple.dt.Xcode.savedState"
     ],
-    "weak" : [
+    "weak": [
       "~/Library/Caches/org.swift.swiftpm",
       "~/Library/org.swift.swiftpm"
     ]
   },
-  "home" : "/Users/test",
-  "identity" : {
-    "appGroups" : [
-
+  "home": "/Users/test",
+  "identity": {
+    "appGroups": [
+      "com.apple.dt.XcodeCloud",
+      "group.com.apple.dt.Xcode",
+      "59GAB85EFG.com.apple.dt.XcodeCloud"
     ],
-    "appPath" : "/Applications/Xcode.app",
-    "bundleId" : "com.apple.dt.Xcode",
-    "embeddedBundleIds" : [
-      "com.apple.dt.Instruments",
-      "com.apple.dt.Xcode.PlaygroundStub-macosx"
+    "appPath": "/Applications/Xcode.app",
+    "bundleId": "com.apple.dt.Xcode",
+    "embeddedBundleIds": [
+      "com.apple.dt.DVTFeedbackReporting.DVTFeedbackReportingDiagnosticExtension",
+      "com.apple.dt.DVTProvisioningProfileQuicklookExtension",
+      "com.apple.dt.DVTFeedbackReporting.XCCFeedbackReportingDiagnosticExtension"
     ],
-    "executableName" : "Xcode",
-    "icloudContainers" : [
-
-    ],
-    "isSandboxed" : false,
-    "name" : "Xcode",
-    "receiptIds" : [
-
-    ],
-    "teamId" : null
+    "executableName": "Xcode",
+    "icloudContainers": [],
+    "isSandboxed": false,
+    "name": "Xcode",
+    "receiptIds": [],
+    "teamId": "59GAB85EFG"
   },
-  "launchdPrograms" : null,
-  "name" : "Xcode — conditions.json ile geliştirici klasörleri",
-  "notes" : "Tur C. ~/Library/Developer taramada yok; xcode kuralı ekler. Xcodes (üçüncü parti yönetici) ve diğer com.apple.* önbellekleri listeye girmez.",
-  "options" : {
-    "includeAggressiveLocations" : false,
-    "includeSystemLocations" : false,
-    "useCaskDatabase" : true
+  "launchdPrograms": null,
+  "name": "Xcode — conditions.json ile geliştirici klasörleri",
+  "notes": "Tur C. ~/Library/Developer taramada yok; xcode kuralı ekler. Xcodes (üçüncü parti yönetici) ve diğer com.apple.* önbellekleri listeye girmez.",
+  "options": {
+    "includeAggressiveLocations": false,
+    "includeSystemLocations": false,
+    "useCaskDatabase": true
   },
-  "receipts" : null,
-  "schema" : 1,
-  "status" : "curated",
-  "tree" : [
+  "receipts": null,
+  "schema": 1,
+  "status": "curated",
+  "tree": [
     "~/Library/Application Support/Xcodes/",
     "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.apple.dt.xcode.sfl4",
     "~/Library/Caches/com.apple.appstore/",
@@ -76,12 +74,13 @@
     "~/Library/Caches/com.apple.helpd/",
     "~/Library/Caches/com.robotsandpencils.XcodesApp/",
     "~/Library/Caches/org.swift.swiftpm/",
-    "~/Library/Developer/CoreSimulator/Devices/",
     "~/Library/Developer/CoreSimulator/Caches/",
+    "~/Library/Developer/CoreSimulator/Devices/",
     "~/Library/Developer/XCTestDevices/",
     "~/Library/Developer/Xcode/DerivedData/",
     "~/Library/Developer/Xcode/UserData/",
     "~/Library/Developer/Xcode/iOS DeviceSupport/",
+    "~/Library/HTTPStorages/com.apple.dt.xcodebuild/",
     "~/Library/Logs/CoreSimulator/",
     "~/Library/MobileDevice/Provisioning Profiles/",
     "~/Library/Preferences/com.apple.dt.Instruments.plist",

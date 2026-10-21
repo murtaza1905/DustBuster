@@ -78,6 +78,10 @@ public final class CaskDatabase {
     private let ownersByExactPath: [String: [Int]]
     /// Jokerli "~/…" kalıpları, jokerden önceki üst dizine göre gruplanmış
     private let globOwnersByParent: [String: [(pattern: String, index: Int)]]
+    /// Her cask'in zap yollarında geçen (Apple dışı) bundle ID benzeri bileşenler
+    private let zapBundleIds: [Set<String>]
+    /// Bundle ID → onu zap yollarında anan cask'ler
+    private let byZapBundleId: [String: [Int]]
 
     public init(entries: [Entry], generated: String = "", source: String = "") {
         self.entries = entries
@@ -89,7 +93,15 @@ public final class CaskDatabase {
         var byName: [String: [Int]] = [:]
         var owners: [String: [Int]] = [:]
         var globOwners: [String: [(pattern: String, index: Int)]] = [:]
+        var zapIds: [Set<String>] = []
+        var byZap: [String: [Int]] = [:]
         for (i, e) in entries.enumerated() {
+            var ids: Set<String> = []
+            for p in e.leftoverPatterns where p.hasPrefix("~/") {
+                for component in CaskDatabase.bundleLikeComponents(ofPattern: p) { ids.insert(component) }
+            }
+            zapIds.append(ids)
+            for id in ids { byZap[id, default: []].append(i) }
             for app in e.apps { byApp[app.lowercased(), default: []].append(i) }
             // `quit:` kimlikleri kullanılmaz: başka uygulamaları da (ör. bir eklenti kurucusunun kapattığı
             // Chrome'u) kapsar; yalnızca paket kimlikleri ve launchd etiketleri uygulamayı tanımlar
@@ -113,11 +125,36 @@ public final class CaskDatabase {
         self.byName = byName
         self.ownersByExactPath = owners
         self.globOwnersByParent = globOwners
+        self.zapBundleIds = zapIds
+        self.byZapBundleId = byZap
+    }
+
+    /// "~/Library/Containers/com.microsoft.Excel*" → ["com.microsoft.excel"]. Uzantılar ve jokerler atılır,
+    /// en az iki nokta içeren, boşluksuz, Apple dışı bileşenler alınır.
+    static func bundleLikeComponents(ofPattern pattern: String) -> [String] {
+        var out: [String] = []
+        for raw in pattern.lowercased().split(separator: "/").dropFirst(2) {
+            var c = String(raw)
+            if let star = c.firstIndex(where: { $0 == "*" || $0 == "?" }) { c = String(c[..<star]) }
+            for suffix in [".plist", ".savedstate", ".sfl4", ".sfl3", ".sfl2", ".sfl", ".binarycookies"] where c.hasSuffix(suffix) {
+                c = String(c.dropLast(suffix.count))
+            }
+            while c.hasSuffix(".") { c.removeLast() }
+            guard c.filter({ $0 == "." }).count >= 2, !c.contains(" "), !c.hasPrefix("com.apple.") else { continue }
+            out.append(c)
+        }
+        return out
+    }
+
+    /// Cask'in zap listesi bu bundle ID'yi anıyorsa o cask aynı uygulamanın (sürüm/paket) kaydıdır.
+    public func caskMentions(token: String, bundleId: String) -> Bool {
+        guard let index = entries.firstIndex(where: { $0.token == token }) else { return false }
+        return zapBundleIds[index].contains(bundleId.lowercased())
     }
 
     /// Yol, `excluding` dışındaki bir cask'in zap listesinde birebir geçiyorsa o cask'lerin token'larını döner.
     /// "Notion Calendar" klasörünün Notion'a değil notion-calendar'a ait olduğunu böyle anlarız.
-    public func otherOwners(ofPath path: String, home: String, excluding tokens: Set<String>) -> [String] {
+    public func otherOwners(ofPath path: String, home: String, excluding tokens: Set<String>, identity: AppIdentity? = nil) -> [String] {
         guard path.hasPrefix(home + "/") else { return [] }
         let key = ("~" + String(path.dropFirst(home.count))).lowercased()
         var indices: [Int] = ownersByExactPath[key] ?? []
@@ -135,7 +172,21 @@ public final class CaskDatabase {
         }
 
         var seen: Set<Int> = []
-        return indices.filter { seen.insert($0).inserted }.map { entries[$0].token }.filter { !tokens.contains($0) }
+        return indices.filter { seen.insert($0).inserted }
+            .filter { !isSameApp(index: $0, as: identity) }
+            .map { entries[$0].token }.filter { !tokens.contains($0) }
+    }
+
+    /// Cask, bu uygulamanın başka bir kaydı mı? Uygulama listesi bizim .app'imizi içeriyorsa (Office paketi
+    /// Excel'i taşır) ya da uygulama listesi boşken zap yolları bizim bundle ID'mizi anıyorsa (pkg tabanlı
+    /// microsoft-excel) aynı uygulamadır; "Google Chrome Beta.app" taşıyan cask ise başka uygulamadır.
+    private func isSameApp(index: Int, as identity: AppIdentity?) -> Bool {
+        guard let identity = identity else { return false }
+        let e = entries[index]
+        let appKey = identity.appFileName.lowercased()
+        if e.apps.contains(where: { $0.lowercased() == appKey }) { return true }
+        if e.apps.isEmpty, let bid = identity.bundleId?.lowercased(), zapBundleIds[index].contains(bid) { return true }
+        return false
     }
 
     public convenience init(jsonData: Data) throws {
@@ -174,6 +225,21 @@ public final class CaskDatabase {
             let nameKey = CaskDatabase.squash(identity.name)
             if nameKey.count >= SearchTerms.minNameLength, let found = byName[nameKey], found.count == 1 {
                 indices = found
+            }
+        }
+
+        // .app adı yalnızca paket cask'lerinde (Office) geçiyorsa, zap listesi doğrudan bu bundle ID'yi
+        // anan ve başka uygulamaya değinmeyen tekil cask (microsoft-excel) tercih edilir
+        if let bid = identity.bundleId?.lowercased(), !bid.isEmpty,
+           indices.allSatisfy({ entries[$0].apps.count > 1 }) {
+            let specific = (byZapBundleId[bid] ?? []).filter { i in
+                let e = entries[i]
+                let otherApps = e.apps.filter { $0.lowercased() != appKey }
+                return otherApps.isEmpty && zapBundleIds[i].count <= 2
+            }
+            if !specific.isEmpty {
+                let minCount = specific.map { zapBundleIds[$0].count }.min() ?? 0
+                indices = specific.filter { zapBundleIds[$0].count == minCount }
             }
         }
 

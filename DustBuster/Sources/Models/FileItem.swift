@@ -176,6 +176,11 @@ struct FileItem: Identifiable, Hashable {
             ).capitalized
         }
 
-        return formatted.joined(separator: " ")
+        var words: [String] = []
+        for word in formatted.joined(separator: " ").split(separator: " ").map(String.init) {
+            if let last = words.last, last.caseInsensitiveCompare(word) == .orderedSame { continue }
+            words.append(word)
+        }
+        return words.joined(separator: " ")
     }
 }

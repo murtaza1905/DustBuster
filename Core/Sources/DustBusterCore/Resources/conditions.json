@@ -38,6 +38,11 @@
           "note": "Xcode araç ayarı"
         },
         {
+          "path": "~/Library/HTTPStorages/com.apple.dt.*",
+          "strength": "strong",
+          "note": "Xcode araç HTTP deposu"
+        },
+        {
           "path": "~/Library/Saved Application State/com.apple.dt.*",
           "strength": "strong"
         },

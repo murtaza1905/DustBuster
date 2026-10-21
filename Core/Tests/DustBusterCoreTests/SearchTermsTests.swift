@@ -132,6 +132,34 @@ final class SearchTermsTests: XCTestCase {
         XCTAssertTrue(db.otherOwners(ofPath: "\(home)/Library/Application Support/Notion", home: home, excluding: ["notion"]).isEmpty)
     }
 
+    func testReceiptMatching() {
+        let identity = AppIdentity(name: "Acme Driver", bundleId: "com.acme.driver", appPath: "/Applications/Acme Driver.app",
+                                   embeddedBundleIds: ["com.acme.driver.helper"])
+        let all = ["com.acme.driver.pkg", "com.acme.driver.helper.pkg", "com.acme.other.pkg", "com.apple.pkg.CLTools", "io.vendor.AcmeAudio"]
+        XCTAssertEqual(ReceiptMatcher.matchingPackageIds(all: all, identity: identity, caskPkgIds: ["io.vendor.Acme*"]),
+                       ["com.acme.driver.pkg", "com.acme.driver.helper.pkg", "io.vendor.AcmeAudio"])
+        let collapsed = ReceiptMatcher.collapse(files: [
+            "/Library/Application Support/Acme/driver.kext/Contents/Info.plist",
+            "/Library/Application Support/Acme/driver.kext/Contents/MacOS/driver",
+            "/Library/LaunchDaemons/com.acme.driverd.plist",
+            "/Applications/Acme Driver.app/Contents/MacOS/Acme Driver",
+            "/Applications/Utilities/Acme Tool.app/Contents/Info.plist",
+            "/usr/local/bin/acme",
+            "relative/path"
+        ], appPath: "/Applications/Acme Driver.app", home: "/Users/test")
+        XCTAssertEqual(collapsed, ["/Library/Application Support/Acme", "/Library/LaunchDaemons/com.acme.driverd.plist",
+                                   "/Applications/Utilities/Acme Tool.app", "/usr/local/bin/acme"])
+    }
+
+    func testVirtualFileSystemMetadataAndLaunchd() {
+        let fs = VirtualFileSystem(paths: ["/Users/test/Library/Containers/ABC/", "/Users/test/Library/LaunchAgents/x.plist"],
+                                   containerIdentifiers: ["/Users/test/Library/Containers/ABC": "com.acme.notes"],
+                                   launchdPrograms: ["/Users/test/Library/LaunchAgents/x.plist": "/Applications/Acme.app/Contents/MacOS/x"])
+        XCTAssertEqual(fs.containerIdentifier(ofContainerAt: "/Users/test/Library/Containers/ABC"), "com.acme.notes")
+        XCTAssertNil(fs.containerIdentifier(ofContainerAt: "/Users/test/Library/Containers/other"))
+        XCTAssertEqual(fs.launchdProgram(ofPlistAt: "/Users/test/Library/LaunchAgents/x.plist"), "/Applications/Acme.app/Contents/MacOS/x")
+    }
+
     func testEffectivelyEmptyDirectory() {
         let fs = VirtualFileSystem(paths: [
             "/x/onlyEmptySubdirs/a/b/",

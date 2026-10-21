@@ -13,10 +13,16 @@ public struct Finding: Codable, Equatable, Hashable {
         case name
         /// Homebrew Cask veritabanı
         case cask
-        /// Paket içindeki yardımcı uygulamanın launchd kaydı
+        /// Paket içindeki yardımcı uygulamanın kendi konteyneri / launchd kaydı
         case helper
-        /// Kurulum faturası (/private/var/db/receipts)
+        /// Kurulum faturası (pkgutil): fatura dosyası veya paketin kurduğu dosya
         case receipt
+        /// Uygulamanın entitlements beyanı (app group)
+        case entitlement
+        /// Konteyner metadata'sındaki sahip bundle ID'si
+        case containerMetadata
+        /// launchd plist'inin programı uygulama paketinin içinde
+        case launchd
     }
 
     public let path: String
@@ -50,12 +56,15 @@ public struct ScanResult: Equatable {
     public var caskTokens: [String]
     /// Kabul edilmeyen yollar (rapor için)
     public var rejected: [RejectedPath]
+    /// Uygulamaya ait bulunan kurulum paketi kimlikleri (pkgutil)
+    public var receiptIds: [String]
 
-    public init(findings: [Finding], droppedDeepCount: Int = 0, caskTokens: [String] = [], rejected: [RejectedPath] = []) {
+    public init(findings: [Finding], droppedDeepCount: Int = 0, caskTokens: [String] = [], rejected: [RejectedPath] = [], receiptIds: [String] = []) {
         self.findings = findings
         self.droppedDeepCount = droppedDeepCount
         self.caskTokens = caskTokens
         self.rejected = rejected
+        self.receiptIds = receiptIds
     }
 
     public var strong: [Finding] { findings.filter { $0.strength == .strong } }
@@ -69,15 +78,17 @@ public final class LeftoverScanner {
     public let home: String
     public let fs: ScanFileSystem
     public let caskDatabase: CaskDatabase?
+    public let receipts: ReceiptProvider?
     public let options: ScanOptions
 
     private var homeLibrary: String { home + "/Library" }
     private let systemLibrary = "/Library"
 
-    public init(home: String, fs: ScanFileSystem, caskDatabase: CaskDatabase?, options: ScanOptions = ScanOptions()) {
+    public init(home: String, fs: ScanFileSystem, caskDatabase: CaskDatabase?, receipts: ReceiptProvider? = nil, options: ScanOptions = ScanOptions()) {
         self.home = home
         self.fs = fs
         self.caskDatabase = caskDatabase
+        self.receipts = receipts
         self.options = options
     }
 
@@ -89,17 +100,25 @@ public final class LeftoverScanner {
         var collected = Collector(home: home, options: options)
         collected.add(appBundle(identity))
         for c in fastCandidates(identity: identity, terms: terms) { collected.add(c) }
-        let tokens = addCaskHits(identity: identity, into: &collected)
-        return collected.result(droppedDeep: 0, caskTokens: tokens)
+        for c in entitlementCandidates(identity: identity) { collected.add(c) }
+        for c in helperContainerCandidates(identity: identity) { collected.add(c) }
+        let entries = addCaskHits(identity: identity, into: &collected)
+        return collected.result(droppedDeep: 0, caskTokens: entries.map { $0.token })
     }
 
-    /// Tam tarama: hızlı + dizin taraması (+ sistem konumları seçiliyse).
+    /// Tam tarama: kesin kaynaklar + veritabanı + dizin taraması (+ sistem konumları seçiliyse).
     public func scan(identity: AppIdentity) -> ScanResult {
         let terms = SearchTerms(identity: identity)
         var collected = Collector(home: home, options: options)
         collected.add(appBundle(identity))
         for c in fastCandidates(identity: identity, terms: terms) { collected.add(c) }
-        let tokens = addCaskHits(identity: identity, into: &collected)
+        for c in entitlementCandidates(identity: identity) { collected.add(c) }
+        for c in helperContainerCandidates(identity: identity) { collected.add(c) }
+        for c in containerMetadataCandidates(identity: identity) { collected.add(c) }
+        for c in launchdCandidates(identity: identity) { collected.add(c) }
+        let entries = addCaskHits(identity: identity, into: &collected)
+        let tokens = entries.map { $0.token }
+        let receiptIds = addReceiptHits(identity: identity, caskPkgIds: entries.flatMap { $0.pkgutil }, into: &collected)
 
         var deep: [Finding] = []
         deep += searchUserLibrary(terms: terms)
@@ -108,7 +127,7 @@ public final class LeftoverScanner {
         deep += searchHelperLaunchItems(identity: identity)
         if options.includeSystemLocations {
             deep += searchSystemLocations(terms: terms)
-            deep += searchInstallerReceipts(terms: terms)
+            deep += searchInstallerReceipts(terms: terms, receiptIds: receiptIds)
         }
 
         var dropped = 0
@@ -128,7 +147,7 @@ public final class LeftoverScanner {
                 collected.add(f)
             }
         }
-        return collected.result(droppedDeep: dropped, caskTokens: tokens)
+        return collected.result(droppedDeep: dropped, caskTokens: tokens, receiptIds: receiptIds)
     }
 
     /// Filtresiz ham liste: standart konumlarda, ayraçlar atıldığında adında bundle ID'yi veya
@@ -196,14 +215,14 @@ public final class LeftoverScanner {
             rejected.append(RejectedPath(path: path, reason: reason))
         }
 
-        func result(droppedDeep: Int, caskTokens: [String]) -> ScanResult {
+        func result(droppedDeep: Int, caskTokens: [String], receiptIds: [String] = []) -> ScanResult {
             let findings = order.compactMap { byPath[$0] }.sorted { a, b in
                 if a.strength != b.strength { return a.strength > b.strength }
                 let ra = LeftoverScanner.kindRank(a.kind), rb = LeftoverScanner.kindRank(b.kind)
                 if ra != rb { return ra < rb }
                 return a.path.localizedCaseInsensitiveCompare(b.path) == .orderedAscending
             }
-            return ScanResult(findings: findings, droppedDeepCount: droppedDeep, caskTokens: caskTokens, rejected: rejected)
+            return ScanResult(findings: findings, droppedDeepCount: droppedDeep, caskTokens: caskTokens, rejected: rejected, receiptIds: receiptIds)
         }
     }
 
@@ -274,7 +293,7 @@ public final class LeftoverScanner {
         return out
     }
 
-    private func addCaskHits(identity: AppIdentity, into collector: inout Collector) -> [String] {
+    private func addCaskHits(identity: AppIdentity, into collector: inout Collector) -> [CaskDatabase.Entry] {
         guard options.useCaskDatabase, let db = caskDatabase else { return [] }
         let entries = db.lookup(identity: identity)
         guard !entries.isEmpty else { return [] }
@@ -291,7 +310,97 @@ public final class LeftoverScanner {
                 collector.reject(hit.path, "Homebrew \(hit.token): \(reason)")
             }
         }
-        return entries.map { $0.token }
+        return entries
+    }
+
+    // MARK: - Kesin kaynaklar (Tur B)
+
+    /// Entitlements'taki app group'lar: Group Containers ve Application Scripts altındaki tam yollar.
+    private func entitlementCandidates(identity: AppIdentity) -> [Finding] {
+        var out: [Finding] = []
+        for group in identity.appGroups where !group.isEmpty {
+            for (sub, note) in [("Group Containers", "Group Containers"), ("Application Scripts", "Application Scripts")] {
+                let path = "\(homeLibrary)/\(sub)/\(group)"
+                if isUsable(path) {
+                    out.append(make(path, source: .entitlement, strength: .strong, note: "Entitlement app group: \(note)"))
+                }
+            }
+        }
+        return out
+    }
+
+    /// Gömülü yardımcıların (uzantı, XPC, LoginItem) kendi konteyner ve script klasörleri.
+    private func helperContainerCandidates(identity: AppIdentity) -> [Finding] {
+        var out: [Finding] = []
+        for id in identity.embeddedBundleIds where !id.isEmpty && !id.lowercased().hasPrefix("com.apple.") {
+            for (sub, note) in [("Containers", "Containers"), ("Application Scripts", "Application Scripts"), ("Group Containers", "Group Containers")] {
+                let path = "\(homeLibrary)/\(sub)/\(id)"
+                if isUsable(path) {
+                    out.append(make(path, source: .helper, strength: .strong, note: "Yardımcı \(id): \(note)"))
+                }
+            }
+        }
+        return out
+    }
+
+    /// ~/Library/Containers altındaki her klasörün metadata'sındaki sahip ID'si; klasör adı UUID olsa da eşleşir.
+    private func containerMetadataCandidates(identity: AppIdentity) -> [Finding] {
+        let dir = homeLibrary + "/Containers"
+        guard let names = fs.contents(ofDirectory: dir) else { return [] }
+        var owners: Set<String> = []
+        if let bid = identity.bundleId?.lowercased(), !bid.isEmpty { owners.insert(bid) }
+        for id in identity.embeddedBundleIds where !id.lowercased().hasPrefix("com.apple.") { owners.insert(id.lowercased()) }
+        guard !owners.isEmpty else { return [] }
+
+        var out: [Finding] = []
+        for name in names {
+            let path = dir + "/" + name
+            guard fs.isDirectory(path), !fs.isSymlink(path) else { continue }
+            guard let owner = fs.containerIdentifier(ofContainerAt: path)?.lowercased(), owners.contains(owner) else { continue }
+            guard isUsable(path) else { continue }
+            out.append(make(path, source: .containerMetadata, strength: .strong, note: "Konteyner metadata: \(owner)"))
+        }
+        return out
+    }
+
+    /// launchd plist'inin programı uygulama paketinin içindeyse kesin kalıntıdır (etiket ne olursa olsun).
+    private func launchdCandidates(identity: AppIdentity) -> [Finding] {
+        var dirs = [homeLibrary + "/LaunchAgents"]
+        if options.includeSystemLocations { dirs += ["/Library/LaunchAgents", "/Library/LaunchDaemons"] }
+        let appPrefix = identity.appPath + "/"
+        var out: [Finding] = []
+        for dir in dirs {
+            guard let names = fs.contents(ofDirectory: dir) else { continue }
+            for name in names where name.hasSuffix(".plist") {
+                let path = dir + "/" + name
+                guard !fs.isSymlink(path), let program = fs.launchdProgram(ofPlistAt: path) else { continue }
+                guard program == identity.appPath || program.hasPrefix(appPrefix) else { continue }
+                out.append(make(path, source: .launchd, strength: .strong, note: "launchd programı paket içinde: \((program as NSString).lastPathComponent)"))
+            }
+        }
+        return out
+    }
+
+    /// Kurulum faturaları: uygulamaya ait paketlerin kurduğu dosyalar (yalnızca sistem taraması açıkken).
+    private func addReceiptHits(identity: AppIdentity, caskPkgIds: [String], into collector: inout Collector) -> [String] {
+        guard let provider = receipts else { return identity.receiptIds }
+        let all = provider.installedPackageIds()
+        var ids = ReceiptMatcher.matchingPackageIds(all: all, identity: identity, caskPkgIds: caskPkgIds)
+        for id in identity.receiptIds where !ids.contains(id) { ids.append(id) }
+        guard !ids.isEmpty, options.includeSystemLocations else { return ids }
+
+        var files: [String] = []
+        for id in ids { files += provider.files(forPackage: id) }
+        for path in ReceiptMatcher.collapse(files: files, appPath: identity.appPath, home: home) {
+            switch PathClassifier.admit(path: path, home: home, options: options) {
+            case .accepted(let strength, let note):
+                guard isUsable(path) else { continue }
+                collector.add(make(path, source: .receipt, strength: strength, note: "Kurulum faturası" + (note.map { " — \($0)" } ?? "")))
+            case .rejected(let reason):
+                collector.reject(path, "Kurulum faturası: \(reason)")
+            }
+        }
+        return ids
     }
 
     private struct Location {
@@ -425,14 +534,15 @@ public final class LeftoverScanner {
         return out
     }
 
-    private func searchInstallerReceipts(terms: SearchTerms) -> [Finding] {
+    private func searchInstallerReceipts(terms: SearchTerms, receiptIds: [String]) -> [Finding] {
         let dir = "/private/var/db/receipts"
         guard let names = fs.contents(ofDirectory: dir) else { return [] }
+        let known = Set(receiptIds.map { $0.lowercased() })
         var out: [Finding] = []
         for name in names where name.hasSuffix(".bom") || name.hasSuffix(".plist") {
             let base = (name as NSString).deletingPathExtension
-            guard terms.match(base, isDirectory: false) == .strong else { continue }
-            out.append(Finding(path: dir + "/" + name, kind: .other, source: .receipt, strength: .strong, note: "Kurulum faturası"))
+            guard known.contains(base.lowercased()) || terms.match(base, isDirectory: false) == .strong else { continue }
+            out.append(Finding(path: dir + "/" + name, kind: .other, source: .receipt, strength: .strong, note: "Kurulum faturası dosyası"))
         }
         return out
     }

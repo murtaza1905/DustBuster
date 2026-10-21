@@ -62,7 +62,7 @@ To open the project in Xcode instead: run `./scripts/install.sh` once (or `xcode
 
 Matching lives in a UI-independent Swift package (`Core/`) and runs in four layers:
 
-1. **Exact paths** — well-known locations derived from the bundle ID (`~/Library/Preferences/<id>.plist`, `Containers/<id>`, …). Always selected.
+1. **Deterministic signals read from the bundle itself** — well-known paths derived from the bundle ID; app groups declared in the code-signature entitlements (`Group Containers`, `Application Scripts`); container ownership from containermanagerd metadata (works for UUID-named containers); launchd plists whose program lives inside the bundle; embedded helpers' containers; `pkgutil` receipts (with system scan on). Always selected.
 2. **Homebrew Cask database** — a snapshot of the community-maintained `zap` stanzas from [Homebrew/homebrew-cask](https://github.com/Homebrew/homebrew-cask) (BSD-2-Clause), embedded in the app. No network access; refresh with `python3 tools/build-cask-db.py <homebrew-cask checkout>`. Always selected.
 3. **Directory scan** — bundle-ID and whole-word name matching inside `~/Library`, including vendor folders (`Google/Chrome`). Name-only hits are listed **unselected** and labelled.
 4. **Safety rules** — other apps from the same vendor, channel variants (Canary/Beta), `com.apple.*` paths for non-Apple apps, protected user data (Keychains, Mail, Documents…) and empty folders are never listed.

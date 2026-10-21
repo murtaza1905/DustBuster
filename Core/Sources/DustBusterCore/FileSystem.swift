@@ -8,6 +8,15 @@ public protocol ScanFileSystem {
     func exists(_ path: String) -> Bool
     func isDirectory(_ path: String) -> Bool
     func isSymlink(_ path: String) -> Bool
+    /// ~/Library/Containers/<klasör> için containermanagerd metadata'sındaki sahip bundle ID'si
+    func containerIdentifier(ofContainerAt path: String) -> String?
+    /// launchd plist'inin çalıştırdığı program yolu (Program, BundleProgram veya ProgramArguments[0])
+    func launchdProgram(ofPlistAt path: String) -> String?
+}
+
+public extension ScanFileSystem {
+    func containerIdentifier(ofContainerAt path: String) -> String? { nil }
+    func launchdProgram(ofPlistAt path: String) -> String? { nil }
 }
 
 public extension ScanFileSystem {
@@ -64,6 +73,24 @@ public struct RealFileSystem: ScanFileSystem {
         guard let attrs = try? fm.attributesOfItem(atPath: path) else { return false }
         return (attrs[.type] as? FileAttributeType) == .typeSymbolicLink
     }
+
+    private func readPlist(_ path: String) -> [String: Any]? {
+        guard let data = fm.contents(atPath: path) else { return nil }
+        return (try? PropertyListSerialization.propertyList(from: data, format: nil)) as? [String: Any]
+    }
+
+    public func containerIdentifier(ofContainerAt path: String) -> String? {
+        let metadata = path + "/.com.apple.containermanagerd.metadata.plist"
+        return readPlist(metadata)?["MCMMetadataIdentifier"] as? String
+    }
+
+    public func launchdProgram(ofPlistAt path: String) -> String? {
+        guard let plist = readPlist(path) else { return nil }
+        if let program = plist["Program"] as? String, !program.isEmpty { return program }
+        if let bundleProgram = plist["BundleProgram"] as? String, !bundleProgram.isEmpty { return bundleProgram }
+        if let args = plist["ProgramArguments"] as? [String], let first = args.first, !first.isEmpty { return first }
+        return nil
+    }
 }
 
 /// Yol listesinden kurulan sanal disk. Sonu "/" ile biten veya altında çocuğu olan girdiler dizin,
@@ -73,14 +100,27 @@ public final class VirtualFileSystem: ScanFileSystem {
     private var files: Set<String> = []
     private var symlinks: Set<String> = []
     private var children: [String: Set<String>] = [:]
+    private var containerIdentifiers: [String: String] = [:]
+    private var launchdPrograms: [String: String] = [:]
 
-    public init(paths: [String], symlinks: [String] = []) {
+    public init(paths: [String], symlinks: [String] = [],
+                containerIdentifiers: [String: String] = [:], launchdPrograms: [String: String] = [:]) {
         for raw in paths { add(raw) }
         for raw in symlinks {
             let p = VirtualFileSystem.normalize(raw)
             add(raw)
             self.symlinks.insert(p)
         }
+        for (path, id) in containerIdentifiers { self.containerIdentifiers[VirtualFileSystem.normalize(path)] = id }
+        for (path, program) in launchdPrograms { self.launchdPrograms[VirtualFileSystem.normalize(path)] = program }
+    }
+
+    public func containerIdentifier(ofContainerAt path: String) -> String? {
+        containerIdentifiers[VirtualFileSystem.normalize(path)]
+    }
+
+    public func launchdProgram(ofPlistAt path: String) -> String? {
+        launchdPrograms[VirtualFileSystem.normalize(path)]
     }
 
     public static func normalize(_ raw: String) -> String {

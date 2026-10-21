@@ -1,4 +1,5 @@
 {
+  "containerIdentifiers": null,
   "emptyDirs": [],
   "expect": {
     "absent": [
@@ -18,9 +19,13 @@
     "bundleId": "com.panelguard.app",
     "embeddedBundleIds": [],
     "executableName": "PanelGuard",
+    "icloudContainers": [],
+    "isSandboxed": false,
     "name": "PanelGuard",
+    "receiptIds": [],
     "teamId": null
   },
+  "launchdPrograms": null,
   "name": "PanelGuard — küçük yerel uygulama, yalnızca tercih dosyası",
   "notes": "Rapor 2026-10-20 build 7.",
   "options": {
@@ -28,6 +33,7 @@
     "includeSystemLocations": false,
     "useCaskDatabase": true
   },
+  "receipts": null,
   "schema": 1,
   "status": "curated",
   "tree": [

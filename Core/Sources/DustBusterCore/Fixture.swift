@@ -48,11 +48,18 @@ public struct Fixture: Codable, Equatable {
     public var tree: [String]
     /// Boş olması gereken dizinler (tarayıcı bunları listelememeli)
     public var emptyDirs: [String]
+    /// ~/Library/Containers/<klasör> → metadata'daki sahip bundle ID'si (Tur B)
+    public var containerIdentifiers: [String: String]?
+    /// launchd plist yolu → çalıştırdığı program yolu (Tur B)
+    public var launchdPrograms: [String: String]?
+    /// Kurulum faturaları: paket kimliği → kurduğu dosyalar (Tur B)
+    public var receipts: [String: [String]]?
     public var expect: Expectation
 
     public init(name: String, status: String = "curated", notes: String = "", home: String = "/Users/test",
                 identity: AppIdentity, options: Options = Options(), tree: [String], emptyDirs: [String] = [],
-                expect: Expectation) {
+                containerIdentifiers: [String: String]? = nil, launchdPrograms: [String: String]? = nil,
+                receipts: [String: [String]]? = nil, expect: Expectation) {
         self.schema = 1
         self.name = name
         self.status = status
@@ -62,6 +69,9 @@ public struct Fixture: Codable, Equatable {
         self.options = options
         self.tree = tree
         self.emptyDirs = emptyDirs
+        self.containerIdentifiers = containerIdentifiers
+        self.launchdPrograms = launchdPrograms
+        self.receipts = receipts
         self.expect = expect
     }
 
@@ -99,7 +109,21 @@ public struct Fixture: Codable, Equatable {
         let appPath = expand(identity.appPath)
         paths.append(appPath + "/")
         paths.append(appPath + "/Contents/Info.plist")
-        return VirtualFileSystem(paths: paths)
+
+        var containers: [String: String] = [:]
+        for (path, id) in containerIdentifiers ?? [:] { containers[expand(path)] = id }
+        var programs: [String: String] = [:]
+        for (path, program) in launchdPrograms ?? [:] {
+            programs[expand(path)] = expand(program)
+            if !paths.contains(expand(path)) { paths.append(expand(path)) }
+        }
+        return VirtualFileSystem(paths: paths, containerIdentifiers: containers, launchdPrograms: programs)
+    }
+
+    public func makeReceiptProvider() -> StaticReceiptProvider {
+        var packages: [String: [String]] = [:]
+        for (id, files) in receipts ?? [:] { packages[id] = files.map(expand) }
+        return StaticReceiptProvider(packages: packages)
     }
 
     public func makeIdentity() -> AppIdentity {
@@ -136,7 +160,8 @@ public struct Fixture: Codable, Equatable {
 
     public func run(caskDatabase: CaskDatabase?) -> (ScanResult, Verdict) {
         let fs = makeFileSystem()
-        let scanner = LeftoverScanner(home: home, fs: fs, caskDatabase: caskDatabase, options: options.scanOptions)
+        let scanner = LeftoverScanner(home: home, fs: fs, caskDatabase: caskDatabase,
+                                      receipts: makeReceiptProvider(), options: options.scanOptions)
         let result = scanner.scan(identity: makeIdentity())
         return (result, verdict(for: result))
     }
@@ -181,7 +206,9 @@ public struct Fixture: Codable, Equatable {
     /// Gerçek bir taramanın sonucundan "observed" durumunda bir vaka üretir.
     public static func capture(name: String, home: String, identity: AppIdentity, options: ScanOptions,
                                result: ScanResult, rawMentions: [String], isDirectory: (String) -> Bool,
-                               isEmptyDirectory: (String) -> Bool = { _ in false }) -> Fixture {
+                               isEmptyDirectory: (String) -> Bool = { _ in false },
+                               containerIdentifier: (String) -> String? = { _ in nil },
+                               launchdProgram: (String) -> String? = { _ in nil }) -> Fixture {
         var fixture = Fixture(
             name: name,
             status: "observed",
@@ -215,6 +242,22 @@ public struct Fixture: Codable, Equatable {
         for r in result.rejected { place(r.path) }
         fixture.tree = tree.sorted()
         fixture.emptyDirs = empty.sorted()
+
+        // Kesin kaynakların yeniden oynatılabilmesi için metadata ve launchd programları da kaydedilir
+        var containers: [String: String] = [:]
+        var programs: [String: String] = [:]
+        for f in result.findings {
+            switch f.source {
+            case .containerMetadata:
+                if let owner = containerIdentifier(f.path) { containers[anonymize(f.path)] = owner }
+            case .launchd:
+                if let program = launchdProgram(f.path) { programs[anonymize(f.path)] = anonymize(program) }
+            default:
+                break
+            }
+        }
+        fixture.containerIdentifiers = containers.isEmpty ? nil : containers
+        fixture.launchdPrograms = programs.isEmpty ? nil : programs
         fixture.expect = Expectation(
             strong: result.findings.filter { $0.strength == .strong && $0.source != .appBundle }.map { anonymize($0.path) },
             weak: result.findings.filter { $0.strength == .weak }.map { anonymize($0.path) },

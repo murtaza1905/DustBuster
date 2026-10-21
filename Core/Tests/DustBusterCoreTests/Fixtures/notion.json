@@ -1,4 +1,5 @@
 {
+  "containerIdentifiers": null,
   "emptyDirs": [],
   "expect": {
     "absent": [
@@ -35,9 +36,13 @@
       "notion.id.helper"
     ],
     "executableName": "Notion",
+    "icloudContainers": [],
+    "isSandboxed": false,
     "name": "Notion",
+    "receiptIds": [],
     "teamId": null
   },
+  "launchdPrograms": null,
   "name": "Notion — Electron güncelleyici cache'i zayıf; Notion Calendar/Mail başka uygulama (Homebrew negatif kanıt)",
   "notes": "Rapor 2026-10-20 build 7. 'Notion Calendar' ad benzerliğiyle zayıf çıkardı; notion-calendar cask'i sahiplendiği için elenir.",
   "options": {
@@ -45,6 +50,7 @@
     "includeSystemLocations": false,
     "useCaskDatabase": true
   },
+  "receipts": null,
   "schema": 1,
   "status": "curated",
   "tree": [

@@ -11,19 +11,24 @@ import os
 OUT = os.path.join(os.path.dirname(__file__), "..", "Core", "Tests", "DustBusterCoreTests", "Fixtures")
 
 
-def identity(name, bundle_id, app_path, executable=None, embedded=None):
+def identity(name, bundle_id, app_path, executable=None, embedded=None, team=None, groups=None,
+             icloud=None, sandboxed=False, receipt_ids=None):
     return {
         "name": name,
         "bundleId": bundle_id,
         "appPath": app_path,
         "executableName": executable,
         "embeddedBundleIds": embedded or [],
-        "teamId": None,
-        "appGroups": [],
+        "teamId": team,
+        "appGroups": groups or [],
+        "icloudContainers": icloud or [],
+        "isSandboxed": sandboxed,
+        "receiptIds": receipt_ids or [],
     }
 
 
-def fixture(file, name, ident, tree, strong, weak=(), absent=(), empty=(), casks=(), notes="", options=None):
+def fixture(file, name, ident, tree, strong, weak=(), absent=(), empty=(), casks=(), notes="", options=None,
+            containers=None, launchd=None, receipts=None):
     data = {
         "schema": 1,
         "name": name,
@@ -34,6 +39,9 @@ def fixture(file, name, ident, tree, strong, weak=(), absent=(), empty=(), casks
         "options": options or {"includeSystemLocations": False, "includeAggressiveLocations": False, "useCaskDatabase": True},
         "tree": sorted(set(tree)),
         "emptyDirs": sorted(set(empty)),
+        "containerIdentifiers": containers,
+        "launchdPrograms": launchd,
+        "receipts": receipts,
         "expect": {
             "strong": sorted(set(strong)),
             "weak": sorted(set(weak)),
@@ -115,7 +123,8 @@ fixture(
     identity("Microsoft Teams", "com.microsoft.teams2", "/Applications/Microsoft Teams.app", "MSTeams",
              embedded=["com.microsoft.teams2.helper", "com.microsoft.teams2.modulehost", "com.microsoft.teams2.notificationcenter2",
                        "com.microsoft.teams2.teamsswitcher", "com.microsoft.teams2.notificationcenter", "com.microsoft.vcxpc",
-                       "com.microsoft.teams2.widgetextension"]),
+                       "com.microsoft.teams2.widgetextension"],
+             team="UBF8T346G9", groups=["UBF8T346G9.com.microsoft.teams"], sandboxed=True),
     tree=teams_strong + [p for p in teams_absent if p not in teams_empty],
     strong=[p.rstrip("/") for p in teams_strong],
     absent=[p.rstrip("/") for p in teams_absent],
@@ -264,3 +273,66 @@ fixture(
 )
 
 print("fixtures written to", os.path.abspath(OUT))
+
+# ================================================================ Tur B — kesin kaynaklar
+# Teams, veritabanı KAPALI: grup konteyneri entitlements'tan bulunmalı
+fixture(
+    "microsoft-teams-nocask.json", "Microsoft Teams (veritabanı kapalı) — app group entitlements'tan, konteynerler bundle ID'den",
+    identity("Microsoft Teams", "com.microsoft.teams2", "/Applications/Microsoft Teams.app", "MSTeams",
+             embedded=["com.microsoft.teams2.helper", "com.microsoft.teams2.notificationcenter", "com.microsoft.vcxpc"],
+             team="UBF8T346G9", groups=["UBF8T346G9.com.microsoft.teams"], sandboxed=True),
+    tree=teams_strong + [p for p in teams_absent if p not in teams_empty],
+    strong=[p.rstrip("/") for p in teams_strong],
+    absent=[p.rstrip("/") for p in teams_absent],
+    empty=teams_empty,
+    options={"includeSystemLocations": False, "includeAggressiveLocations": False, "useCaskDatabase": False},
+    notes="Sentetik varyant: Homebrew olmadan da UBF8T346G9.com.microsoft.teams güçlü olmalı (entitlement).",
+)
+
+# launchd: etiket adı uygulamayla ilgisiz, programı paket içinde
+fixture(
+    "launchd-program-inside-bundle.json", "launchd — plist etiketi farklı, programı uygulama paketinin içinde",
+    identity("Acme Sync", "com.acme.sync", "/Applications/Acme Sync.app", "Acme Sync"),
+    tree=["~/Library/Preferences/com.acme.sync.plist", "~/Library/LaunchAgents/io.vendor.helper-agent.plist",
+          "~/Library/LaunchAgents/com.other.agent.plist"],
+    strong=["~/Library/Preferences/com.acme.sync.plist", "~/Library/LaunchAgents/io.vendor.helper-agent.plist"],
+    absent=["~/Library/LaunchAgents/com.other.agent.plist"],
+    launchd={"~/Library/LaunchAgents/io.vendor.helper-agent.plist": "/Applications/Acme Sync.app/Contents/MacOS/sync-agent",
+             "~/Library/LaunchAgents/com.other.agent.plist": "/Applications/Other.app/Contents/MacOS/other-agent"},
+    notes="Sentetik. Program yolu paketin içini gösteren launchd kaydı etiketinden bağımsız olarak kesindir.",
+)
+
+# Konteyner metadata: UUID adlı konteyner, sahibi bundle ID'den
+fixture(
+    "container-metadata-uuid.json", "Konteyner metadata — UUID adlı konteynerin sahibi metadata'dan okunur",
+    identity("Acme Notes", "com.acme.notes", "/Applications/Acme Notes.app", "Acme Notes",
+             embedded=["com.acme.notes.ShareExtension"], sandboxed=True),
+    tree=["~/Library/Containers/3F2504E0-4F89-11D3-9A0C-0305E82C3301/", "~/Library/Containers/7D0C4F2A-1B2C-4D3E-8F90-123456789ABC/",
+          "~/Library/Containers/com.acme.notes.ShareExtension/", "~/Library/Application Scripts/com.acme.notes.ShareExtension/"],
+    strong=["~/Library/Containers/3F2504E0-4F89-11D3-9A0C-0305E82C3301", "~/Library/Containers/com.acme.notes.ShareExtension",
+            "~/Library/Application Scripts/com.acme.notes.ShareExtension"],
+    absent=["~/Library/Containers/7D0C4F2A-1B2C-4D3E-8F90-123456789ABC"],
+    containers={"~/Library/Containers/3F2504E0-4F89-11D3-9A0C-0305E82C3301": "com.acme.notes",
+                "~/Library/Containers/7D0C4F2A-1B2C-4D3E-8F90-123456789ABC": "com.other.app"},
+    notes="Sentetik. Ad eşleşmesi UUID klasörleri bulamaz; metadata bulur.",
+)
+
+# Kurulum faturaları (sistem taraması açık)
+fixture(
+    "receipts-pkgutil.json", "pkgutil — paketin /Library altına kurduğu dosyalar ve fatura dosyası (sistem taraması açık)",
+    identity("Acme Driver", "com.acme.driver", "/Applications/Acme Driver.app", "Acme Driver"),
+    tree=["~/Library/Preferences/com.acme.driver.plist", "/Library/Application Support/Acme/driver.kext/",
+          "/Library/LaunchDaemons/com.acme.driverd.plist", "/Library/Application Support/Other/x.dat",
+          "/private/var/db/receipts/com.acme.driver.pkg.bom", "/private/var/db/receipts/com.acme.driver.pkg.plist",
+          "/private/var/db/receipts/com.other.pkg.bom"],
+    strong=["~/Library/Preferences/com.acme.driver.plist", "/Library/Application Support/Acme",
+            "/Library/LaunchDaemons/com.acme.driverd.plist",
+            "/private/var/db/receipts/com.acme.driver.pkg.bom", "/private/var/db/receipts/com.acme.driver.pkg.plist"],
+    absent=["/Library/Application Support/Other", "/private/var/db/receipts/com.other.pkg.bom"],
+    options={"includeSystemLocations": True, "includeAggressiveLocations": False, "useCaskDatabase": True},
+    receipts={"com.acme.driver.pkg": ["/Library/Application Support/Acme/driver.kext/Contents/Info.plist",
+                                      "/Library/LaunchDaemons/com.acme.driverd.plist",
+                                      "/Applications/Acme Driver.app/Contents/MacOS/Acme Driver"],
+              "com.other.pkg": ["/Library/Application Support/Other/x.dat"]},
+    notes="Sentetik. Faturadaki dosyalar standart kökün altındaki ilk bileşene indirgenir.",
+)

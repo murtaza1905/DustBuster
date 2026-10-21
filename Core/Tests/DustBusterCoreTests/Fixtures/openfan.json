@@ -1,4 +1,5 @@
 {
+  "containerIdentifiers": null,
   "emptyDirs": [],
   "expect": {
     "absent": [
@@ -22,9 +23,13 @@
     "bundleId": "com.openfan.app",
     "embeddedBundleIds": [],
     "executableName": "OpenFan",
+    "icloudContainers": [],
+    "isSandboxed": false,
     "name": "OpenFan",
+    "receiptIds": [],
     "teamId": null
   },
+  "launchdPrograms": null,
   "name": "OpenFan — 'app' ⊂ 'apple' tuzağı (ilk sürümde 2.220 yanlış pozitif)",
   "notes": "Rapor 2026-10-18.",
   "options": {
@@ -32,6 +37,7 @@
     "includeSystemLocations": false,
     "useCaskDatabase": true
   },
+  "receipts": null,
   "schema": 1,
   "status": "curated",
   "tree": [

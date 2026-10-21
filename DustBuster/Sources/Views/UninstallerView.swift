@@ -235,8 +235,8 @@ struct UninstallerView: View {
                                         .background(Color.secondary.opacity(0.15))
                                         .cornerRadius(4)
 
-                                    if item.isFromDatabase {
-                                        Text("Homebrew")
+                                    if let badge = item.sourceBadge {
+                                        Text(badge)
                                             .font(.caption2)
                                             .padding(.horizontal, 6)
                                             .padding(.vertical, 2)

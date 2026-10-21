@@ -1,4 +1,5 @@
 {
+  "containerIdentifiers": null,
   "emptyDirs": [],
   "expect": {
     "absent": [
@@ -21,9 +22,13 @@
     "bundleId": "ai.storyteller.artcraft-launcher",
     "embeddedBundleIds": [],
     "executableName": "ArtCraft Launcher",
+    "icloudContainers": [],
+    "isSandboxed": false,
     "name": "ArtCraft Launcher",
+    "receiptIds": [],
     "teamId": null
   },
+  "launchdPrograms": null,
   "name": "ArtCraft Launcher — iki kelimeli ad, bundle ID'de tire",
   "notes": "Rapor 2026-10-20. Homebrew kaydı var (artcraft-launcher).",
   "options": {
@@ -31,6 +36,7 @@
     "includeSystemLocations": false,
     "useCaskDatabase": true
   },
+  "receipts": null,
   "schema": 1,
   "status": "curated",
   "tree": [

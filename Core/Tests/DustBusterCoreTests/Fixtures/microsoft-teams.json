@@ -1,4 +1,5 @@
 {
+  "containerIdentifiers": null,
   "emptyDirs": [
     "~/Library/Application Scripts/UBF8T346G9.com.microsoft.teams/",
     "~/Library/Application Scripts/com.microsoft.teams2.agent/",
@@ -35,7 +36,9 @@
   },
   "home": "/Users/test",
   "identity": {
-    "appGroups": [],
+    "appGroups": [
+      "UBF8T346G9.com.microsoft.teams"
+    ],
     "appPath": "/Applications/Microsoft Teams.app",
     "bundleId": "com.microsoft.teams2",
     "embeddedBundleIds": [
@@ -48,9 +51,13 @@
       "com.microsoft.teams2.widgetextension"
     ],
     "executableName": "MSTeams",
+    "icloudContainers": [],
+    "isSandboxed": true,
     "name": "Microsoft Teams",
-    "teamId": null
+    "receiptIds": [],
+    "teamId": "UBF8T346G9"
   },
+  "launchdPrograms": null,
   "name": "Microsoft Teams — takım-ID önekli grup konteyneri, paylaşılan Office/AutoUpdate",
   "notes": "Rapor 2026-10-20 (build 6 gözlemiyle birleştirildi). UBF8T346G9.com.microsoft.teams Homebrew zap ile güçlü; boş Application Scripts dizinleri listelenmez.",
   "options": {
@@ -58,6 +65,7 @@
     "includeSystemLocations": false,
     "useCaskDatabase": true
   },
+  "receipts": null,
   "schema": 1,
   "status": "curated",
   "tree": [

@@ -1,4 +1,5 @@
 {
+  "containerIdentifiers": null,
   "emptyDirs": [],
   "expect": {
     "absent": [
@@ -21,9 +22,13 @@
     "bundleId": "ai.storyteller.pdfcraft",
     "embeddedBundleIds": [],
     "executableName": "PdfCraft",
+    "icloudContainers": [],
+    "isSandboxed": false,
     "name": "PdfCraft",
+    "receiptIds": [],
     "teamId": null
   },
+  "launchdPrograms": null,
   "name": "PdfCraft — aynı geliştiricinin diğer uygulaması listelenmez",
   "notes": "Rapor 2026-10-20. Homebrew kaydı var (pdfcraft); ~/.local/share/pdfcraft zayıf olarak gelir.",
   "options": {
@@ -31,6 +36,7 @@
     "includeSystemLocations": false,
     "useCaskDatabase": true
   },
+  "receipts": null,
   "schema": 1,
   "status": "curated",
   "tree": [

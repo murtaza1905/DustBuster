@@ -1,4 +1,5 @@
 {
+  "containerIdentifiers": null,
   "emptyDirs": [
     "~/Library/Caches/com.apple.nsurlsessiond/Downloads/com.google.Chrome/"
   ],
@@ -37,9 +38,13 @@
     "bundleId": "com.google.Chrome",
     "embeddedBundleIds": [],
     "executableName": "Google Chrome",
+    "icloudContainers": [],
+    "isSandboxed": false,
     "name": "Google Chrome",
+    "receiptIds": [],
     "teamId": null
   },
+  "launchdPrograms": null,
   "name": "Google Chrome — geliştirici klasörü içinde veri, kanal türevi, Keystone",
   "notes": "Rapor 2026-10-20 (build 6 gözlemiyle birleştirildi). ~/Library/Google ve Keystone yalnızca Homebrew verisiyle bulunur.",
   "options": {
@@ -47,6 +52,7 @@
     "includeSystemLocations": false,
     "useCaskDatabase": true
   },
+  "receipts": null,
   "schema": 1,
   "status": "curated",
   "tree": [

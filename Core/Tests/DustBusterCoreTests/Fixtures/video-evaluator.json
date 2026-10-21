@@ -1,4 +1,5 @@
 {
+  "containerIdentifiers": null,
   "emptyDirs": [
     "~/Library/Application Scripts/com.koraybirand.Video-Evaluator/"
   ],
@@ -21,9 +22,13 @@
     "bundleId": "com.koraybirand.Video-Evaluator",
     "embeddedBundleIds": [],
     "executableName": "Video Evaluator",
+    "icloudContainers": [],
+    "isSandboxed": false,
     "name": "Video Evaluator",
+    "receiptIds": [],
     "teamId": null
   },
+  "launchdPrograms": null,
   "name": "Video Evaluator — sandbox konteyneri, 'video' genel kelimesi",
   "notes": "Rapor 2026-10-20.",
   "options": {
@@ -31,6 +36,7 @@
     "includeSystemLocations": false,
     "useCaskDatabase": true
   },
+  "receipts": null,
   "schema": 1,
   "status": "curated",
   "tree": [

@@ -10,10 +10,16 @@ public struct AppIdentity: Codable, Equatable {
     public var executableName: String?
     /// Paket içindeki yardımcıların (LoginItems, XPC, appex, Helpers) bundle ID'leri
     public var embeddedBundleIds: [String]
-    /// Kod imzasından Team ID (Tur B)
+    /// Kod imzasından Team ID
     public var teamId: String?
-    /// Entitlements'tan app group ID'leri (Tur B)
+    /// Entitlements'tan app group ID'leri (uygulama + gömülü yardımcılar)
     public var appGroups: [String]
+    /// Entitlements'tan iCloud konteyner ID'leri
+    public var icloudContainers: [String]
+    /// com.apple.security.app-sandbox
+    public var isSandboxed: Bool
+    /// Diskteki kurulum faturalarından (pkgutil) uygulamaya ait paket kimlikleri
+    public var receiptIds: [String]
 
     public init(
         name: String,
@@ -22,7 +28,10 @@ public struct AppIdentity: Codable, Equatable {
         executableName: String? = nil,
         embeddedBundleIds: [String] = [],
         teamId: String? = nil,
-        appGroups: [String] = []
+        appGroups: [String] = [],
+        icloudContainers: [String] = [],
+        isSandboxed: Bool = false,
+        receiptIds: [String] = []
     ) {
         self.name = name
         self.bundleId = bundleId
@@ -31,6 +40,27 @@ public struct AppIdentity: Codable, Equatable {
         self.embeddedBundleIds = embeddedBundleIds
         self.teamId = teamId
         self.appGroups = appGroups
+        self.icloudContainers = icloudContainers
+        self.isSandboxed = isSandboxed
+        self.receiptIds = receiptIds
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case name, bundleId, appPath, executableName, embeddedBundleIds, teamId, appGroups, icloudContainers, isSandboxed, receiptIds
+    }
+
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        name = try c.decode(String.self, forKey: .name)
+        bundleId = try c.decodeIfPresent(String.self, forKey: .bundleId)
+        appPath = try c.decode(String.self, forKey: .appPath)
+        executableName = try c.decodeIfPresent(String.self, forKey: .executableName)
+        embeddedBundleIds = try c.decodeIfPresent([String].self, forKey: .embeddedBundleIds) ?? []
+        teamId = try c.decodeIfPresent(String.self, forKey: .teamId)
+        appGroups = try c.decodeIfPresent([String].self, forKey: .appGroups) ?? []
+        icloudContainers = try c.decodeIfPresent([String].self, forKey: .icloudContainers) ?? []
+        isSandboxed = try c.decodeIfPresent(Bool.self, forKey: .isSandboxed) ?? false
+        receiptIds = try c.decodeIfPresent([String].self, forKey: .receiptIds) ?? []
     }
 
     /// "/Applications/Google Chrome.app" → "Google Chrome.app"

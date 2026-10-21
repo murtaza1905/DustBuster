@@ -1,4 +1,5 @@
 {
+  "containerIdentifiers": null,
   "emptyDirs": [
     "~/Library/Caches/com.logi.optionsplus.installer/"
   ],
@@ -43,9 +44,13 @@
       "com.logi.optionsplus.helper"
     ],
     "executableName": "logioptionsplus",
+    "icloudContainers": [],
+    "isSandboxed": false,
     "name": "Logi Options+",
+    "receiptIds": [],
     "teamId": null
   },
+  "launchdPrograms": null,
   "name": "Logi Options+ — Homebrew'un bildiği gizli kalıntılar, sürücü kurucu .bundle, 'logi' ⊂ 'login/logic' tuzağı",
   "notes": "Rapor 2026-10-20 build 7. /Library yolları sistem taraması kapalıyken listelenmez; 'Logitech Options' eski uygulama (logitech-options cask) ayrı tutulur.",
   "options": {
@@ -53,6 +58,7 @@
     "includeSystemLocations": false,
     "useCaskDatabase": true
   },
+  "receipts": null,
   "schema": 1,
   "status": "curated",
   "tree": [

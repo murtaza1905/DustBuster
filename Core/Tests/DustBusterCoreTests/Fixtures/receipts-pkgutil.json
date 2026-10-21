@@ -1,0 +1,61 @@
+{
+  "containerIdentifiers": null,
+  "emptyDirs": [],
+  "expect": {
+    "absent": [
+      "/Library/Application Support/Other",
+      "/private/var/db/receipts/com.other.pkg.bom"
+    ],
+    "caskTokens": [],
+    "strong": [
+      "/Library/Application Support/Acme",
+      "/Library/LaunchDaemons/com.acme.driverd.plist",
+      "/private/var/db/receipts/com.acme.driver.pkg.bom",
+      "/private/var/db/receipts/com.acme.driver.pkg.plist",
+      "~/Library/Preferences/com.acme.driver.plist"
+    ],
+    "weak": []
+  },
+  "home": "/Users/test",
+  "identity": {
+    "appGroups": [],
+    "appPath": "/Applications/Acme Driver.app",
+    "bundleId": "com.acme.driver",
+    "embeddedBundleIds": [],
+    "executableName": "Acme Driver",
+    "icloudContainers": [],
+    "isSandboxed": false,
+    "name": "Acme Driver",
+    "receiptIds": [],
+    "teamId": null
+  },
+  "launchdPrograms": null,
+  "name": "pkgutil — paketin /Library altına kurduğu dosyalar ve fatura dosyası (sistem taraması açık)",
+  "notes": "Sentetik. Faturadaki dosyalar standart kökün altındaki ilk bileşene indirgenir.",
+  "options": {
+    "includeAggressiveLocations": false,
+    "includeSystemLocations": true,
+    "useCaskDatabase": true
+  },
+  "receipts": {
+    "com.acme.driver.pkg": [
+      "/Library/Application Support/Acme/driver.kext/Contents/Info.plist",
+      "/Library/LaunchDaemons/com.acme.driverd.plist",
+      "/Applications/Acme Driver.app/Contents/MacOS/Acme Driver"
+    ],
+    "com.other.pkg": [
+      "/Library/Application Support/Other/x.dat"
+    ]
+  },
+  "schema": 1,
+  "status": "curated",
+  "tree": [
+    "/Library/Application Support/Acme/driver.kext/",
+    "/Library/Application Support/Other/x.dat",
+    "/Library/LaunchDaemons/com.acme.driverd.plist",
+    "/private/var/db/receipts/com.acme.driver.pkg.bom",
+    "/private/var/db/receipts/com.acme.driver.pkg.plist",
+    "/private/var/db/receipts/com.other.pkg.bom",
+    "~/Library/Preferences/com.acme.driver.plist"
+  ]
+}

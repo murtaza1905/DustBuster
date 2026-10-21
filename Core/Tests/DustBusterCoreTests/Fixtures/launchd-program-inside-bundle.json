@@ -1,0 +1,47 @@
+{
+  "containerIdentifiers": null,
+  "emptyDirs": [],
+  "expect": {
+    "absent": [
+      "~/Library/LaunchAgents/com.other.agent.plist"
+    ],
+    "caskTokens": [],
+    "strong": [
+      "~/Library/LaunchAgents/io.vendor.helper-agent.plist",
+      "~/Library/Preferences/com.acme.sync.plist"
+    ],
+    "weak": []
+  },
+  "home": "/Users/test",
+  "identity": {
+    "appGroups": [],
+    "appPath": "/Applications/Acme Sync.app",
+    "bundleId": "com.acme.sync",
+    "embeddedBundleIds": [],
+    "executableName": "Acme Sync",
+    "icloudContainers": [],
+    "isSandboxed": false,
+    "name": "Acme Sync",
+    "receiptIds": [],
+    "teamId": null
+  },
+  "launchdPrograms": {
+    "~/Library/LaunchAgents/com.other.agent.plist": "/Applications/Other.app/Contents/MacOS/other-agent",
+    "~/Library/LaunchAgents/io.vendor.helper-agent.plist": "/Applications/Acme Sync.app/Contents/MacOS/sync-agent"
+  },
+  "name": "launchd — plist etiketi farklı, programı uygulama paketinin içinde",
+  "notes": "Sentetik. Program yolu paketin içini gösteren launchd kaydı etiketinden bağımsız olarak kesindir.",
+  "options": {
+    "includeAggressiveLocations": false,
+    "includeSystemLocations": false,
+    "useCaskDatabase": true
+  },
+  "receipts": null,
+  "schema": 1,
+  "status": "curated",
+  "tree": [
+    "~/Library/LaunchAgents/com.other.agent.plist",
+    "~/Library/LaunchAgents/io.vendor.helper-agent.plist",
+    "~/Library/Preferences/com.acme.sync.plist"
+  ]
+}

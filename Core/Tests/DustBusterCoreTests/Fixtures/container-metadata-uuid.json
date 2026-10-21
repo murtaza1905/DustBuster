@@ -1,0 +1,51 @@
+{
+  "containerIdentifiers": {
+    "~/Library/Containers/3F2504E0-4F89-11D3-9A0C-0305E82C3301": "com.acme.notes",
+    "~/Library/Containers/7D0C4F2A-1B2C-4D3E-8F90-123456789ABC": "com.other.app"
+  },
+  "emptyDirs": [],
+  "expect": {
+    "absent": [
+      "~/Library/Containers/7D0C4F2A-1B2C-4D3E-8F90-123456789ABC"
+    ],
+    "caskTokens": [],
+    "strong": [
+      "~/Library/Application Scripts/com.acme.notes.ShareExtension",
+      "~/Library/Containers/3F2504E0-4F89-11D3-9A0C-0305E82C3301",
+      "~/Library/Containers/com.acme.notes.ShareExtension"
+    ],
+    "weak": []
+  },
+  "home": "/Users/test",
+  "identity": {
+    "appGroups": [],
+    "appPath": "/Applications/Acme Notes.app",
+    "bundleId": "com.acme.notes",
+    "embeddedBundleIds": [
+      "com.acme.notes.ShareExtension"
+    ],
+    "executableName": "Acme Notes",
+    "icloudContainers": [],
+    "isSandboxed": true,
+    "name": "Acme Notes",
+    "receiptIds": [],
+    "teamId": null
+  },
+  "launchdPrograms": null,
+  "name": "Konteyner metadata — UUID adlı konteynerin sahibi metadata'dan okunur",
+  "notes": "Sentetik. Ad eşleşmesi UUID klasörleri bulamaz; metadata bulur.",
+  "options": {
+    "includeAggressiveLocations": false,
+    "includeSystemLocations": false,
+    "useCaskDatabase": true
+  },
+  "receipts": null,
+  "schema": 1,
+  "status": "curated",
+  "tree": [
+    "~/Library/Application Scripts/com.acme.notes.ShareExtension/",
+    "~/Library/Containers/3F2504E0-4F89-11D3-9A0C-0305E82C3301/",
+    "~/Library/Containers/7D0C4F2A-1B2C-4D3E-8F90-123456789ABC/",
+    "~/Library/Containers/com.acme.notes.ShareExtension/"
+  ]
+}

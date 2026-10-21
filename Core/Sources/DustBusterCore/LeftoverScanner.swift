@@ -116,6 +116,7 @@ public final class LeftoverScanner {
         let matched = addConditionHits(identity: identity, caskTokens: tokens, into: &collected)
         applyExclusions(conditions: matched, to: &collected)
         downgradeVendorFolders(identity: identity, in: &collected)
+        collected.finalizeEmptyDirectories(isEmpty: isEmptyDirectory)
         return collected.result(droppedDeep: 0, caskTokens: tokens, conditionIds: matched.map { $0.id })
     }
 
@@ -163,6 +164,7 @@ public final class LeftoverScanner {
         }
         applyExclusions(conditions: matchedConditions, to: &collected)
         downgradeVendorFolders(identity: identity, in: &collected)
+        collected.finalizeEmptyDirectories(isEmpty: isEmptyDirectory)
         return collected.result(droppedDeep: dropped, caskTokens: tokens, receiptIds: receiptIds,
                                 conditionIds: matchedConditions.map { $0.id })
     }
@@ -247,6 +249,19 @@ public final class LeftoverScanner {
             rejected.append(RejectedPath(path: path, reason: reason))
         }
 
+        /// Boş klasörler: uygulamanın kendi kabukları (güçlü) "boş klasör" etiketiyle listelenir; yalnızca zayıf
+        /// kanıtla bulunan boş klasörler (paylaşılan grup, ad benzerliği) kazanç getirmediği için elenir.
+        mutating func finalizeEmptyDirectories(isEmpty: (String) -> Bool) {
+            for path in order {
+                guard let f = byPath[path], isEmpty(path) else { continue }
+                if f.strength == .weak {
+                    remove(path, reason: "boş klasör, yalnızca zayıf eşleşme")
+                } else {
+                    byPath[path] = Finding(path: f.path, kind: f.kind, source: f.source, strength: f.strength, note: "\(f.note) — boş klasör")
+                }
+            }
+        }
+
         func result(droppedDeep: Int, caskTokens: [String], receiptIds: [String] = [], conditionIds: [String] = []) -> ScanResult {
             let findings = order.compactMap { byPath[$0] }.sorted { a, b in
                 if a.strength != b.strength { return a.strength > b.strength }
@@ -280,10 +295,7 @@ public final class LeftoverScanner {
     }
 
     private func make(_ path: String, source: Finding.Source, strength: MatchStrength, note: String) -> Finding {
-        // Uygulamanın kendi boş kabukları (sandbox'ın açtığı Application Scripts / Group Containers klasörleri)
-        // da kalıntıdır; listelenir ve etiketlenir
-        let label = isEmptyDirectory(path) ? "\(note) — boş klasör" : note
-        return Finding(path: path, kind: PathClassifier.kind(forPath: path, home: home), source: source, strength: strength, note: label)
+        Finding(path: path, kind: PathClassifier.kind(forPath: path, home: home), source: source, strength: strength, note: note)
     }
 
     /// Diskte var ve symlink değil.

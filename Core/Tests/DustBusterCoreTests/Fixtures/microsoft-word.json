@@ -1,37 +1,58 @@
 {
   "emptyDirs": [
+    "~/Library/Application Scripts/UBF8T346G9.Office/",
+    "~/Library/Application Scripts/UBF8T346G9.OfficeOneDriveSyncIntegration/",
+    "~/Library/Application Scripts/UBF8T346G9.OfficeOsfWebHost/",
+    "~/Library/Application Scripts/UBF8T346G9.OfficeWordWidget/",
+    "~/Library/Application Scripts/UBF8T346G9.com.microsoft.entrabroker/",
+    "~/Library/Application Scripts/UBF8T346G9.com.microsoft.oneauth/",
+    "~/Library/Application Scripts/UBF8T346G9.group.com.microsoft.shared/",
+    "~/Library/Application Scripts/UBF8T346G9.ms/",
     "~/Library/Application Scripts/com.microsoft.Excel/",
     "~/Library/Application Scripts/com.microsoft.Powerpoint/",
     "~/Library/Application Scripts/com.microsoft.Word.widgetextension/",
     "~/Library/Application Scripts/com.microsoft.Word/",
     "~/Library/Group Containers/UBF8T346G9.OfficeOneDriveSyncIntegration/",
-    "~/Library/Group Containers/UBF8T346G9.OfficeOsfWebHost/"
+    "~/Library/Group Containers/UBF8T346G9.OfficeOsfWebHost/",
+    "~/Library/Group Containers/UBF8T346G9.com.microsoft.entrabroker/"
   ],
   "expect": {
     "absent": [
-      "~/Library/Containers/com.microsoft.Excel",
-      "~/Library/Containers/com.microsoft.Powerpoint",
+      "/Applications/Microsoft Excel.app",
+      "/Applications/Microsoft PowerPoint.app",
+      "~/Library/Application Scripts/UBF8T346G9.Office",
+      "~/Library/Application Scripts/UBF8T346G9.OfficeOneDriveSyncIntegration",
+      "~/Library/Application Scripts/UBF8T346G9.OfficeOsfWebHost",
+      "~/Library/Application Scripts/UBF8T346G9.com.microsoft.entrabroker",
+      "~/Library/Application Scripts/UBF8T346G9.com.microsoft.oneauth",
+      "~/Library/Application Scripts/UBF8T346G9.group.com.microsoft.shared",
+      "~/Library/Application Scripts/UBF8T346G9.ms",
+      "~/Library/Application Scripts/com.microsoft.Excel",
+      "~/Library/Application Scripts/com.microsoft.Powerpoint",
       "~/Library/Application Support/Microsoft/MSTeams",
       "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.microsoft.excel.sfl4",
-      "/Applications/Microsoft Excel.app",
-      "/Applications/Microsoft PowerPoint.app"
+      "~/Library/Containers/com.microsoft.Excel",
+      "~/Library/Containers/com.microsoft.Powerpoint",
+      "~/Library/Group Containers/UBF8T346G9.OfficeOneDriveSyncIntegration",
+      "~/Library/Group Containers/UBF8T346G9.OfficeOsfWebHost",
+      "~/Library/Group Containers/UBF8T346G9.com.microsoft.entrabroker"
     ],
     "caskTokens": [
       "microsoft-word"
     ],
     "strong": [
+      "~/Library/Application Scripts/UBF8T346G9.OfficeWordWidget",
       "~/Library/Application Scripts/com.microsoft.Word",
       "~/Library/Application Scripts/com.microsoft.Word.widgetextension",
       "~/Library/Containers/com.microsoft.Word",
       "~/Library/Containers/com.microsoft.Word.widgetextension",
       "~/Library/Group Containers/UBF8T346G9.OfficeWordWidget",
+      "~/Library/Group Containers/UBF8T346G9.ms/Microsoft Word.MERP.params.txt",
       "~/Library/Preferences/com.microsoft.Word.plist"
     ],
     "weak": [
       "~/Library/Application Support/Microsoft",
       "~/Library/Group Containers/UBF8T346G9.Office",
-      "~/Library/Group Containers/UBF8T346G9.OfficeOneDriveSyncIntegration",
-      "~/Library/Group Containers/UBF8T346G9.OfficeOsfWebHost",
       "~/Library/Group Containers/UBF8T346G9.com.microsoft.oneauth",
       "~/Library/Group Containers/UBF8T346G9.group.com.microsoft.shared",
       "~/Library/Group Containers/UBF8T346G9.ms"
@@ -73,6 +94,7 @@
   "tree": [
     "/Applications/Microsoft Excel.app/",
     "/Applications/Microsoft PowerPoint.app/",
+    "~/Library/Application Support/Microsoft/",
     "~/Library/Application Support/Microsoft/MSTeams/",
     "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.microsoft.excel.sfl4",
     "~/Library/Containers/com.microsoft.Excel/",
@@ -84,6 +106,7 @@
     "~/Library/Group Containers/UBF8T346G9.com.microsoft.oneauth/",
     "~/Library/Group Containers/UBF8T346G9.group.com.microsoft.shared/",
     "~/Library/Group Containers/UBF8T346G9.ms/",
+    "~/Library/Group Containers/UBF8T346G9.ms/Microsoft Word.MERP.params.txt",
     "~/Library/Preferences/com.microsoft.Word.plist"
   ]
 }

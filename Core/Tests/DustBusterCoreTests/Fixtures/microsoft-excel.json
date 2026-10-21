@@ -1,19 +1,39 @@
 {
   "emptyDirs": [
+    "~/Library/Application Scripts/UBF8T346G9.Office/",
     "~/Library/Application Scripts/UBF8T346G9.OfficeExcelWidget/",
+    "~/Library/Application Scripts/UBF8T346G9.OfficeOneDriveSyncIntegration/",
+    "~/Library/Application Scripts/UBF8T346G9.OfficeOsfWebHost/",
+    "~/Library/Application Scripts/UBF8T346G9.com.microsoft.entrabroker/",
+    "~/Library/Application Scripts/UBF8T346G9.com.microsoft.oneauth/",
+    "~/Library/Application Scripts/UBF8T346G9.group.com.microsoft.shared/",
+    "~/Library/Application Scripts/UBF8T346G9.ms/",
     "~/Library/Application Scripts/com.microsoft.Excel.widgetextension/",
     "~/Library/Application Scripts/com.microsoft.Excel/",
     "~/Library/Application Scripts/com.microsoft.Powerpoint/",
     "~/Library/Application Scripts/com.microsoft.Word/",
     "~/Library/Group Containers/UBF8T346G9.OfficeOneDriveSyncIntegration/",
-    "~/Library/Group Containers/UBF8T346G9.OfficeOsfWebHost/"
+    "~/Library/Group Containers/UBF8T346G9.OfficeOsfWebHost/",
+    "~/Library/Group Containers/UBF8T346G9.com.microsoft.entrabroker/"
   ],
   "expect": {
     "absent": [
+      "/Applications/Microsoft PowerPoint.app",
+      "/Applications/Microsoft Word.app",
+      "~/Library/Application Scripts/UBF8T346G9.Office",
+      "~/Library/Application Scripts/UBF8T346G9.OfficeOneDriveSyncIntegration",
+      "~/Library/Application Scripts/UBF8T346G9.OfficeOsfWebHost",
+      "~/Library/Application Scripts/UBF8T346G9.com.microsoft.entrabroker",
+      "~/Library/Application Scripts/UBF8T346G9.com.microsoft.oneauth",
+      "~/Library/Application Scripts/UBF8T346G9.group.com.microsoft.shared",
+      "~/Library/Application Scripts/UBF8T346G9.ms",
+      "~/Library/Application Scripts/com.microsoft.Powerpoint",
+      "~/Library/Application Scripts/com.microsoft.Word",
       "~/Library/Containers/com.microsoft.Powerpoint",
       "~/Library/Containers/com.microsoft.Word",
-      "/Applications/Microsoft PowerPoint.app",
-      "/Applications/Microsoft Word.app"
+      "~/Library/Group Containers/UBF8T346G9.OfficeOneDriveSyncIntegration",
+      "~/Library/Group Containers/UBF8T346G9.OfficeOsfWebHost",
+      "~/Library/Group Containers/UBF8T346G9.com.microsoft.entrabroker"
     ],
     "caskTokens": [
       "microsoft-excel"
@@ -29,8 +49,6 @@
     ],
     "weak": [
       "~/Library/Group Containers/UBF8T346G9.Office",
-      "~/Library/Group Containers/UBF8T346G9.OfficeOneDriveSyncIntegration",
-      "~/Library/Group Containers/UBF8T346G9.OfficeOsfWebHost",
       "~/Library/Group Containers/UBF8T346G9.com.microsoft.oneauth",
       "~/Library/Group Containers/UBF8T346G9.group.com.microsoft.shared",
       "~/Library/Group Containers/UBF8T346G9.ms"

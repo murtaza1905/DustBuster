@@ -1,12 +1,34 @@
 {
   "emptyDirs": [
+    "~/Library/Application Scripts/UBF8T346G9.Office/",
+    "~/Library/Application Scripts/UBF8T346G9.OfficeOneDriveSyncIntegration/",
+    "~/Library/Application Scripts/UBF8T346G9.OfficeOsfWebHost/",
+    "~/Library/Application Scripts/UBF8T346G9.OfficePPTWidget/",
+    "~/Library/Application Scripts/UBF8T346G9.com.microsoft.entrabroker/",
+    "~/Library/Application Scripts/UBF8T346G9.com.microsoft.oneauth/",
+    "~/Library/Application Scripts/UBF8T346G9.group.com.microsoft.shared/",
+    "~/Library/Application Scripts/UBF8T346G9.ms/",
     "~/Library/Application Scripts/com.microsoft.Powerpoint.widgetextension/",
-    "~/Library/Application Scripts/com.microsoft.Powerpoint/"
+    "~/Library/Application Scripts/com.microsoft.Powerpoint/",
+    "~/Library/Group Containers/UBF8T346G9.OfficeOneDriveSyncIntegration/",
+    "~/Library/Group Containers/UBF8T346G9.OfficeOsfWebHost/",
+    "~/Library/Group Containers/UBF8T346G9.com.microsoft.entrabroker/"
   ],
   "expect": {
     "absent": [
+      "~/Library/Application Scripts/UBF8T346G9.Office",
+      "~/Library/Application Scripts/UBF8T346G9.OfficeOneDriveSyncIntegration",
+      "~/Library/Application Scripts/UBF8T346G9.OfficeOsfWebHost",
+      "~/Library/Application Scripts/UBF8T346G9.OfficePPTWidget",
+      "~/Library/Application Scripts/UBF8T346G9.com.microsoft.entrabroker",
+      "~/Library/Application Scripts/UBF8T346G9.com.microsoft.oneauth",
+      "~/Library/Application Scripts/UBF8T346G9.group.com.microsoft.shared",
+      "~/Library/Application Scripts/UBF8T346G9.ms",
       "~/Library/Containers/com.microsoft.Excel",
-      "~/Library/Containers/com.microsoft.Word"
+      "~/Library/Containers/com.microsoft.Word",
+      "~/Library/Group Containers/UBF8T346G9.OfficeOneDriveSyncIntegration",
+      "~/Library/Group Containers/UBF8T346G9.OfficeOsfWebHost",
+      "~/Library/Group Containers/UBF8T346G9.com.microsoft.entrabroker"
     ],
     "caskTokens": [
       "microsoft-powerpoint"
@@ -18,11 +40,11 @@
       "~/Library/Containers/com.microsoft.Powerpoint.widgetextension"
     ],
     "weak": [
+      "~/Library/Group Containers/UBF8T346G9.Office",
+      "~/Library/Group Containers/UBF8T346G9.OfficePPTWidget",
       "~/Library/Group Containers/UBF8T346G9.com.microsoft.oneauth",
       "~/Library/Group Containers/UBF8T346G9.group.com.microsoft.shared",
-      "~/Library/Group Containers/UBF8T346G9.ms",
-      "~/Library/Group Containers/UBF8T346G9.Office",
-      "~/Library/Group Containers/UBF8T346G9.OfficePPTWidget"
+      "~/Library/Group Containers/UBF8T346G9.ms"
     ]
   },
   "home": "/Users/test",

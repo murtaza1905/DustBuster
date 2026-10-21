@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "conditions": [
+    {
+      "id": "xcode",
+      "bundleIds": [
+        "com.apple.dt.Xcode"
+      ],
+      "include": [
+        {
+          "path": "~/Library/Developer/Xcode",
+          "strength": "strong",
+          "note": "DerivedData, Archives, cihaz destek dosyaları"
+        },
+        {
+          "path": "~/Library/Developer/CoreSimulator",
+          "strength": "strong",
+          "note": "Simülatör cihazları ve önbellekleri"
+        },
+        {
+          "path": "~/Library/Developer/XCTestDevices",
+          "strength": "strong",
+          "note": "Test cihazları"
+        },
+        {
+          "path": "~/Library/Developer/XCPGDevices",
+          "strength": "strong",
+          "note": "Playground cihazları"
+        },
+        {
+          "path": "~/Library/Caches/com.apple.dt.*",
+          "strength": "strong",
+          "note": "Xcode araç önbelleği"
+        },
+        {
+          "path": "~/Library/Preferences/com.apple.dt.*",
+          "strength": "strong",
+          "note": "Xcode araç ayarı"
+        },
+        {
+          "path": "~/Library/Saved Application State/com.apple.dt.*",
+          "strength": "strong"
+        },
+        {
+          "path": "~/Library/Logs/CoreSimulator",
+          "strength": "strong",
+          "note": "Simülatör günlükleri"
+        },
+        {
+          "path": "~/Library/Application Support/Developer/Shared/Xcode",
+          "strength": "strong",
+          "note": "Xcode eklentileri"
+        },
+        {
+          "path": "~/Library/Caches/org.swift.swiftpm",
+          "strength": "weak",
+          "note": "Swift paket önbelleği, komut satırı araçları da kullanır"
+        },
+        {
+          "path": "~/Library/org.swift.swiftpm",
+          "strength": "weak",
+          "note": "Swift paket yapılandırması, komut satırı araçları da kullanır"
+        }
+      ],
+      "exclude": []
+    },
+    {
+      "id": "notion",
+      "bundleIds": [
+        "notion.id"
+      ],
+      "caskTokens": [
+        "notion"
+      ],
+      "include": [
+        {
+          "path": "~/Library/Caches/notion-updater",
+          "strength": "strong",
+          "note": "Güncelleyici önbelleği"
+        },
+        {
+          "path": "~/Library/Application Support/Caches/notion-updater",
+          "strength": "strong",
+          "note": "Güncelleyici önbelleği"
+        }
+      ],
+      "exclude": []
+    }
+  ]
+}

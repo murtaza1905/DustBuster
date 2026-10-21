@@ -23,6 +23,8 @@ public struct Finding: Codable, Equatable, Hashable {
         case containerMetadata
         /// launchd plist'inin programı uygulama paketinin içinde
         case launchd
+        /// Uygulama başına elle tanımlı kural (conditions.json)
+        case condition
     }
 
     public let path: String
@@ -58,13 +60,17 @@ public struct ScanResult: Equatable {
     public var rejected: [RejectedPath]
     /// Uygulamaya ait bulunan kurulum paketi kimlikleri (pkgutil)
     public var receiptIds: [String]
+    /// Uygulanan kural kimlikleri (conditions.json)
+    public var conditionIds: [String]
 
-    public init(findings: [Finding], droppedDeepCount: Int = 0, caskTokens: [String] = [], rejected: [RejectedPath] = [], receiptIds: [String] = []) {
+    public init(findings: [Finding], droppedDeepCount: Int = 0, caskTokens: [String] = [], rejected: [RejectedPath] = [],
+                receiptIds: [String] = [], conditionIds: [String] = []) {
         self.findings = findings
         self.droppedDeepCount = droppedDeepCount
         self.caskTokens = caskTokens
         self.rejected = rejected
         self.receiptIds = receiptIds
+        self.conditionIds = conditionIds
     }
 
     public var strong: [Finding] { findings.filter { $0.strength == .strong } }
@@ -79,16 +85,19 @@ public final class LeftoverScanner {
     public let fs: ScanFileSystem
     public let caskDatabase: CaskDatabase?
     public let receipts: ReceiptProvider?
+    public let conditions: AppConditions?
     public let options: ScanOptions
 
     private var homeLibrary: String { home + "/Library" }
     private let systemLibrary = "/Library"
 
-    public init(home: String, fs: ScanFileSystem, caskDatabase: CaskDatabase?, receipts: ReceiptProvider? = nil, options: ScanOptions = ScanOptions()) {
+    public init(home: String, fs: ScanFileSystem, caskDatabase: CaskDatabase?, receipts: ReceiptProvider? = nil,
+                conditions: AppConditions? = nil, options: ScanOptions = ScanOptions()) {
         self.home = home
         self.fs = fs
         self.caskDatabase = caskDatabase
         self.receipts = receipts
+        self.conditions = conditions
         self.options = options
     }
 
@@ -103,7 +112,10 @@ public final class LeftoverScanner {
         for c in entitlementCandidates(identity: identity) { collected.add(c) }
         for c in helperContainerCandidates(identity: identity) { collected.add(c) }
         let entries = addCaskHits(identity: identity, into: &collected)
-        return collected.result(droppedDeep: 0, caskTokens: entries.map { $0.token })
+        let tokens = entries.map { $0.token }
+        let matched = addConditionHits(identity: identity, caskTokens: tokens, into: &collected)
+        applyExclusions(conditions: matched, to: &collected)
+        return collected.result(droppedDeep: 0, caskTokens: tokens, conditionIds: matched.map { $0.id })
     }
 
     /// Tam tarama: kesin kaynaklar + veritabanı + dizin taraması (+ sistem konumları seçiliyse).
@@ -119,6 +131,7 @@ public final class LeftoverScanner {
         let entries = addCaskHits(identity: identity, into: &collected)
         let tokens = entries.map { $0.token }
         let receiptIds = addReceiptHits(identity: identity, caskPkgIds: entries.flatMap { $0.pkgutil }, into: &collected)
+        let matchedConditions = addConditionHits(identity: identity, caskTokens: tokens, into: &collected)
 
         var deep: [Finding] = []
         deep += searchUserLibrary(terms: terms)
@@ -137,7 +150,7 @@ public final class LeftoverScanner {
             let matched = Set(tokens)
             for f in deep {
                 // Ad benzerliğiyle bulunan yol başka bir uygulamanın Homebrew kaydında geçiyorsa o uygulamaya aittir
-                if f.strength == .weak, options.useCaskDatabase, let db = caskDatabase {
+                if f.strength == .weak, !collected.contains(f.path), options.useCaskDatabase, let db = caskDatabase {
                     let owners = db.otherOwners(ofPath: f.path, home: home, excluding: matched)
                     if !owners.isEmpty {
                         collected.reject(f.path, "başka uygulamaya ait (Homebrew: \(owners.joined(separator: ", ")))")
@@ -147,7 +160,9 @@ public final class LeftoverScanner {
                 collected.add(f)
             }
         }
-        return collected.result(droppedDeep: dropped, caskTokens: tokens, receiptIds: receiptIds)
+        applyExclusions(conditions: matchedConditions, to: &collected)
+        return collected.result(droppedDeep: dropped, caskTokens: tokens, receiptIds: receiptIds,
+                                conditionIds: matchedConditions.map { $0.id })
     }
 
     /// Filtresiz ham liste: standart konumlarda, ayraçlar atıldığında adında bundle ID'yi veya
@@ -215,14 +230,25 @@ public final class LeftoverScanner {
             rejected.append(RejectedPath(path: path, reason: reason))
         }
 
-        func result(droppedDeep: Int, caskTokens: [String], receiptIds: [String] = []) -> ScanResult {
+        var paths: [String] { order }
+
+        func contains(_ path: String) -> Bool { byPath[path] != nil }
+
+        mutating func remove(_ path: String, reason: String) {
+            guard byPath.removeValue(forKey: path) != nil else { return }
+            order.removeAll { $0 == path }
+            rejected.append(RejectedPath(path: path, reason: reason))
+        }
+
+        func result(droppedDeep: Int, caskTokens: [String], receiptIds: [String] = [], conditionIds: [String] = []) -> ScanResult {
             let findings = order.compactMap { byPath[$0] }.sorted { a, b in
                 if a.strength != b.strength { return a.strength > b.strength }
                 let ra = LeftoverScanner.kindRank(a.kind), rb = LeftoverScanner.kindRank(b.kind)
                 if ra != rb { return ra < rb }
                 return a.path.localizedCaseInsensitiveCompare(b.path) == .orderedAscending
             }
-            return ScanResult(findings: findings, droppedDeepCount: droppedDeep, caskTokens: caskTokens, rejected: rejected, receiptIds: receiptIds)
+            return ScanResult(findings: findings, droppedDeepCount: droppedDeep, caskTokens: caskTokens, rejected: rejected,
+                              receiptIds: receiptIds, conditionIds: conditionIds)
         }
     }
 
@@ -319,6 +345,38 @@ public final class LeftoverScanner {
             }
         }
         return entries
+    }
+
+    // MARK: - Uygulama başına kurallar (Tur C)
+
+    private func addConditionHits(identity: AppIdentity, caskTokens: [String], into collector: inout Collector) -> [AppCondition] {
+        guard let conditions = conditions else { return [] }
+        let matched = conditions.matching(identity: identity, caskTokens: caskTokens)
+        guard !matched.isEmpty else { return [] }
+        let appPath = identity.appPath
+        for hit in conditions.expand(conditions: matched, home: home, fs: fs) {
+            if hit.path == appPath || hit.path.hasPrefix(appPath + "/") { continue }
+            switch PathClassifier.admit(path: hit.path, home: home, options: options) {
+            case .accepted(let admitted, let note):
+                guard isUsable(hit.path) else { collector.reject(hit.path, "boş klasör veya symlink"); continue }
+                var label = "Kural: \(hit.conditionId)"
+                if let ruleNote = hit.note { label += " — \(ruleNote)" }
+                if let note = note { label += " — \(note)" }
+                collector.add(make(hit.path, source: .condition, strength: min(admitted, hit.strength), note: label))
+            case .rejected(let reason):
+                collector.reject(hit.path, "Kural \(hit.conditionId): \(reason)")
+            }
+        }
+        return matched
+    }
+
+    private func applyExclusions(conditions matched: [AppCondition], to collector: inout Collector) {
+        guard let conditions = conditions, !matched.isEmpty else { return }
+        for path in collector.paths {
+            if let id = conditions.exclusion(forPath: path, home: home, conditions: matched) {
+                collector.remove(path, reason: "Kural \(id) hariç tutuyor")
+            }
+        }
     }
 
     // MARK: - Kesin kaynaklar (Tur B)

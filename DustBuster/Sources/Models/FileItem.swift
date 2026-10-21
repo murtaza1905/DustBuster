@@ -10,6 +10,9 @@ struct FileItem: Identifiable, Hashable {
     // UI Properties
     var isSelected: Bool = true
 
+    /// Kural katmanının verdiği hazır etiket (tarayıcı önbelleği, bölünmüş satıcı klasörü); yoksa yoldan türetilir
+    var label: String? = nil
+
     var path: String {
         return url.path
     }
@@ -19,6 +22,8 @@ struct FileItem: Identifiable, Hashable {
     }
 
     var displayName: String {
+        if let label = label, !label.isEmpty { return label }
+
         // MARK: - Safari Cache (dizin sınırına saygılı: com.apple.Safari.SafeBrowsing buraya girmez)
         if path.contains("/com.apple.Safari/") || path.hasSuffix("/com.apple.Safari") {
             if path.contains("WebKitCache") {

@@ -16,6 +16,7 @@
       "~/Library/Application Support/Caches/notion-updater",
       "~/Library/Application Support/Notion",
       "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/notion.id.sfl4",
+      "~/Library/Caches/notion-updater",
       "~/Library/Caches/notion.id",
       "~/Library/Caches/notion.id.ShipIt",
       "~/Library/HTTPStorages/notion.id",
@@ -23,9 +24,7 @@
       "~/Library/Preferences/ByHost/notion.id.ShipIt.7214F14B-116C-5737-A4C1-6F18619B1E3F.plist",
       "~/Library/Preferences/notion.id.plist"
     ],
-    "weak": [
-      "~/Library/Caches/notion-updater"
-    ]
+    "weak": []
   },
   "home": "/Users/test",
   "identity": {

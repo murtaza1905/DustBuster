@@ -158,10 +158,10 @@ public struct Fixture: Codable, Equatable {
         }
     }
 
-    public func run(caskDatabase: CaskDatabase?) -> (ScanResult, Verdict) {
+    public func run(caskDatabase: CaskDatabase?, conditions: AppConditions? = AppConditions.bundled()) -> (ScanResult, Verdict) {
         let fs = makeFileSystem()
         let scanner = LeftoverScanner(home: home, fs: fs, caskDatabase: caskDatabase,
-                                      receipts: makeReceiptProvider(), options: options.scanOptions)
+                                      receipts: makeReceiptProvider(), conditions: conditions, options: options.scanOptions)
         let result = scanner.scan(identity: makeIdentity())
         return (result, verdict(for: result))
     }

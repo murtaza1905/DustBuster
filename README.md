@@ -60,12 +60,13 @@ To open the project in Xcode instead: run `./scripts/install.sh` once (or `xcode
 
 ## How the uninstaller finds leftovers
 
-Matching lives in a UI-independent Swift package (`Core/`) and runs in four layers:
+Matching lives in a UI-independent Swift package (`Core/`) and runs in five layers:
 
 1. **Deterministic signals read from the bundle itself** — well-known paths derived from the bundle ID; app groups declared in the code-signature entitlements (`Group Containers`, `Application Scripts`); container ownership from containermanagerd metadata (works for UUID-named containers); launchd plists whose program lives inside the bundle; embedded helpers' containers; `pkgutil` receipts (with system scan on). Always selected.
 2. **Homebrew Cask database** — a snapshot of the community-maintained `zap` stanzas from [Homebrew/homebrew-cask](https://github.com/Homebrew/homebrew-cask) (BSD-2-Clause), embedded in the app. No network access; refresh with `python3 tools/build-cask-db.py <homebrew-cask checkout>`. Always selected.
 3. **Directory scan** — bundle-ID and whole-word name matching inside `~/Library`, including vendor folders (`Google/Chrome`). Name-only hits are listed **unselected** and labelled.
-4. **Safety rules** — other apps from the same vendor, channel variants (Canary/Beta), `com.apple.*` paths for non-Apple apps, protected user data (Keychains, Mail, Documents…) and empty folders are never listed.
+4. **Per-app conditions** (`Core/Sources/DustBusterCore/Resources/conditions.json`) — explicit `include`/`exclude` globs for apps whose leftovers follow no convention (Xcode's `~/Library/Developer`, Notion's updater cache). Matched by bundle ID or Homebrew token; adding an app is a data change, not a code change.
+5. **Safety rules** — other apps from the same vendor, channel variants (Canary/Beta), `com.apple.*` paths for non-Apple apps, protected user data (Keychains, Mail, Documents…) and empty folders are never listed, whatever layer proposed them.
 
 Every real-world scan can be exported from the app as a JSON test case (**Test vakası**) and dropped into `Core/Tests/DustBusterCoreTests/Fixtures/`; the test suite replays it against a virtual `~/Library`. CI runs the suite and builds the app on every push.
 
@@ -73,6 +74,10 @@ Every real-world scan can be exported from the app as a JSON test case (**Test v
 cd ~/Desktop/DustBuster/Core
 swift test
 ```
+
+## How System Cleanup decides
+
+All cleanup rules are data (`Core/Sources/DustBusterCore/Resources/rules.json`) applied by `CleanupPolicy`: the scanned roots (`~/Library/Caches`, `~/Library/Logs`), forbidden roots, sensitive keywords that block a path, the Apple system-service list (listed but unselected, since macOS regenerates them), vendor folders that are split into their children (`Caches/Google` → `Google › GoogleUpdater`), and browser definitions. Chromium browsers are detected by their `Local State` file under Application Support and their caches are collected from both Application Support and the mirrored `~/Library/Caches/<vendor>/<browser>/<profile>` layout (`Cache`, `Code Cache`, `GPUCache`, shader caches); Firefox-family `cache2` and Safari's container cache are listed by name.
 
 ## Project layout
 
@@ -87,8 +92,8 @@ DustBuster/
     ├── ViewModels/
     └── Views/
 Core/                              # DustBusterCore Swift package (no UI)
-├── Sources/DustBusterCore/        # Scanner, matching rules, cask database, fixtures
-│   └── Resources/cask-zap.json    # Embedded Homebrew snapshot
+├── Sources/DustBusterCore/        # Scanner, matching rules, cask database, cleanup policy, fixtures
+│   └── Resources/                 # cask-zap.json (Homebrew snapshot), conditions.json, rules.json
 └── Tests/                         # XCTest suite + Fixtures/*.json
 tools/                             # build-cask-db.py, make-fixtures.py
 project.yml                        # XcodeGen project definition

@@ -31,6 +31,7 @@ struct UninstallItem: Identifiable {
         case .launchd: return "launchd"
         case .receipt: return "pkgutil"
         case .helper: return "Yardımcı"
+        case .condition: return "Kural"
         case .appBundle, .exactPath, .bundleId, .name: return nil
         }
     }
@@ -46,6 +47,7 @@ final class UninstallerManager {
     private let home: String
     private let fs = RealFileSystem()
     private let caskDatabase: CaskDatabase?
+    private let conditions: AppConditions?
     private let receipts = PkgutilReceiptProvider()
 
     /// Sistem seviyesi konumları da taramak için true yap (/Library/)
@@ -62,6 +64,7 @@ final class UninstallerManager {
     init() {
         home = fileManager.homeDirectoryForCurrentUser.path
         caskDatabase = CaskDatabase.bundled()
+        conditions = AppConditions.bundled()
     }
 
     var options: ScanOptions {
@@ -76,7 +79,7 @@ final class UninstallerManager {
     }
 
     private func makeScanner() -> LeftoverScanner {
-        LeftoverScanner(home: home, fs: fs, caskDatabase: caskDatabase, receipts: receipts, options: options)
+        LeftoverScanner(home: home, fs: fs, caskDatabase: caskDatabase, receipts: receipts, conditions: conditions, options: options)
     }
 
     // MARK: - Kimlik
@@ -166,6 +169,12 @@ final class UninstallerManager {
             lines.append("Eşleşen cask: " + tokens.joined(separator: ", "))
         } else {
             lines.append("Eşleşen cask: yok")
+        }
+        lines.append("Kural dosyası (conditions.json): " + (conditions.map { "\($0.count) uygulama" } ?? "yüklenemedi"))
+        if let ids = lastScanResult?.conditionIds, !ids.isEmpty {
+            lines.append("Uygulanan kural: " + ids.joined(separator: ", "))
+        } else {
+            lines.append("Uygulanan kural: yok")
         }
         return lines
     }

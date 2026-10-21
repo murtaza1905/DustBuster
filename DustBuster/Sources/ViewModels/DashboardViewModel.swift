@@ -205,7 +205,7 @@ class DashboardViewModel: ObservableObject {
             lines.append("")
         }
 
-        lines.append("Konum bazlı karar listesi — LİSTE: plana girdi, ATLANDI: dışarıda kaldı (neden), AYRI: tarayıcı cache")
+        lines.append("Konum bazlı karar listesi — LİSTE: plana girdi, ATLANDI: dışarıda kaldı (neden), AYRI: tarayıcı cache, BÖLÜNDÜ: satıcı klasörü alt girdileriyle")
         lines.append(contentsOf: cleanerManager.diagnosticListing(plan: cleaningPlan))
 
         let text = lines.joined(separator: "\n") + "\n"

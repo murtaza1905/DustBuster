@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "roots": [
+    { "path": "~/Library/Caches", "label": "Caches" },
+    { "path": "~/Library/Logs", "label": "Logs" }
+  ],
+  "forbiddenRoots": ["/System", "/Library", "/bin", "/sbin", "/usr", "/Applications"],
+  "sensitiveKeywords": ["history", "bookmark", "bookmarks", "cookies", "keychain", "account", "accounts", "login", "logindata", "sessions", "autofill"],
+  "appleServicePrefixes": ["com.apple."],
+  "appleServiceExceptions": ["com.apple.dt."],
+  "appleServiceNames": [
+    "AMSDataMigratorTool", "Animoji", "ARFileCache", "askpermissiond", "CloudKit", "familycircled", "FamilyCircle",
+    "features_config", "GameKit", "GeoServices", "JetPackCache", "LSMImageCache", "mbuseragent", "menkaure.enabled",
+    "PassKit", "SharedImageCache", "ssu", "TrickPlay", "tvapp_bag"
+  ],
+  "vendorFolders": [
+    "Google", "Microsoft", "Adobe", "JetBrains", "Mozilla", "BraveSoftware", "Yandex", "Logitech", "Autodesk",
+    "Epic", "Unity", "Corsair", "Razer", "Elgato", "Opera Software", "Vivaldi", "Blackmagic Design", "Native Instruments",
+    "Steinberg", "Ableton", "Figma", "Slack", "Zoom", "Dropbox", "Box", "Nextcloud", "Synology", "Parallels", "VMware",
+    "Oracle", "Docker", "Electron", "Avast Software", "Bitdefender", "Kaspersky Lab", "Sophos", "Malwarebytes",
+    "Wacom", "Canon", "HP", "Epson", "Brother"
+  ],
+  "browsers": {
+    "chromiumProfileCacheFolders": ["Cache", "Code Cache", "GPUCache", "Media Cache"],
+    "chromiumRootCacheFolders": ["ShaderCache", "GrShaderCache", "GraphiteDawnCache", "DawnWebGPUCache", "DawnGraphiteCache"],
+    "chromiumProfileNames": ["Default", "Guest Profile", "System Profile"],
+    "chromiumProfilePrefixes": ["Profile "],
+    "chromiumSingleProfileRoots": [
+      "com.operasoftware.Opera", "com.operasoftware.OperaGX", "com.operasoftware.OperaAir",
+      "com.operasoftware.OperaDeveloper", "com.operasoftware.OperaNext"
+    ],
+    "chromiumNames": {
+      "Google/Chrome": "Google Chrome",
+      "Google/Chrome Beta": "Google Chrome Beta",
+      "Google/Chrome Canary": "Google Chrome Canary",
+      "Google/Chrome Dev": "Google Chrome Dev",
+      "Chromium": "Chromium",
+      "BraveSoftware/Brave-Browser": "Brave",
+      "BraveSoftware/Brave-Browser-Beta": "Brave Beta",
+      "BraveSoftware/Brave-Browser-Nightly": "Brave Nightly",
+      "Microsoft Edge": "Microsoft Edge",
+      "Microsoft Edge Beta": "Microsoft Edge Beta",
+      "Microsoft Edge Dev": "Microsoft Edge Dev",
+      "Microsoft Edge Canary": "Microsoft Edge Canary",
+      "Vivaldi": "Vivaldi",
+      "Arc": "Arc",
+      "Arc/User Data": "Arc",
+      "com.operasoftware.Opera": "Opera",
+      "com.operasoftware.OperaGX": "Opera GX",
+      "com.operasoftware.OperaAir": "Opera Air",
+      "com.operasoftware.OperaDeveloper": "Opera Developer",
+      "com.operasoftware.OperaNext": "Opera Next",
+      "Yandex/YandexBrowser": "Yandex Browser",
+      "Coccoc": "Cốc Cốc",
+      "SRWare Iron": "SRWare Iron",
+      "Thorium": "Thorium",
+      "Sidekick": "Sidekick",
+      "Wavebox": "Wavebox",
+      "Naver Whale": "Naver Whale",
+      "Orion": "Orion",
+      "CentBrowser": "Cent Browser",
+      "Iridium": "Iridium",
+      "Ungoogled Chromium": "Ungoogled Chromium"
+    },
+    "geckoProfileRoots": [
+      "~/Library/Caches/Firefox/Profiles",
+      "~/Library/Caches/LibreWolf/Profiles",
+      "~/Library/Caches/Waterfox/Profiles",
+      "~/Library/Caches/Pale Moon/Profiles",
+      "~/Library/Caches/Zen/Profiles"
+    ],
+    "geckoCacheFolder": "cache2",
+    "geckoNames": {
+      "Firefox": "Firefox",
+      "LibreWolf": "LibreWolf",
+      "Waterfox": "Waterfox",
+      "Pale Moon": "Pale Moon",
+      "Zen": "Zen Browser"
+    },
+    "safariCachePaths": [
+      "~/Library/Containers/com.apple.Safari/Data/Library/Caches/com.apple.Safari",
+      "~/Library/Caches/com.apple.Safari"
+    ]
+  }
+}

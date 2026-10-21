@@ -10,7 +10,7 @@ let package = Package(
     targets: [
         .target(
             name: "DustBusterCore",
-            resources: [.copy("Resources/cask-zap.json")]
+            resources: [.copy("Resources/cask-zap.json"), .copy("Resources/conditions.json"), .copy("Resources/rules.json")]
         ),
         .testTarget(
             name: "DustBusterCoreTests",

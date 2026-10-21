@@ -10,19 +10,23 @@
   ],
   "expect": {
     "absent": [
-      "~/Library/Containers/com.facebook.archon",
-      "~/Library/Containers/net.whatsapp.WhatsApp.Intents",
-      "~/Library/Group Containers/group.net.whatsapp.family"
+      "~/Library/Containers/com.facebook.archon"
     ],
     "caskTokens": [
       "whatsapp"
     ],
     "strong": [
+      "~/Library/Application Scripts/group.net.whatsapp.WhatsApp.shared",
+      "~/Library/Application Scripts/net.whatsapp.WhatsApp",
       "~/Library/Containers/net.whatsapp.WhatsApp",
+      "~/Library/Containers/net.whatsapp.WhatsApp.Intents",
+      "~/Library/Containers/net.whatsapp.WhatsApp.ServiceExtension",
       "~/Library/Containers/net.whatsapp.WhatsApp.WAAppKitBridgeService",
       "~/Library/Group Containers/group.com.facebook.family",
       "~/Library/Group Containers/group.net.whatsapp.WhatsApp.private",
-      "~/Library/Group Containers/group.net.whatsapp.WhatsApp.shared"
+      "~/Library/Group Containers/group.net.whatsapp.WhatsApp.shared",
+      "~/Library/Group Containers/group.net.whatsapp.WhatsAppSMB.shared",
+      "~/Library/Group Containers/group.net.whatsapp.family"
     ],
     "weak": []
   },
@@ -53,7 +57,7 @@
   },
   "launchdPrograms": null,
   "name": "WhatsApp — sandbox; satıcı ortak grubu (facebook.family) zayıf, kendi grupları güçlü",
-  "notes": "Rapor 2026-10-21 build 9. group.com.facebook.family entitlement sezgiselinde zayıf kalırdı; Homebrew yalnızca whatsapp cask'inde listelediği için güçlü sayılır.",
+  "notes": "Rapor 2026-10-21 build 9. group.com.facebook.family entitlement sezgiselinde zayıf kalırdı; Homebrew yalnızca whatsapp cask'inde listelediği için güçlü sayılır. Boş kabuk klasörler (sandbox Application Scripts / Group Containers) de listelenir.",
   "options": {
     "includeAggressiveLocations": false,
     "includeSystemLocations": false,

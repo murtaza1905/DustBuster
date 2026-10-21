@@ -232,4 +232,21 @@ final class SearchTermsTests: XCTestCase {
         XCTAssertEqual(LeftoverScanner.vendorToken(identity: word), "microsoft")
         XCTAssertEqual(LeftoverScanner.vendorToken(identity: notion), "notion")
     }
+
+    func testEmptyShellsAreListedFromDeterministicSourcesOnly() {
+        let home = "/Users/test"
+        let fs = VirtualFileSystem(paths: [
+            "\(home)/Library/Application Scripts/com.demo.app/",
+            "\(home)/Library/Containers/com.demo.app/Data/x",
+            "\(home)/Library/Application Support/Demo Something/",
+            "/Applications/Demo.app/Contents/Info.plist"
+        ])
+        let identity = AppIdentity(name: "Demo", bundleId: "com.demo.app", appPath: "/Applications/Demo.app")
+        let result = LeftoverScanner(home: home, fs: fs, caskDatabase: nil).scan(identity: identity)
+        let shell = result.findings.first { $0.path == "\(home)/Library/Application Scripts/com.demo.app" }
+        XCTAssertEqual(shell?.strength, .strong, "bundle ID ile bulunan boş kabuk listelenir")
+        XCTAssertTrue(shell?.note.contains("boş klasör") ?? false)
+        XCTAssertFalse(result.findings.first { $0.path == "\(home)/Library/Containers/com.demo.app" }?.note.contains("boş klasör") ?? true)
+        XCTAssertFalse(result.contains(path: "\(home)/Library/Application Support/Demo Something"), "ad benzerliğiyle bulunan boş klasör gürültüdür")
+    }
 }

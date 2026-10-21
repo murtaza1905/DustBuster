@@ -20,6 +20,8 @@
       "microsoft-word"
     ],
     "strong": [
+      "~/Library/Application Scripts/com.microsoft.Word",
+      "~/Library/Application Scripts/com.microsoft.Word.widgetextension",
       "~/Library/Containers/com.microsoft.Word",
       "~/Library/Containers/com.microsoft.Word.widgetextension",
       "~/Library/Group Containers/UBF8T346G9.OfficeWordWidget",
@@ -27,10 +29,12 @@
     ],
     "weak": [
       "~/Library/Application Support/Microsoft",
+      "~/Library/Group Containers/UBF8T346G9.Office",
+      "~/Library/Group Containers/UBF8T346G9.OfficeOneDriveSyncIntegration",
+      "~/Library/Group Containers/UBF8T346G9.OfficeOsfWebHost",
       "~/Library/Group Containers/UBF8T346G9.com.microsoft.oneauth",
       "~/Library/Group Containers/UBF8T346G9.group.com.microsoft.shared",
-      "~/Library/Group Containers/UBF8T346G9.ms",
-      "~/Library/Group Containers/UBF8T346G9.Office"
+      "~/Library/Group Containers/UBF8T346G9.ms"
     ]
   },
   "home": "/Users/test",
@@ -58,7 +62,7 @@
     "teamId": "UBF8T346G9"
   },
   "name": "Microsoft Word — tekil cask, satıcı klasörü seçimsiz",
-  "notes": "Rapor 2026-10-21 build 11. microsoft-word cask'i ~/Library/Application Support/Microsoft'u (tüm Microsoft ürünlerinin ortak klasörü) siler; satıcı klasörü kuralı seçimsiz bırakır.",
+  "notes": "Rapor 2026-10-21 build 11. microsoft-word cask'i ~/Library/Application Support/Microsoft'u (tüm Microsoft ürünlerinin ortak klasörü) siler; satıcı klasörü kuralı seçimsiz bırakır. Boş kabuk klasörler (sandbox Application Scripts / Group Containers) de listelenir.",
   "options": {
     "includeAggressiveLocations": false,
     "includeSystemLocations": false,

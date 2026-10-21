@@ -11,8 +11,6 @@
       "~/Library/Application Support/Logic",
       "~/Library/Application Support/Logitech/Logitech Options",
       "~/Library/Caches/com.apple.logic10",
-      "~/Library/Caches/com.logi.optionsplus.installer",
-      "~/Library/Logs/xlog_logitech",
       "~/Library/Preferences/com.apple.loginwindow.plist"
     ],
     "caskTokens": [
@@ -24,7 +22,9 @@
       "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.logi.optionsplus.driverhost.sfl4",
       "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.logi.optionsplus.sfl4",
       "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.logi.pluginservice.sfl4",
+      "~/Library/Caches/com.logi.optionsplus.installer",
       "~/Library/HTTPStorages/LogiPluginServiceNative",
+      "~/Library/Logs/xlog_logitech",
       "~/Library/Preferences/com.logi.cp-dev-mgr.plist",
       "~/Library/Preferences/com.logi.lps.settings.plist",
       "~/Library/Preferences/com.logi.optionsplus.driverhost.plist",
@@ -53,7 +53,7 @@
   },
   "launchdPrograms": null,
   "name": "Logi Options+ — Homebrew'un bildiği gizli kalıntılar, sürücü kurucu .bundle, 'logi' ⊂ 'login/logic' tuzağı",
-  "notes": "Rapor 2026-10-20 build 7. /Library yolları sistem taraması kapalıyken listelenmez; 'Logitech Options' eski uygulama (logitech-options cask) ayrı tutulur. Satıcı klasörü ~/Library/Application Support/Logi diğer Logi ürünleriyle ortak olabileceğinden seçimsiz.",
+  "notes": "Rapor 2026-10-20 build 7. /Library yolları sistem taraması kapalıyken listelenmez; 'Logitech Options' eski uygulama (logitech-options cask) ayrı tutulur. Satıcı klasörü ~/Library/Application Support/Logi diğer Logi ürünleriyle ortak olabileceğinden seçimsiz. Boş kabuk klasörler (sandbox Application Scripts / Group Containers) de listelenir.",
   "options": {
     "includeAggressiveLocations": false,
     "includeSystemLocations": false,

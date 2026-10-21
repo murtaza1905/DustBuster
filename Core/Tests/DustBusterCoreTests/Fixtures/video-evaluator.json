@@ -5,12 +5,12 @@
   ],
   "expect": {
     "absent": [
-      "~/Library/Application Scripts/com.koraybirand.Video-Evaluator",
       "~/Library/Caches/com.apple.VideoConference",
       "~/Library/Logs/Video"
     ],
     "caskTokens": [],
     "strong": [
+      "~/Library/Application Scripts/com.koraybirand.Video-Evaluator",
       "~/Library/Containers/com.koraybirand.Video-Evaluator"
     ],
     "weak": []
@@ -30,7 +30,7 @@
   },
   "launchdPrograms": null,
   "name": "Video Evaluator — sandbox konteyneri, 'video' genel kelimesi",
-  "notes": "Rapor 2026-10-20.",
+  "notes": "Rapor 2026-10-20. Boş kabuk klasörler (sandbox Application Scripts / Group Containers) de listelenir.",
   "options": {
     "includeAggressiveLocations": false,
     "includeSystemLocations": false,

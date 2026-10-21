@@ -9,7 +9,6 @@
       "~/Library/Application Support/Google/DriveFS",
       "~/Library/Caches/Google/GoogleUpdater",
       "~/Library/Caches/com.apple.Safari",
-      "~/Library/Caches/com.apple.nsurlsessiond/Downloads/com.google.Chrome",
       "~/Library/Caches/com.google.GoogleUpdater",
       "~/Library/Preferences/com.apple.Accessibility.plist",
       "~/Library/Preferences/com.google.Chrome.canary.plist"
@@ -20,6 +19,7 @@
     "strong": [
       "~/Library/Application Support/Google/Chrome",
       "~/Library/Caches/Google/Chrome",
+      "~/Library/Caches/com.apple.nsurlsessiond/Downloads/com.google.Chrome",
       "~/Library/Preferences/com.google.Chrome.plist"
     ],
     "weak": [
@@ -46,7 +46,7 @@
   },
   "launchdPrograms": null,
   "name": "Google Chrome — geliştirici klasörü içinde veri, kanal türevi, Keystone",
-  "notes": "Rapor 2026-10-21 build 9. ~/Library/Google ve Keystone yalnızca Homebrew verisiyle bulunur; başka Google cask'leri de sahiplendiği için paylaşılan sayılıp seçimsiz gelir.",
+  "notes": "Rapor 2026-10-21 build 9. ~/Library/Google ve Keystone yalnızca Homebrew verisiyle bulunur; başka Google cask'leri de sahiplendiği için paylaşılan sayılıp seçimsiz gelir. Boş kabuk klasörler (sandbox Application Scripts / Group Containers) de listelenir.",
   "options": {
     "includeAggressiveLocations": false,
     "includeSystemLocations": false,

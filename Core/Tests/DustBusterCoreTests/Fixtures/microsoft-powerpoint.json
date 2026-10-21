@@ -12,6 +12,8 @@
       "microsoft-powerpoint"
     ],
     "strong": [
+      "~/Library/Application Scripts/com.microsoft.Powerpoint",
+      "~/Library/Application Scripts/com.microsoft.Powerpoint.widgetextension",
       "~/Library/Containers/com.microsoft.Powerpoint",
       "~/Library/Containers/com.microsoft.Powerpoint.widgetextension"
     ],
@@ -48,7 +50,7 @@
     "teamId": "UBF8T346G9"
   },
   "name": "Microsoft PowerPoint — Office ortak grupları seçimsiz",
-  "notes": "Rapor 2026-10-21 build 11. Konteyner paket cask'lerinde de geçer ama onlar aynı uygulamayı taşıdığı için 'paylaşılan' sayılmaz.",
+  "notes": "Rapor 2026-10-21 build 11. Konteyner paket cask'lerinde de geçer ama onlar aynı uygulamayı taşıdığı için 'paylaşılan' sayılmaz. Boş kabuk klasörler (sandbox Application Scripts / Group Containers) de listelenir.",
   "options": {
     "includeAggressiveLocations": false,
     "includeSystemLocations": false,

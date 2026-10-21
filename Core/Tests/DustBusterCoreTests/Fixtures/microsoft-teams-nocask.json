@@ -9,23 +9,23 @@
   ],
   "expect": {
     "absent": [
-      "~/Library/Application Scripts/UBF8T346G9.com.microsoft.teams",
-      "~/Library/Application Scripts/com.microsoft.teams2",
-      "~/Library/Application Scripts/com.microsoft.teams2.agent",
       "~/Library/Application Support/Microsoft/Office",
       "~/Library/Caches/com.microsoft.autoupdate2",
       "~/Library/Containers/com.microsoft.Outlook",
-      "~/Library/Containers/com.microsoft.teams2.notificationcenter",
-      "~/Library/Containers/com.microsoft.teams2.respawn",
       "~/Library/Group Containers/UBF8T346G9.Office",
       "~/Library/Preferences/com.microsoft.office.plist"
     ],
     "caskTokens": [],
     "strong": [
+      "~/Library/Application Scripts/UBF8T346G9.com.microsoft.teams",
+      "~/Library/Application Scripts/com.microsoft.teams2",
+      "~/Library/Application Scripts/com.microsoft.teams2.agent",
       "~/Library/Application Support/Microsoft/MSTeams",
       "~/Library/Caches/com.microsoft.teams2.installer_telemetry",
       "~/Library/Containers/com.microsoft.teams2",
       "~/Library/Containers/com.microsoft.teams2.agent",
+      "~/Library/Containers/com.microsoft.teams2.notificationcenter",
+      "~/Library/Containers/com.microsoft.teams2.respawn",
       "~/Library/Containers/com.microsoft.teams2.widgetextension",
       "~/Library/Group Containers/UBF8T346G9.com.microsoft.teams",
       "~/Library/HTTPStorages/com.microsoft.teams2.installer_telemetry",
@@ -58,7 +58,7 @@
   },
   "launchdPrograms": null,
   "name": "Microsoft Teams (veritabanı kapalı) — app group entitlements'tan, konteynerler bundle ID'den",
-  "notes": "Sentetik varyant: Homebrew olmadan da UBF8T346G9.com.microsoft.teams güçlü olmalı (entitlement).",
+  "notes": "Sentetik varyant: Homebrew olmadan da UBF8T346G9.com.microsoft.teams güçlü olmalı (entitlement). Boş kabuk klasörler (sandbox Application Scripts / Group Containers) de listelenir.",
   "options": {
     "includeAggressiveLocations": false,
     "includeSystemLocations": false,

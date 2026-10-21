@@ -10,7 +10,6 @@
       "~/Library/Application Support/Xcodes",
       "~/Library/Caches/com.robotsandpencils.XcodesApp",
       "~/Library/Preferences/com.robotsandpencils.XcodesApp.plist",
-      "~/Library/Developer/XCPGDevices",
       "~/Library/MobileDevice/Provisioning Profiles"
     ],
     "caskTokens": [],
@@ -19,6 +18,7 @@
       "~/Library/Caches/com.apple.dt.Xcode",
       "~/Library/Caches/com.apple.dt.xcodebuild",
       "~/Library/Developer/CoreSimulator",
+      "~/Library/Developer/XCPGDevices",
       "~/Library/Developer/XCTestDevices",
       "~/Library/Developer/Xcode",
       "~/Library/HTTPStorages/com.apple.dt.xcodebuild",
@@ -56,7 +56,7 @@
   },
   "launchdPrograms": null,
   "name": "Xcode — conditions.json ile geliştirici klasörleri",
-  "notes": "Tur C. ~/Library/Developer taramada yok; xcode kuralı ekler. Xcodes (üçüncü parti yönetici) ve diğer com.apple.* önbellekleri listeye girmez.",
+  "notes": "Tur C. ~/Library/Developer taramada yok; xcode kuralı ekler. Xcodes (üçüncü parti yönetici) ve diğer com.apple.* önbellekleri listeye girmez. Boş kabuk klasörler (sandbox Application Scripts / Group Containers) de listelenir.",
   "options": {
     "includeAggressiveLocations": false,
     "includeSystemLocations": false,

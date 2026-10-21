@@ -280,14 +280,19 @@ public final class LeftoverScanner {
     }
 
     private func make(_ path: String, source: Finding.Source, strength: MatchStrength, note: String) -> Finding {
-        Finding(path: path, kind: PathClassifier.kind(forPath: path, home: home), source: source, strength: strength, note: note)
+        // Uygulamanın kendi boş kabukları (sandbox'ın açtığı Application Scripts / Group Containers klasörleri)
+        // da kalıntıdır; listelenir ve etiketlenir
+        let label = isEmptyDirectory(path) ? "\(note) — boş klasör" : note
+        return Finding(path: path, kind: PathClassifier.kind(forPath: path, home: home), source: source, strength: strength, note: label)
     }
 
-    /// Diskte var, symlink değil ve (dizinse) boş değil.
+    /// Diskte var ve symlink değil.
     private func isUsable(_ path: String) -> Bool {
-        guard fs.exists(path), !fs.isSymlink(path) else { return false }
-        if fs.isEffectivelyEmptyDirectory(path) { return false }
-        return true
+        fs.exists(path) && !fs.isSymlink(path)
+    }
+
+    private func isEmptyDirectory(_ path: String) -> Bool {
+        fs.isDirectory(path) && fs.isEffectivelyEmptyDirectory(path)
     }
 
     private func fastCandidates(identity: AppIdentity, terms: SearchTerms) -> [Finding] {
@@ -337,7 +342,7 @@ public final class LeftoverScanner {
             if hit.path == appPath || hit.path.hasPrefix(appPath + "/") { continue }
             switch PathClassifier.admit(path: hit.path, home: home, options: options) {
             case .accepted(let admitted, let note):
-                guard isUsable(hit.path) else { collector.reject(hit.path, "boş klasör veya symlink"); continue }
+                guard isUsable(hit.path) else { collector.reject(hit.path, "symlink veya yok"); continue }
                 var strength = admitted
                 var label = "Homebrew: \(hit.token)" + (note.map { " — \($0)" } ?? "")
                 // Aynı yolu başka cask'ler de sahipleniyorsa (ortak güncelleyici, satıcı kimlik grubu) paylaşılıyordur
@@ -365,7 +370,7 @@ public final class LeftoverScanner {
             if hit.path == appPath || hit.path.hasPrefix(appPath + "/") { continue }
             switch PathClassifier.admit(path: hit.path, home: home, options: options) {
             case .accepted(let admitted, let note):
-                guard isUsable(hit.path) else { collector.reject(hit.path, "boş klasör veya symlink"); continue }
+                guard isUsable(hit.path) else { collector.reject(hit.path, "symlink veya yok"); continue }
                 var label = "Kural: \(hit.conditionId)"
                 if let ruleNote = hit.note { label += " — \(ruleNote)" }
                 if let note = note { label += " — \(note)" }
@@ -586,6 +591,8 @@ public final class LeftoverScanner {
             if let strength = terms.match(relative, isDirectory: isDir) {
                 if system && strength != .strong { continue }
                 guard isUsable(path) else { continue }
+                // Yalnızca ad benzerliğiyle bulunan boş klasörler gürültüdür
+                if strength == .weak && isEmptyDirectory(path) { continue }
                 let source: Finding.Source = terms.matchesBundleId(name) ? .bundleId : .name
                 out.append(make(path, source: source, strength: strength, note: (dir as NSString).lastPathComponent))
             } else if isDir {
@@ -603,6 +610,7 @@ public final class LeftoverScanner {
         return names.compactMap { name in
             let path = dir + "/" + name
             guard !fs.isSymlink(path), let strength = terms.match(name, isDirectory: false), isUsable(path) else { return nil }
+            if strength == .weak && isEmptyDirectory(path) { return nil }
             return make(path, source: terms.matchesBundleId(name) ? .bundleId : .name, strength: strength, note: "Preferences/ByHost")
         }
     }
@@ -615,6 +623,7 @@ public final class LeftoverScanner {
             for name in names {
                 let path = dir + "/" + name
                 guard let strength = terms.match(name, isDirectory: fs.isDirectory(path)), isUsable(path) else { continue }
+                if strength == .weak && isEmptyDirectory(path) { continue }
                 out.append(make(path, source: terms.matchesBundleId(name) ? .bundleId : .name, strength: strength, note: (sub as NSString).lastPathComponent))
             }
         }

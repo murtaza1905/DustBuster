@@ -6,13 +6,14 @@
   ],
   "expect": {
     "absent": [
-      "~/Library/Containers/com.getupnote.other",
-      "~/Library/Group Containers/78LWHGWLUL.com.getupnote.desktop"
+      "~/Library/Containers/com.getupnote.other"
     ],
     "caskTokens": [],
     "strong": [
+      "~/Library/Application Scripts/com.getupnote.desktop",
       "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.getupnote.desktop.sfl4",
       "~/Library/Containers/com.getupnote.desktop",
+      "~/Library/Group Containers/78LWHGWLUL.com.getupnote.desktop",
       "~/Library/Group Containers/group.com.getupnote.ios"
     ],
     "weak": []
@@ -41,7 +42,7 @@
   },
   "launchdPrograms": null,
   "name": "UpNote — Homebrew'da yok; sandbox konteyneri, iOS ile paylaşılan grup, Son Belgeler kaydı",
-  "notes": "Rapor 2026-10-21 build 9. Satıcı adı uygulama adını içerdiği için (getupnote ⊃ upnote) grup uygulamaya özgü sayılır.",
+  "notes": "Rapor 2026-10-21 build 9. Satıcı adı uygulama adını içerdiği için (getupnote ⊃ upnote) grup uygulamaya özgü sayılır. Boş kabuk klasörler (sandbox Application Scripts / Group Containers) de listelenir.",
   "options": {
     "includeAggressiveLocations": false,
     "includeSystemLocations": false,

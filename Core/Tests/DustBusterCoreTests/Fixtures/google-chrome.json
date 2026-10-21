@@ -20,15 +20,15 @@
     "strong": [
       "~/Library/Application Support/Google/Chrome",
       "~/Library/Caches/Google/Chrome",
+      "~/Library/Preferences/com.google.Chrome.plist"
+    ],
+    "weak": [
       "~/Library/Google/Google Chrome Brand.plist",
       "~/Library/Google/GoogleSoftwareUpdate",
       "~/Library/LaunchAgents/com.google.keystone.agent.plist",
       "~/Library/LaunchAgents/com.google.keystone.xpcservice.plist",
-      "~/Library/Preferences/com.google.Chrome.plist",
+      "~/Library/Logs/DiagnosticReports/ExcUserFault_Google Chrome-2026-10-14-140258.ips",
       "~/Library/Preferences/com.google.Keystone.Agent.plist"
-    ],
-    "weak": [
-      "~/Library/Logs/DiagnosticReports/ExcUserFault_Google Chrome-2026-10-14-140258.ips"
     ]
   },
   "home": "/Users/test",
@@ -46,7 +46,7 @@
   },
   "launchdPrograms": null,
   "name": "Google Chrome — geliştirici klasörü içinde veri, kanal türevi, Keystone",
-  "notes": "Rapor 2026-10-20 (build 6 gözlemiyle birleştirildi). ~/Library/Google ve Keystone yalnızca Homebrew verisiyle bulunur.",
+  "notes": "Rapor 2026-10-21 build 9. ~/Library/Google ve Keystone yalnızca Homebrew verisiyle bulunur; başka Google cask'leri de sahiplendiği için paylaşılan sayılıp seçimsiz gelir.",
   "options": {
     "includeAggressiveLocations": false,
     "includeSystemLocations": false,

@@ -1,0 +1,73 @@
+{
+  "containerIdentifiers": null,
+  "emptyDirs": [
+    "~/Library/Application Scripts/group.net.whatsapp.WhatsApp.shared/",
+    "~/Library/Application Scripts/net.whatsapp.WhatsApp/",
+    "~/Library/Containers/net.whatsapp.WhatsApp.Intents/",
+    "~/Library/Containers/net.whatsapp.WhatsApp.ServiceExtension/",
+    "~/Library/Group Containers/group.net.whatsapp.WhatsAppSMB.shared/",
+    "~/Library/Group Containers/group.net.whatsapp.family/"
+  ],
+  "expect": {
+    "absent": [
+      "~/Library/Containers/com.facebook.archon",
+      "~/Library/Containers/net.whatsapp.WhatsApp.Intents",
+      "~/Library/Group Containers/group.net.whatsapp.family"
+    ],
+    "caskTokens": [
+      "whatsapp"
+    ],
+    "strong": [
+      "~/Library/Containers/net.whatsapp.WhatsApp",
+      "~/Library/Containers/net.whatsapp.WhatsApp.WAAppKitBridgeService",
+      "~/Library/Group Containers/group.com.facebook.family",
+      "~/Library/Group Containers/group.net.whatsapp.WhatsApp.private",
+      "~/Library/Group Containers/group.net.whatsapp.WhatsApp.shared"
+    ],
+    "weak": []
+  },
+  "home": "/Users/test",
+  "identity": {
+    "appGroups": [
+      "group.net.whatsapp.WhatsApp.shared",
+      "group.net.whatsapp.WhatsAppSMB.shared",
+      "group.net.whatsapp.WhatsApp.private",
+      "group.net.whatsapp.family",
+      "group.com.facebook.family"
+    ],
+    "appPath": "/Applications/WhatsApp.app",
+    "bundleId": "net.whatsapp.WhatsApp",
+    "embeddedBundleIds": [
+      "net.whatsapp.WhatsApp.ServiceExtension",
+      "net.whatsapp.WhatsApp.Intents"
+    ],
+    "executableName": "WhatsApp",
+    "icloudContainers": [
+      "57T9237FN3.net.whatsapp.WhatsApp",
+      "iCloud.net.whatsapp.WhatsApp"
+    ],
+    "isSandboxed": true,
+    "name": "WhatsApp",
+    "receiptIds": [],
+    "teamId": "57T9237FN3"
+  },
+  "launchdPrograms": null,
+  "name": "WhatsApp — sandbox; satıcı ortak grubu (facebook.family) zayıf, kendi grupları güçlü",
+  "notes": "Rapor 2026-10-21 build 9. group.com.facebook.family entitlement sezgiselinde zayıf kalırdı; Homebrew yalnızca whatsapp cask'inde listelediği için güçlü sayılır.",
+  "options": {
+    "includeAggressiveLocations": false,
+    "includeSystemLocations": false,
+    "useCaskDatabase": true
+  },
+  "receipts": null,
+  "schema": 1,
+  "status": "curated",
+  "tree": [
+    "~/Library/Containers/com.facebook.archon/",
+    "~/Library/Containers/net.whatsapp.WhatsApp.WAAppKitBridgeService/",
+    "~/Library/Containers/net.whatsapp.WhatsApp/",
+    "~/Library/Group Containers/group.com.facebook.family/",
+    "~/Library/Group Containers/group.net.whatsapp.WhatsApp.private/",
+    "~/Library/Group Containers/group.net.whatsapp.WhatsApp.shared/"
+  ]
+}

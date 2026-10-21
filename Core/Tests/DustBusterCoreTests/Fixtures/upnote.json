@@ -1,0 +1,59 @@
+{
+  "containerIdentifiers": null,
+  "emptyDirs": [
+    "~/Library/Application Scripts/com.getupnote.desktop/",
+    "~/Library/Group Containers/78LWHGWLUL.com.getupnote.desktop/"
+  ],
+  "expect": {
+    "absent": [
+      "~/Library/Containers/com.getupnote.other",
+      "~/Library/Group Containers/78LWHGWLUL.com.getupnote.desktop"
+    ],
+    "caskTokens": [],
+    "strong": [
+      "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.getupnote.desktop.sfl4",
+      "~/Library/Containers/com.getupnote.desktop",
+      "~/Library/Group Containers/group.com.getupnote.ios"
+    ],
+    "weak": []
+  },
+  "home": "/Users/test",
+  "identity": {
+    "appGroups": [
+      "group.com.getupnote.ios",
+      "78LWHGWLUL.com.getupnote.desktop"
+    ],
+    "appPath": "/Applications/UpNote.app",
+    "bundleId": "com.getupnote.desktop",
+    "embeddedBundleIds": [
+      "com.getupnote.desktop.loginhelper",
+      "com.getupnote.desktop.helper",
+      "com.getupnote.desktop.helper.Renderer",
+      "com.getupnote.desktop.helper.Plugin",
+      "com.getupnote.desktop.helper.GPU"
+    ],
+    "executableName": "UpNote",
+    "icloudContainers": [],
+    "isSandboxed": true,
+    "name": "UpNote",
+    "receiptIds": [],
+    "teamId": "78LWHGWLUL"
+  },
+  "launchdPrograms": null,
+  "name": "UpNote — Homebrew'da yok; sandbox konteyneri, iOS ile paylaşılan grup, Son Belgeler kaydı",
+  "notes": "Rapor 2026-10-21 build 9. Satıcı adı uygulama adını içerdiği için (getupnote ⊃ upnote) grup uygulamaya özgü sayılır.",
+  "options": {
+    "includeAggressiveLocations": false,
+    "includeSystemLocations": false,
+    "useCaskDatabase": true
+  },
+  "receipts": null,
+  "schema": 1,
+  "status": "curated",
+  "tree": [
+    "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.getupnote.desktop.sfl4",
+    "~/Library/Containers/com.getupnote.desktop/",
+    "~/Library/Containers/com.getupnote.other/",
+    "~/Library/Group Containers/group.com.getupnote.ios/"
+  ]
+}

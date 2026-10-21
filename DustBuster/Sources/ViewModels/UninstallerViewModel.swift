@@ -458,9 +458,14 @@ final class UninstallerViewModel: ObservableObject {
             return nil
         }
 
-        let name = bundle.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String
+        let rawName = bundle.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String
             ?? bundle.object(forInfoDictionaryKey: "CFBundleName") as? String
             ?? url.deletingPathExtension().lastPathComponent
+        // Bazı paketler ada görünmez yön işaretleri koyar (ör. U+200E); eşleştirmeyi ve raporu bozmasın
+        let name = String(rawName.unicodeScalars.filter { scalar in
+            let category = scalar.properties.generalCategory
+            return category != .format && category != .control
+        }).trimmingCharacters(in: .whitespacesAndNewlines)
 
         errorMessage = nil
         return (name: name, bundleId: bundle.bundleIdentifier)

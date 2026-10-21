@@ -1,0 +1,48 @@
+{
+  "containerIdentifiers": null,
+  "emptyDirs": [],
+  "expect": {
+    "absent": [
+      "~/Library/Application Support/LogiOptionsPlus",
+      "~/Library/Preferences/com.apple.driver.AppleHIDMouse.plist",
+      "~/Library/Preferences/com.logi.optionsplus.plist"
+    ],
+    "caskTokens": [],
+    "strong": [
+      "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.logi.optionsplus.driverhost.sfl4",
+      "~/Library/Preferences/com.logi.optionsplus.driverhost.plist"
+    ],
+    "weak": []
+  },
+  "home": "/Users/test",
+  "identity": {
+    "appGroups": [],
+    "appPath": "/Applications/Utilities/Logi Options+ Driver Installer.bundle/Logi Options+ Driver Installer.app",
+    "bundleId": "com.logi.optionsplus.driverhost",
+    "embeddedBundleIds": [],
+    "executableName": "Logi Options+ Driver Installer",
+    "icloudContainers": [],
+    "isSandboxed": false,
+    "name": "Logi Options+ Driver Installer",
+    "receiptIds": [],
+    "teamId": "QED4VVPZWA"
+  },
+  "launchdPrograms": null,
+  "name": "Logi Options+ Driver Installer — .bundle içindeki iç .app, 'driver' genel kelimesi",
+  "notes": "Rapor 2026-10-21 build 9. Ana uygulamanın (optionsplus) dosyaları bu yardımcıya ait değildir.",
+  "options": {
+    "includeAggressiveLocations": false,
+    "includeSystemLocations": false,
+    "useCaskDatabase": true
+  },
+  "receipts": null,
+  "schema": 1,
+  "status": "curated",
+  "tree": [
+    "~/Library/Application Support/LogiOptionsPlus/",
+    "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.logi.optionsplus.driverhost.sfl4",
+    "~/Library/Preferences/com.apple.driver.AppleHIDMouse.plist",
+    "~/Library/Preferences/com.logi.optionsplus.driverhost.plist",
+    "~/Library/Preferences/com.logi.optionsplus.plist"
+  ]
+}

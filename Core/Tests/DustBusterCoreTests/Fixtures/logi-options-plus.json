@@ -1,7 +1,8 @@
 {
   "containerIdentifiers": null,
   "emptyDirs": [
-    "~/Library/Caches/com.logi.optionsplus.installer/"
+    "~/Library/Caches/com.logi.optionsplus.installer/",
+    "~/Library/Logs/xlog_logitech/"
   ],
   "expect": {
     "absent": [
@@ -11,6 +12,7 @@
       "~/Library/Application Support/Logitech/Logitech Options",
       "~/Library/Caches/com.apple.logic10",
       "~/Library/Caches/com.logi.optionsplus.installer",
+      "~/Library/Logs/xlog_logitech",
       "~/Library/Preferences/com.apple.loginwindow.plist"
     ],
     "caskTokens": [
@@ -24,7 +26,6 @@
       "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.logi.optionsplus.sfl4",
       "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.logi.pluginservice.sfl4",
       "~/Library/HTTPStorages/LogiPluginServiceNative",
-      "~/Library/Logs/xlog_logitech",
       "~/Library/Preferences/com.logi.cp-dev-mgr.plist",
       "~/Library/Preferences/com.logi.lps.settings.plist",
       "~/Library/Preferences/com.logi.optionsplus.driverhost.plist",
@@ -48,7 +49,7 @@
     "isSandboxed": false,
     "name": "Logi Options+",
     "receiptIds": [],
-    "teamId": null
+    "teamId": "QED4VVPZWA"
   },
   "launchdPrograms": null,
   "name": "Logi Options+ — Homebrew'un bildiği gizli kalıntılar, sürücü kurucu .bundle, 'logi' ⊂ 'login/logic' tuzağı",
@@ -75,7 +76,6 @@
     "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.logi.pluginservice.sfl4",
     "~/Library/Caches/com.apple.logic10/",
     "~/Library/HTTPStorages/LogiPluginServiceNative/",
-    "~/Library/Logs/xlog_logitech/",
     "~/Library/Preferences/com.apple.loginwindow.plist",
     "~/Library/Preferences/com.logi.cp-dev-mgr.plist",
     "~/Library/Preferences/com.logi.lps.settings.plist",

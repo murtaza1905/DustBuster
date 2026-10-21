@@ -61,15 +61,18 @@ os.makedirs(OUT, exist_ok=True)
 # ---------------------------------------------------------------- Google Chrome
 chrome_strong = [
     "~/Library/Preferences/com.google.Chrome.plist",
-    "~/Library/Preferences/com.google.Keystone.Agent.plist",
     "~/Library/Application Support/Google/Chrome/",
     "~/Library/Caches/Google/Chrome/",
+]
+# Keystone (Google'ın ortak güncelleyicisi) birden fazla Google cask'inde geçer → paylaşılan, seçimsiz
+chrome_weak = [
+    "~/Library/Logs/DiagnosticReports/ExcUserFault_Google Chrome-2026-10-14-140258.ips",
+    "~/Library/Preferences/com.google.Keystone.Agent.plist",
     "~/Library/Google/GoogleSoftwareUpdate/",
     "~/Library/Google/Google Chrome Brand.plist",
     "~/Library/LaunchAgents/com.google.keystone.agent.plist",
     "~/Library/LaunchAgents/com.google.keystone.xpcservice.plist",
 ]
-chrome_weak = ["~/Library/Logs/DiagnosticReports/ExcUserFault_Google Chrome-2026-10-14-140258.ips"]
 chrome_absent = [
     "~/Library/Caches/com.apple.nsurlsessiond/Downloads/com.google.Chrome/",
     "~/Library/Preferences/com.google.Chrome.canary.plist",
@@ -85,11 +88,11 @@ fixture(
     identity("Google Chrome", "com.google.Chrome", "/Applications/Google Chrome.app", "Google Chrome"),
     tree=chrome_strong + chrome_weak + [p for p in chrome_absent if not p.endswith("Downloads/com.google.Chrome/")],
     strong=[p.rstrip("/") for p in chrome_strong],
-    weak=chrome_weak,
+    weak=[p.rstrip("/") for p in chrome_weak],
     absent=[p.rstrip("/") for p in chrome_absent],
     empty=["~/Library/Caches/com.apple.nsurlsessiond/Downloads/com.google.Chrome/"],
     casks=["google-chrome"],
-    notes="Rapor 2026-10-20 (build 6 gözlemiyle birleştirildi). ~/Library/Google ve Keystone yalnızca Homebrew verisiyle bulunur.",
+    notes="Rapor 2026-10-21 build 9. ~/Library/Google ve Keystone yalnızca Homebrew verisiyle bulunur; başka Google cask'leri de sahiplendiği için paylaşılan sayılıp seçimsiz gelir.",
 )
 
 # ---------------------------------------------------------------- Microsoft Teams
@@ -110,7 +113,11 @@ teams_empty = [
     "~/Library/Application Scripts/com.microsoft.teams2/",
     "~/Library/Application Scripts/com.microsoft.teams2.agent/",
     "~/Library/Application Scripts/UBF8T346G9.com.microsoft.teams/",
+    "~/Library/Containers/com.microsoft.teams2.notificationcenter/",
+    "~/Library/Containers/com.microsoft.teams2.respawn/",
 ]
+teams_weak = ["~/Library/Group Containers/UBF8T346G9.com.microsoft.oneauth/"]
+teams_strong = [p for p in teams_strong if p not in ("~/Library/Containers/com.microsoft.teams2.notificationcenter/", "~/Library/Containers/com.microsoft.teams2.respawn/")]
 teams_absent = [
     "~/Library/Containers/com.microsoft.Outlook/",
     "~/Library/Application Support/Microsoft/Office/",
@@ -124,13 +131,14 @@ fixture(
              embedded=["com.microsoft.teams2.helper", "com.microsoft.teams2.modulehost", "com.microsoft.teams2.notificationcenter2",
                        "com.microsoft.teams2.teamsswitcher", "com.microsoft.teams2.notificationcenter", "com.microsoft.vcxpc",
                        "com.microsoft.teams2.widgetextension"],
-             team="UBF8T346G9", groups=["UBF8T346G9.com.microsoft.teams"], sandboxed=True),
-    tree=teams_strong + [p for p in teams_absent if p not in teams_empty],
+             team="UBF8T346G9", groups=["UBF8T346G9.com.microsoft.teams", "UBF8T346G9.com.microsoft.oneauth", "UBF8T346G9.com.microsoft.entrabroker"], sandboxed=True),
+    tree=teams_strong + teams_weak + [p for p in teams_absent if p not in teams_empty],
     strong=[p.rstrip("/") for p in teams_strong],
+    weak=[p.rstrip("/") for p in teams_weak],
     absent=[p.rstrip("/") for p in teams_absent],
     empty=teams_empty,
     casks=["microsoft-teams"],
-    notes="Rapor 2026-10-20 (build 6 gözlemiyle birleştirildi). UBF8T346G9.com.microsoft.teams Homebrew zap ile güçlü; boş Application Scripts dizinleri listelenmez.",
+    notes="Rapor 2026-10-21 build 9. oneauth grubu Microsoft'un ortak kimlik grubu (Outlook/OneDrive ile paylaşılır): entitlement'ta geçse de adı uygulamaya özgü olmadığı için zayıf.",
 )
 
 # ---------------------------------------------------------------- Logi Options+
@@ -142,7 +150,6 @@ logi_strong = [
     "~/Library/Preferences/com.logi.lps.settings.plist",
     "~/Library/Application Support/LogiOptionsPlus/",
     "~/Library/Application Support/Logi/",
-    "~/Library/Logs/xlog_logitech/",
     "~/Library/HTTPStorages/LogiPluginServiceNative/",
     "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.logi.optionsplus.sfl4",
     "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.logi.optionsplus.driverhost.sfl4",
@@ -150,7 +157,7 @@ logi_strong = [
     "/Applications/Utilities/Logi Options+ Driver Installer.bundle/",
 ]
 logi_weak = ["~/Library/Application Support/CrashReporter/logioptionsplus_agent_7214F14B-116C-5737-A4C1-6F18619B1E3F.plist"]
-logi_empty = ["~/Library/Caches/com.logi.optionsplus.installer/"]
+logi_empty = ["~/Library/Caches/com.logi.optionsplus.installer/", "~/Library/Logs/xlog_logitech/"]
 logi_absent = [
     "~/Library/Preferences/com.apple.loginwindow.plist",
     "~/Library/Application Support/Logic/",
@@ -161,7 +168,7 @@ logi_absent = [
 ] + logi_empty
 fixture(
     "logi-options-plus.json", "Logi Options+ — Homebrew'un bildiği gizli kalıntılar, sürücü kurucu .bundle, 'logi' ⊂ 'login/logic' tuzağı",
-    identity("Logi Options+", "com.logi.optionsplus", "/Applications/logioptionsplus.app", "logioptionsplus", embedded=["com.logi.optionsplus.helper"]),
+    identity("Logi Options+", "com.logi.optionsplus", "/Applications/logioptionsplus.app", "logioptionsplus", embedded=["com.logi.optionsplus.helper"], team="QED4VVPZWA"),
     tree=logi_strong + logi_weak + [p for p in logi_absent if p not in logi_empty],
     strong=[p.rstrip("/") for p in logi_strong],
     weak=logi_weak,
@@ -280,9 +287,10 @@ fixture(
     "microsoft-teams-nocask.json", "Microsoft Teams (veritabanı kapalı) — app group entitlements'tan, konteynerler bundle ID'den",
     identity("Microsoft Teams", "com.microsoft.teams2", "/Applications/Microsoft Teams.app", "MSTeams",
              embedded=["com.microsoft.teams2.helper", "com.microsoft.teams2.notificationcenter", "com.microsoft.vcxpc"],
-             team="UBF8T346G9", groups=["UBF8T346G9.com.microsoft.teams"], sandboxed=True),
-    tree=teams_strong + [p for p in teams_absent if p not in teams_empty],
+             team="UBF8T346G9", groups=["UBF8T346G9.com.microsoft.teams", "UBF8T346G9.com.microsoft.oneauth"], sandboxed=True),
+    tree=teams_strong + teams_weak + [p for p in teams_absent if p not in teams_empty],
     strong=[p.rstrip("/") for p in teams_strong],
+    weak=[p.rstrip("/") for p in teams_weak],
     absent=[p.rstrip("/") for p in teams_absent],
     empty=teams_empty,
     options={"includeSystemLocations": False, "includeAggressiveLocations": False, "useCaskDatabase": False},
@@ -335,4 +343,58 @@ fixture(
                                       "/Applications/Acme Driver.app/Contents/MacOS/Acme Driver"],
               "com.other.pkg": ["/Library/Application Support/Other/x.dat"]},
     notes="Sentetik. Faturadaki dosyalar standart kökün altındaki ilk bileşene indirgenir.",
+)
+
+# ================================================================ build 9 gözlemleri (2026-10-21)
+fixture(
+    "whatsapp.json", "WhatsApp — sandbox; satıcı ortak grubu (facebook.family) zayıf, kendi grupları güçlü",
+    identity("WhatsApp", "net.whatsapp.WhatsApp", "/Applications/WhatsApp.app", "WhatsApp",
+             embedded=["net.whatsapp.WhatsApp.ServiceExtension", "net.whatsapp.WhatsApp.Intents"], team="57T9237FN3",
+             groups=["group.net.whatsapp.WhatsApp.shared", "group.net.whatsapp.WhatsAppSMB.shared", "group.net.whatsapp.WhatsApp.private",
+                     "group.net.whatsapp.family", "group.com.facebook.family"],
+             icloud=["57T9237FN3.net.whatsapp.WhatsApp", "iCloud.net.whatsapp.WhatsApp"], sandboxed=True),
+    tree=["~/Library/Containers/net.whatsapp.WhatsApp/", "~/Library/Containers/net.whatsapp.WhatsApp.WAAppKitBridgeService/",
+          "~/Library/Group Containers/group.net.whatsapp.WhatsApp.private/", "~/Library/Group Containers/group.net.whatsapp.WhatsApp.shared/",
+          "~/Library/Group Containers/group.com.facebook.family/", "~/Library/Containers/com.facebook.archon/"],
+    strong=["~/Library/Containers/net.whatsapp.WhatsApp", "~/Library/Containers/net.whatsapp.WhatsApp.WAAppKitBridgeService",
+            "~/Library/Group Containers/group.net.whatsapp.WhatsApp.private", "~/Library/Group Containers/group.net.whatsapp.WhatsApp.shared",
+            "~/Library/Group Containers/group.com.facebook.family"],
+    absent=["~/Library/Containers/com.facebook.archon", "~/Library/Containers/net.whatsapp.WhatsApp.Intents",
+            "~/Library/Group Containers/group.net.whatsapp.family"],
+    empty=["~/Library/Containers/net.whatsapp.WhatsApp.Intents/", "~/Library/Containers/net.whatsapp.WhatsApp.ServiceExtension/",
+           "~/Library/Group Containers/group.net.whatsapp.WhatsAppSMB.shared/", "~/Library/Group Containers/group.net.whatsapp.family/",
+           "~/Library/Application Scripts/net.whatsapp.WhatsApp/", "~/Library/Application Scripts/group.net.whatsapp.WhatsApp.shared/"],
+    casks=["whatsapp"],
+    notes="Rapor 2026-10-21 build 9. group.com.facebook.family entitlement sezgiselinde zayıf kalırdı; Homebrew yalnızca whatsapp cask'inde listelediği için güçlü sayılır.",
+)
+
+fixture(
+    "upnote.json", "UpNote — Homebrew'da yok; sandbox konteyneri, iOS ile paylaşılan grup, Son Belgeler kaydı",
+    identity("UpNote", "com.getupnote.desktop", "/Applications/UpNote.app", "UpNote",
+             embedded=["com.getupnote.desktop.loginhelper", "com.getupnote.desktop.helper", "com.getupnote.desktop.helper.Renderer",
+                       "com.getupnote.desktop.helper.Plugin", "com.getupnote.desktop.helper.GPU"],
+             team="78LWHGWLUL", groups=["group.com.getupnote.ios", "78LWHGWLUL.com.getupnote.desktop"], sandboxed=True),
+    tree=["~/Library/Containers/com.getupnote.desktop/", "~/Library/Group Containers/group.com.getupnote.ios/",
+          "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.getupnote.desktop.sfl4",
+          "~/Library/Containers/com.getupnote.other/"],
+    strong=["~/Library/Containers/com.getupnote.desktop", "~/Library/Group Containers/group.com.getupnote.ios",
+            "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.getupnote.desktop.sfl4"],
+    absent=["~/Library/Containers/com.getupnote.other", "~/Library/Group Containers/78LWHGWLUL.com.getupnote.desktop"],
+    empty=["~/Library/Group Containers/78LWHGWLUL.com.getupnote.desktop/", "~/Library/Application Scripts/com.getupnote.desktop/"],
+    notes="Rapor 2026-10-21 build 9. Satıcı adı uygulama adını içerdiği için (getupnote ⊃ upnote) grup uygulamaya özgü sayılır.",
+)
+
+fixture(
+    "logi-driver-installer-nested-app.json", "Logi Options+ Driver Installer — .bundle içindeki iç .app, 'driver' genel kelimesi",
+    identity("Logi Options+ Driver Installer", "com.logi.optionsplus.driverhost",
+             "/Applications/Utilities/Logi Options+ Driver Installer.bundle/Logi Options+ Driver Installer.app",
+             "Logi Options+ Driver Installer", team="QED4VVPZWA"),
+    tree=["~/Library/Preferences/com.logi.optionsplus.driverhost.plist", "~/Library/Preferences/com.logi.optionsplus.plist",
+          "~/Library/Preferences/com.apple.driver.AppleHIDMouse.plist", "~/Library/Application Support/LogiOptionsPlus/",
+          "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.logi.optionsplus.driverhost.sfl4"],
+    strong=["~/Library/Preferences/com.logi.optionsplus.driverhost.plist",
+            "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.logi.optionsplus.driverhost.sfl4"],
+    absent=["~/Library/Preferences/com.logi.optionsplus.plist", "~/Library/Preferences/com.apple.driver.AppleHIDMouse.plist",
+            "~/Library/Application Support/LogiOptionsPlus"],
+    notes="Rapor 2026-10-21 build 9. Ana uygulamanın (optionsplus) dosyaları bu yardımcıya ait değildir.",
 )

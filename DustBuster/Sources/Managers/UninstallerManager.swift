@@ -192,7 +192,8 @@ final class UninstallerManager {
     /// Boyut hesabı. Home dışındaki yollar yalnızca uygulama paketi (/Applications/…app) veya
     /// /Library altı ise hesaplanır.
     func computeSizeBytes(for url: URL, isAppBundle: Bool = false) -> Int64? {
-        let allowOutsideHome = isAppBundle || isInsideSystemLibrary(url) || url.path.hasPrefix("/Users/Shared/")
+        let path = url.standardizedFileURL.path
+        let allowOutsideHome = isAppBundle || isInsideSystemLibrary(url) || path.hasPrefix("/Users/Shared/") || path.hasPrefix("/Applications/")
         return sizeOfItem(at: url, allowOutsideHome: allowOutsideHome)
     }
 

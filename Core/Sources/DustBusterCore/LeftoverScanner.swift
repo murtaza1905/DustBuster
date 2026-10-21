@@ -298,13 +298,21 @@ public final class LeftoverScanner {
         let entries = db.lookup(identity: identity)
         guard !entries.isEmpty else { return [] }
         let appPath = identity.appPath
+        let matchedTokens = Set(entries.map { $0.token })
         for hit in db.expand(entries: entries, home: home, fs: fs) {
             // Uygulamanın kendisi ve içi ayrı ele alınır
             if hit.path == appPath || hit.path.hasPrefix(appPath + "/") { continue }
             switch PathClassifier.admit(path: hit.path, home: home, options: options) {
-            case .accepted(let strength, let note):
+            case .accepted(let admitted, let note):
                 guard isUsable(hit.path) else { collector.reject(hit.path, "boş klasör veya symlink"); continue }
-                let label = "Homebrew: \(hit.token)" + (note.map { " — \($0)" } ?? "")
+                var strength = admitted
+                var label = "Homebrew: \(hit.token)" + (note.map { " — \($0)" } ?? "")
+                // Aynı yolu başka cask'ler de sahipleniyorsa (ortak güncelleyici, satıcı kimlik grubu) paylaşılıyordur
+                let others = db.otherOwners(ofPath: hit.path, home: home, excluding: matchedTokens)
+                if !others.isEmpty {
+                    strength = .weak
+                    label += " — paylaşılan (\(others.prefix(3).joined(separator: ", "))), kontrol et"
+                }
                 collector.add(make(hit.path, source: .cask, strength: strength, note: label))
             case .rejected(let reason):
                 collector.reject(hit.path, "Homebrew \(hit.token): \(reason)")
@@ -315,14 +323,39 @@ public final class LeftoverScanner {
 
     // MARK: - Kesin kaynaklar (Tur B)
 
+    /// Uygulamayı (satıcıyı değil) tanımlayan token'lar: bundle ID'nin satıcıdan sonraki parçaları ve
+    /// uygulama adı. Satıcı adı yalnızca uygulama adını içeriyorsa sayılır ("getupnote" ⊃ "upnote").
+    static func appSpecificTokens(identity: AppIdentity) -> Set<String> {
+        let ignored: Set<String> = ["desktop", "ios", "macos", "mobile", "shared", "private", "family", "group", "team"]
+        var tokens: Set<String> = []
+        let parts = (identity.bundleId ?? "").lowercased().split(separator: ".").map(String.init)
+        let vendor = parts.count >= 2 ? parts[1] : ""
+        for part in parts.dropFirst(2) { tokens.formUnion(SearchTerms.tokens(of: part)) }
+        for set in SearchTerms(identity: identity).nameTokenSets {
+            for t in set where t != vendor { tokens.insert(t) }
+        }
+        let nameSquashed = SearchTerms.tokens(of: identity.name).joined()
+        if !vendor.isEmpty, nameSquashed.count >= SearchTerms.minNameLength, vendor.contains(nameSquashed) {
+            tokens.insert(vendor)
+        }
+        return tokens.filter { $0.count >= 3 && !SearchTerms.genericNames.contains($0) && !ignored.contains($0) }
+    }
+
     /// Entitlements'taki app group'lar: Group Containers ve Application Scripts altındaki tam yollar.
+    /// Adı uygulamaya özgü olmayan gruplar (ör. satıcının ortak kimlik doğrulama grubu) başka
+    /// uygulamalarla paylaşılıyor olabilir; seçimsiz listelenir.
     private func entitlementCandidates(identity: AppIdentity) -> [Finding] {
+        let specific = LeftoverScanner.appSpecificTokens(identity: identity)
         var out: [Finding] = []
         for group in identity.appGroups where !group.isEmpty {
+            let isSpecific = !Set(SearchTerms.tokens(of: group)).isDisjoint(with: specific)
             for (sub, note) in [("Group Containers", "Group Containers"), ("Application Scripts", "Application Scripts")] {
                 let path = "\(homeLibrary)/\(sub)/\(group)"
-                if isUsable(path) {
+                guard isUsable(path) else { continue }
+                if isSpecific {
                     out.append(make(path, source: .entitlement, strength: .strong, note: "Entitlement app group: \(note)"))
+                } else {
+                    out.append(make(path, source: .entitlement, strength: .weak, note: "Entitlement app group: \(note) — satıcının ortak grubu olabilir, kontrol et"))
                 }
             }
         }
@@ -421,7 +454,8 @@ public final class LeftoverScanner {
             Location(subpath: "HTTPStorages", recursive: false),
             Location(subpath: "Cookies", recursive: false),
             Location(subpath: "Application Scripts", recursive: false),
-            Location(subpath: "Caches/com.apple.nsurlsessiond/Downloads", recursive: false)
+            Location(subpath: "Caches/com.apple.nsurlsessiond/Downloads", recursive: false),
+            Location(subpath: "Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments", recursive: false)
         ]
         let aggressive: [Location] = [
             Location(subpath: "WebKit", recursive: true),
@@ -436,8 +470,7 @@ public final class LeftoverScanner {
             Location(subpath: "ColorPickers", recursive: false),
             Location(subpath: "Address Book Plug-Ins", recursive: false),
             Location(subpath: "Mail/Bundles", recursive: false),
-            Location(subpath: "Developer", recursive: true),
-            Location(subpath: "Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments", recursive: false)
+            Location(subpath: "Developer", recursive: true)
         ]
         let locations = base + (options.includeAggressiveLocations ? aggressive : [])
         var out: [Finding] = []

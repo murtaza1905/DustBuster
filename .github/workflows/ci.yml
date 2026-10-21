@@ -37,6 +37,7 @@ jobs:
           fi
       - name: Publish log to ci-logs branch
         if: always()
+        continue-on-error: true
         env:
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -83,6 +84,7 @@ jobs:
           fi
       - name: Publish log to ci-logs branch
         if: always()
+        continue-on-error: true
         env:
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |

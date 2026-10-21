@@ -106,3 +106,35 @@ jobs:
         with:
           name: DustBuster-unsigned
           path: DustBuster-ci.zip
+
+  app-build-xcode16:
+    name: Build app (Xcode 16, macOS 15 SDK)
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Generate Xcode project
+        run: xcodegen generate --quiet
+      - name: Build
+        run: |
+          set +e
+          xcodebuild -version
+          xcodebuild \
+            -project DustBuster.xcodeproj \
+            -scheme DustBuster \
+            -configuration Release \
+            -derivedDataPath build \
+            ARCHS="arm64 x86_64" \
+            ONLY_ACTIVE_ARCH=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            DEVELOPMENT_TEAM="" \
+            build > build.log 2>&1
+          status=$?
+          grep -E "error:|BUILD (SUCCEEDED|FAILED)" build.log | tail -30
+          if [ "$status" != "0" ]; then
+            grep -nE "error:" build.log | head -40 | while IFS= read -r line; do echo "::error::${line}"; done
+            exit 1
+          fi
+          test -x build/Build/Products/Release/DustBuster.app/Contents/MacOS/DustBuster

@@ -65,19 +65,26 @@ generate_project() {
 build_release() {
     log "Release derlemesi başlıyor (arm64 + x86_64)..."
     rm -rf "$BUILD_DIR"
-    (cd "$ROOT_DIR" && xcodebuild \
-        -project "$APP_NAME.xcodeproj" \
-        -scheme "$SCHEME" \
-        -configuration Release \
-        -derivedDataPath "$BUILD_DIR" \
-        ARCHS="arm64 x86_64" \
-        ONLY_ACTIVE_ARCH=NO \
-        CODE_SIGNING_ALLOWED=NO \
-        CODE_SIGNING_REQUIRED=NO \
-        DEVELOPMENT_TEAM="" \
-        build 2>&1 | tee "$BUILD_DIR.log" | grep -E "error:|warning: unre|BUILD (SUCCEEDED|FAILED)" || true)
+    local status
+    status="$(
+        set +e
+        cd "$ROOT_DIR" || exit 1
+        xcodebuild \
+            -project "$APP_NAME.xcodeproj" \
+            -scheme "$SCHEME" \
+            -configuration Release \
+            -derivedDataPath "$BUILD_DIR" \
+            ARCHS="arm64 x86_64" \
+            ONLY_ACTIVE_ARCH=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            DEVELOPMENT_TEAM="" \
+            build 2>&1 | tee "$BUILD_DIR.log" | grep -E "error:|warning: unre|BUILD (SUCCEEDED|FAILED)" >&2
+        echo "${PIPESTATUS[0]}"
+    )"
     APP_PATH="$BUILD_DIR/Build/Products/Release/$APP_NAME.app"
-    [[ -d "$APP_PATH" ]] || die "Derleme başarısız. Tam log: $BUILD_DIR.log"
+    [[ "$status" == "0" ]] || die "Derleme başarısız (xcodebuild çıkış kodu: $status). Kurulum yapılmadı, mevcut uygulama korundu. Tam log: $BUILD_DIR.log"
+    [[ -x "$APP_PATH/Contents/MacOS/$APP_NAME" ]] || die "Derleme çıktısında çalıştırılabilir dosya yok. Tam log: $BUILD_DIR.log"
     ok "Derlendi: $APP_PATH"
 }
 

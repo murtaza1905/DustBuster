@@ -173,6 +173,12 @@ class DashboardViewModel: ObservableObject {
         plan.clearSelection()
         cleaningPlan = plan
     }
+
+    func setSystemServicesSelected(_ selected: Bool) {
+        guard var plan = cleaningPlan else { return }
+        plan.setSystemServicesSelected(selected)
+        cleaningPlan = plan
+    }
     
     // MARK: - Rapor (.txt)
 

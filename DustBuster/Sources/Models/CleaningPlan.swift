@@ -62,7 +62,7 @@ struct CleaningCandidate: Identifiable, Hashable {
     }
 
     var formattedSize: String {
-        ByteCountFormatter.string(fromByteCount: size, countStyle: .file)
+        size == 0 ? "boş" : ByteCountFormatter.string(fromByteCount: size, countStyle: .file)
     }
 }
 
@@ -90,11 +90,21 @@ struct CleaningPlan: Hashable {
         candidates[index].isSelected.toggle()
     }
 
+    /// Apple sistem servisleri "tümünü seç" kapsamına girmez; kendi bölümünden ayrıca seçilir.
     mutating func selectAll() {
-        for index in candidates.indices {
+        for index in candidates.indices where !candidates[index].isSystemService {
             candidates[index].isSelected = true
         }
     }
+
+    mutating func setSystemServicesSelected(_ selected: Bool) {
+        for index in candidates.indices where candidates[index].isSystemService {
+            candidates[index].isSelected = selected
+        }
+    }
+
+    var systemServiceCandidates: [CleaningCandidate] { candidates.filter { $0.isSystemService } }
+    var regularCandidates: [CleaningCandidate] { candidates.filter { !$0.isSystemService } }
 
     mutating func clearSelection() {
         for index in candidates.indices {

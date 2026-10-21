@@ -47,7 +47,7 @@ enum ReportExporter {
 
     static func formatSize(_ bytes: Int64?) -> String {
         guard let bytes else { return "-" }
-        return ByteCountFormatter.string(fromByteCount: bytes, countStyle: .file)
+        return bytes == 0 ? "boş" : ByteCountFormatter.string(fromByteCount: bytes, countStyle: .file)
     }
 
     /// Home dizinini "~" ile kısaltır.

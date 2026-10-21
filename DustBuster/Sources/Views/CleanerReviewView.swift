@@ -45,16 +45,22 @@ struct CleanerReviewView: View {
     @State private var sortOrder: CleanerSortOrder = .descending
     @State private var showConfirmation: Bool = false
     @State private var selectedTab: CleanerReviewTab = .items
+    @State private var showSystemServices: Bool = false
     
     private var plan: CleaningPlan? {
         viewModel.cleaningPlan
     }
     
-    // Seçenekler listesi (view içinde sıralanmış)
-    private var sortedItems: [CleaningCandidate] {
-        guard let plan else { return [] }
-        let base = plan.candidates
-        
+    private var sortedItems: [CleaningCandidate] { sorted(plan?.regularCandidates ?? []) }
+    private var sortedSystemItems: [CleaningCandidate] { sorted(plan?.systemServiceCandidates ?? []) }
+
+    private var systemTotalSize: String {
+        ByteCountFormatter.string(fromByteCount: sortedSystemItems.reduce(0) { $0 + $1.size }, countStyle: .file)
+    }
+
+    private var systemSelectedCount: Int { sortedSystemItems.filter { $0.isSelected }.count }
+
+    private func sorted(_ base: [CleaningCandidate]) -> [CleaningCandidate] {
         let sorted: [CleaningCandidate]
         switch sortKey {
         case .name:
@@ -158,7 +164,8 @@ struct CleanerReviewView: View {
                     Label("Tümünü Seç", systemImage: "checkmark.square")
                 }
                 .buttonStyle(.bordered)
-                .disabled(plan == nil || plan?.candidates.isEmpty == true)
+                .disabled(plan == nil || plan?.regularCandidates.isEmpty == true)
+                .help("Apple sistem servisleri hariç")
                 
                 Button {
                     viewModel.clearScannedSelection()
@@ -234,49 +241,103 @@ struct CleanerReviewView: View {
     
     private var list: some View {
         List {
-            if sortedItems.isEmpty {
+            if sortedItems.isEmpty && sortedSystemItems.isEmpty {
                 Text("Temizlenecek dosya bulunamadı.")
                     .foregroundColor(.secondary)
                     .padding()
             } else {
-                ForEach(sortedItems) { item in
-                    HStack {
-                        Toggle("", isOn: Binding(
-                            get: { item.isSelected },
-                            set: { _ in viewModel.toggleSelection(for: item.id) }
-                        ))
-                        .toggleStyle(CheckboxToggleStyle())
-                        
-                        VStack(alignment: .leading, spacing: 2) {
-                            HStack(spacing: 8) {
-                                Text(item.displayName)
-                                    .font(.body)
-                                if item.isSystemService {
-                                    Text("Apple sistem servisi — yeniden indirilir")
-                                        .font(.caption2)
-                                        .padding(.horizontal, 6)
-                                        .padding(.vertical, 2)
-                                        .background(Color.orange.opacity(0.15))
-                                        .foregroundColor(.orange)
-                                        .cornerRadius(4)
-                                }
-                            }
-                            Text(item.path)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                                .lineLimit(1)
-                                .truncationMode(.middle)
-                        }
-                        Spacer()
-                        Text(item.formattedSize)
-                            .font(.callout)
+                Section {
+                    if sortedItems.isEmpty {
+                        Text("Uygulama ve tarayıcı önbelleği bulunamadı.")
                             .foregroundColor(.secondary)
                     }
-                    .padding(.vertical, 4)
+                    ForEach(sortedItems) { item in
+                        row(for: item)
+                    }
+                }
+
+                if !sortedSystemItems.isEmpty {
+                    Section {
+                        if showSystemServices {
+                            ForEach(sortedSystemItems) { item in
+                                row(for: item)
+                            }
+                        }
+                    } header: {
+                        systemServicesHeader
+                    }
                 }
             }
         }
         .listStyle(.plain)
+    }
+
+    /// Apple sistem servisleri ayrı, varsayılan daraltılmış bölümde durur; macOS bunları yeniden ürettiği
+    /// için "Tümünü Seç" kapsamına girmez.
+    private var systemServicesHeader: some View {
+        HStack(spacing: 10) {
+            Button {
+                withAnimation(.easeInOut(duration: 0.15)) { showSystemServices.toggle() }
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: showSystemServices ? "chevron.down" : "chevron.right")
+                        .font(.caption.weight(.semibold))
+                        .frame(width: 12)
+                    Text("Apple sistem servisleri")
+                        .font(.subheadline.weight(.semibold))
+                    Text("\(sortedSystemItems.count) öğe · \(systemTotalSize)")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+            .buttonStyle(.plain)
+
+            Text("macOS yeniden üretir, varsayılan seçimsiz")
+                .font(.caption)
+                .foregroundColor(.orange)
+
+            Spacer()
+
+            if showSystemServices {
+                Button(systemSelectedCount == sortedSystemItems.count ? "Seçimi bırak" : "Tümünü seç") {
+                    viewModel.setSystemServicesSelected(systemSelectedCount != sortedSystemItems.count)
+                }
+                .buttonStyle(.link)
+                .font(.caption)
+            } else if systemSelectedCount > 0 {
+                Text("\(systemSelectedCount) seçili")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
+        .padding(.vertical, 6)
+        .textCase(nil)
+    }
+
+    private func row(for item: CleaningCandidate) -> some View {
+        HStack {
+            Toggle("", isOn: Binding(
+                get: { item.isSelected },
+                set: { _ in viewModel.toggleSelection(for: item.id) }
+            ))
+            .toggleStyle(CheckboxToggleStyle())
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(item.displayName)
+                    .font(.body)
+                Text(item.path.replacingOccurrences(of: NSHomeDirectory(), with: "~"))
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+            }
+            Spacer()
+            Text(item.formattedSize)
+                .font(.callout)
+                .foregroundColor(.secondary)
+                .monospacedDigit()
+        }
+        .padding(.vertical, 4)
     }
 
     // MARK: - History
@@ -349,23 +410,25 @@ struct CleanerReviewView: View {
             Button {
                 viewModel.undoLastTransaction()
             } label: {
-                HStack {
+                HStack(spacing: 6) {
                     if viewModel.isUndoing {
-                        ProgressView().scaleEffect(0.7)
+                        ProgressView().controlSize(.small)
+                    } else {
+                        Image(systemName: "arrow.uturn.backward")
                     }
-                    Image(systemName: "arrow.uturn.backward")
                     Text("Geri Al")
                 }
             }
             .buttonStyle(.bordered)
             .disabled(viewModel.lastTrashTransaction == nil || viewModel.isUndoing)
-            
+            .help("Son taşıma işlemini geri al")
+
             Button(action: {
                 showConfirmation = true
             }) {
-                HStack {
+                HStack(spacing: 6) {
                     if viewModel.isCleaning {
-                        ProgressView().scaleEffect(0.7)
+                        ProgressView().controlSize(.small)
                     } else {
                         Image(systemName: "trash")
                     }

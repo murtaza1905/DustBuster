@@ -5,6 +5,7 @@ import DustBusterCore
 struct UninstallerView: View {
     @StateObject private var viewModel = UninstallerViewModel()
     @State private var isTargeted: Bool = false
+    @State private var showWeakItems: Bool = true
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -212,80 +213,37 @@ struct UninstallerView: View {
                 .padding(.vertical, 8)
             } else {
                 List {
-                    ForEach($viewModel.items) { $item in
-                        HStack(alignment: .center, spacing: 12) {
-                            // İkon eklendi
-                            Image(systemName: iconName(for: item.kind))
-                                .font(.title3)
-                                .foregroundColor(.secondary)
-                                .frame(width: 24)
-                            
-                            VStack(alignment: .leading, spacing: 4) {
-                                // Satır 1: İsim + Tür badge
-                                HStack(spacing: 8) {
-                                    Text(item.displayName)
-                                        .font(.body)
-                                        .fontWeight(.medium)
-                                        .lineLimit(1)
-                                    
-                                    Text(item.kind.rawValue)
-                                        .font(.caption2)
-                                        .padding(.horizontal, 6)
-                                        .padding(.vertical, 2)
-                                        .background(Color.secondary.opacity(0.15))
-                                        .cornerRadius(4)
+                    Section {
+                        ForEach(strongItems) { item in
+                            row(for: item)
+                        }
+                    } header: {
+                        sectionHeader(title: "Kaldırılacaklar", count: strongItems.count,
+                                      note: "Kesin kaynaklarla bulundu, varsayılan seçili", color: .green)
+                    }
 
-                                    if let badge = item.sourceBadge {
-                                        Text(badge)
-                                            .font(.caption2)
-                                            .padding(.horizontal, 6)
-                                            .padding(.vertical, 2)
-                                            .background(Color.green.opacity(0.15))
-                                            .foregroundColor(.green)
-                                            .cornerRadius(4)
-                                            .help(item.note)
-                                    }
-
-                                    if !item.isStrongMatch {
-                                        Text(item.isFromDatabase ? "Kontrol et" : "İsim benzerliği — kontrol et")
-                                            .font(.caption2)
-                                            .padding(.horizontal, 6)
-                                            .padding(.vertical, 2)
-                                            .background(Color.orange.opacity(0.15))
-                                            .foregroundColor(.orange)
-                                            .cornerRadius(4)
+                    if !weakItems.isEmpty {
+                        Section {
+                            if showWeakItems {
+                                ForEach(weakItems) { item in
+                                    row(for: item)
+                                }
+                            }
+                        } header: {
+                            HStack(spacing: 10) {
+                                Button {
+                                    withAnimation(.easeInOut(duration: 0.15)) { showWeakItems.toggle() }
+                                } label: {
+                                    HStack(spacing: 8) {
+                                        Image(systemName: showWeakItems ? "chevron.down" : "chevron.right")
+                                            .font(.caption.weight(.semibold))
+                                            .frame(width: 12)
+                                        sectionHeader(title: "Kontrol et", count: weakItems.count,
+                                                      note: "Paylaşılan grup, satıcı klasörü veya ad benzerliği; varsayılan seçimsiz", color: .orange)
                                     }
                                 }
-                                
-                                // Satır 2: Path (kısaltılmış)
-                                Text(item.url.path.replacingOccurrences(of: NSHomeDirectory(), with: "~"))
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                                    .lineLimit(1)
-                                    .truncationMode(.middle)
-                            }
-
-                            Spacer()
-
-                            // Boyut ve checkbox yan yana
-                            HStack(spacing: 12) {
-                                Text(sizeText(for: item))
-                                    .font(.subheadline)
-                                    .foregroundColor(.secondary)
-                                    .frame(width: 70, alignment: .trailing)
-                                
-                                Toggle("", isOn: $item.isSelected)
-                                    .labelsHidden()
-                                    .toggleStyle(.checkbox)
-                            }
-                        }
-                        .padding(.vertical, 8)
-                        .onAppear {
-                            viewModel.requestSize(for: item.id)
-                        }
-                        .onChange(of: item.isSelected) { _, newValue in
-                            if newValue {
-                                viewModel.requestSize(for: item.id)
+                                .buttonStyle(.plain)
+                                Spacer()
                             }
                         }
                     }
@@ -294,6 +252,98 @@ struct UninstallerView: View {
                 .listStyle(.inset(alternatesRowBackgrounds: true))
             }
         }
+    }
+
+    private var strongItems: [UninstallItem] { viewModel.items.filter { $0.isStrongMatch } }
+    private var weakItems: [UninstallItem] { viewModel.items.filter { !$0.isStrongMatch } }
+
+    private func sectionHeader(title: String, count: Int, note: String, color: Color) -> some View {
+        HStack(spacing: 8) {
+            Text(title)
+                .font(.subheadline.weight(.semibold))
+            Text("\(count)")
+                .font(.caption2.weight(.semibold))
+                .padding(.horizontal, 6)
+                .padding(.vertical, 2)
+                .background(color.opacity(0.15))
+                .foregroundColor(color)
+                .clipShape(Capsule())
+            Text(note)
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+        .padding(.vertical, 4)
+        .textCase(nil)
+    }
+
+    private func selectionBinding(for item: UninstallItem) -> Binding<Bool> {
+        Binding(
+            get: { viewModel.items.first { $0.id == item.id }?.isSelected ?? item.isSelected },
+            set: { newValue in
+                guard let index = viewModel.items.firstIndex(where: { $0.id == item.id }) else { return }
+                viewModel.items[index].isSelected = newValue
+                if newValue { viewModel.requestSize(for: item.id) }
+            }
+        )
+    }
+
+    private func row(for item: UninstallItem) -> some View {
+        HStack(alignment: .center, spacing: 12) {
+            Image(systemName: iconName(for: item.kind))
+                .font(.title3)
+                .foregroundColor(.secondary)
+                .frame(width: 24)
+
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 8) {
+                    Text(item.displayName)
+                        .font(.body)
+                        .fontWeight(.medium)
+                        .lineLimit(1)
+
+                    tag(item.kind.rawValue, color: .secondary)
+
+                    if let badge = item.sourceBadge {
+                        tag(badge, color: .green)
+                    }
+                }
+
+                Text(item.url.path.replacingOccurrences(of: NSHomeDirectory(), with: "~"))
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+            }
+
+            Spacer()
+
+            HStack(spacing: 12) {
+                Text(sizeText(for: item))
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .monospacedDigit()
+                    .frame(width: 70, alignment: .trailing)
+
+                Toggle("", isOn: selectionBinding(for: item))
+                    .labelsHidden()
+                    .toggleStyle(.checkbox)
+            }
+        }
+        .padding(.vertical, 8)
+        .help(item.note)
+        .onAppear {
+            viewModel.requestSize(for: item.id)
+        }
+    }
+
+    private func tag(_ text: String, color: Color) -> some View {
+        Text(text)
+            .font(.caption2)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 2)
+            .background(color.opacity(0.15))
+            .foregroundColor(color == .secondary ? .primary : color)
+            .cornerRadius(4)
     }
 
     // MARK: - Action
@@ -329,7 +379,7 @@ struct UninstallerView: View {
                     }
                 }
                 
-                Text("Kaynaklar: bundle ID, uygulama adı ve gömülü Homebrew Cask veritabanı (ağ erişimi yok).")
+                Text("Kaynaklar: bundle ID, kod imzası ve entitlements, Homebrew Cask veritabanı, uygulama kuralları (ağ erişimi yok).")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -575,7 +625,7 @@ struct UninstallerView: View {
     }
 
     private func sizeText(for item: UninstallItem) -> String {
-        guard let size = item.sizeBytes else { return "-" }
-        return ByteCountFormatter.string(fromByteCount: size, countStyle: .file)
+        guard let size = item.sizeBytes else { return "…" }
+        return size == 0 ? "boş" : ByteCountFormatter.string(fromByteCount: size, countStyle: .file)
     }
 }

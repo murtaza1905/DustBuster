@@ -1,0 +1,40 @@
+{
+  "emptyDirs": [],
+  "expect": {
+    "absent": [],
+    "caskTokens": [],
+    "strong": [
+      "~/Library/Preferences/com.muratonurcu.DustBuster.plist"
+    ],
+    "weak": [
+      "~/Library/Application Support/DustBusterPro",
+      "~/Library/Caches/com.example.dustbusterhelper"
+    ]
+  },
+  "home": "/Users/test",
+  "identity": {
+    "appGroups": [],
+    "appPath": "/Applications/DustBuster.app",
+    "bundleId": "com.muratonurcu.DustBuster",
+    "embeddedBundleIds": [],
+    "executableName": "DustBuster",
+    "icloudContainers": [],
+    "isSandboxed": false,
+    "name": "DustBuster",
+    "receiptIds": []
+  },
+  "name": "DustBuster — imzasız, cask'siz uygulama; yalnızca birebir yollar",
+  "notes": "Rapor 2026-10-21 build 14. Team ID yok, Homebrew kaydı yok; tek kesin kalıntı Preferences plist'i. Adı önek olarak taşıyan klasörler (DustBusterPro, dustbusterhelper) yalnızca seçimsiz listelenir.",
+  "options": {
+    "includeAggressiveLocations": false,
+    "includeSystemLocations": false,
+    "useCaskDatabase": true
+  },
+  "schema": 1,
+  "status": "curated",
+  "tree": [
+    "~/Library/Application Support/DustBusterPro/x",
+    "~/Library/Caches/com.example.dustbusterhelper/x",
+    "~/Library/Preferences/com.muratonurcu.DustBuster.plist"
+  ]
+}

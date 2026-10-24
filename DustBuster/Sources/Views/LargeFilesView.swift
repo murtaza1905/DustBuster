@@ -5,13 +5,15 @@ struct LargeFilesView: View {
     @State private var showDeleteAlert = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: DS.Spacing.lg) {
-            PageTitle(title: "Büyük Dosyalar", subtitle: "Ev dizinindeki 250 MB ve üzeri dosyalar")
-            fileList
-            errorBanner
-            footer
+        ScrollView {
+            VStack(alignment: .leading, spacing: DS.Spacing.lg) {
+                PageTitle(title: "Büyük Dosyalar", subtitle: "Ev dizinindeki 250 MB ve üzeri dosyalar")
+                fileList
+                errorBanner
+                footer
+            }
+            .pageLayout()
         }
-        .pageLayout()
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {
@@ -36,7 +38,7 @@ struct LargeFilesView: View {
 
     private var fileList: some View {
         VStack(alignment: .leading, spacing: DS.Spacing.md) {
-            CardHeader("Büyük Dosyalar", subtitle: "Ev dizinindeki 250 MB ve üzeri dosyalar", systemImage: "externaldrive") {
+            CardHeader("Bulunan Dosyalar", subtitle: "Seçili olanlar Çöp Kutusu'na taşınır", systemImage: "externaldrive") {
                 if viewModel.isScanning {
                     ProgressView().controlSize(.small)
                 } else if !viewModel.items.isEmpty {

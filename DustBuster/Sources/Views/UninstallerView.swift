@@ -64,11 +64,12 @@ struct UninstallerView: View {
         let shape = RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
         return VStack(spacing: DS.Spacing.sm) {
             Image(systemName: hasApp ? "checkmark.circle" : "square.and.arrow.down.on.square")
-                .font(.system(size: hasApp ? 28 : 40, weight: .regular))
+                .font(.system(size: hasApp ? 28 : 56, weight: .regular))
                 .symbolRenderingMode(.hierarchical)
                 .foregroundStyle(isTargeted ? Color.accentColor : (hasApp ? Color.green : Color.secondary))
             Text(hasApp ? "Başka bir .app bırakarak yeni tarama başlat" : ".app dosyasını buraya bırak")
-                .font(hasApp ? .subheadline : .title3.weight(.medium))
+                .font(hasApp ? .subheadline : .title2.weight(.semibold))
+                .padding(.top, hasApp ? 0 : DS.Spacing.sm)
                 .foregroundStyle(hasApp ? .secondary : .primary)
             if !hasApp {
                 Text("Yalnızca uygulama paketleri kabul edilir; hiçbir şey otomatik silinmez.")
@@ -77,7 +78,8 @@ struct UninstallerView: View {
             }
         }
         .frame(maxWidth: .infinity)
-        .frame(height: hasApp ? 84 : 180)
+        .frame(height: hasApp ? 84 : 360)
+        .animation(.easeInOut(duration: 0.25), value: hasApp)
         .background(isTargeted ? Color.accentColor.opacity(0.08) : Color.clear, in: shape)
         .overlay(shape.strokeBorder(isTargeted ? Color.accentColor : Color.secondary.opacity(0.35),
                                     style: StrokeStyle(lineWidth: isTargeted ? 2 : 1.5, dash: [8, 6])))

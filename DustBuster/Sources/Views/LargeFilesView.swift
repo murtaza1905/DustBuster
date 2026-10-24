@@ -6,12 +6,12 @@ struct LargeFilesView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: DS.Spacing.lg) {
+            PageTitle(title: "Büyük Dosyalar", subtitle: "Ev dizinindeki 250 MB ve üzeri dosyalar")
             fileList
             errorBanner
             footer
         }
         .pageLayout()
-        .navigationSubtitle("250 MB ve üzeri dosyalar")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {

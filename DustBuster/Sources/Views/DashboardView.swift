@@ -12,12 +12,12 @@ struct DashboardView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: DS.Spacing.xl) {
+                PageTitle(title: "Panel", subtitle: "Sistem durumu ve temizlik")
                 usageCards
                 cleaningCard
             }
             .pageLayout()
         }
-        .navigationSubtitle("Sistem durumu ve temizlik")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button(action: scan) {

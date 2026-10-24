@@ -322,6 +322,24 @@ struct NoticeBanner: View {
     }
 }
 
+/// Sayfa başlığı (başlık çubuğu gizli olduğu için içerikte).
+struct PageTitle: View {
+    let title: String
+    var subtitle: String? = nil
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .font(.title.weight(.bold))
+            if let subtitle {
+                Text(subtitle)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+}
+
 /// Boş durum.
 struct EmptyState: View {
     let systemImage: String

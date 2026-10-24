@@ -15,6 +15,7 @@ struct UninstallerView: View {
         ZStack(alignment: .bottom) {
             ScrollView {
                 VStack(alignment: .leading, spacing: DS.Spacing.xl) {
+                    PageTitle(title: "Uygulama Kaldır", subtitle: "Bir uygulamayı kalıntılarıyla birlikte kaldır")
                     dropArea
                     errorBanner
                     if hasApp {
@@ -34,7 +35,6 @@ struct UninstallerView: View {
                     .padding(.bottom, DS.Spacing.lg)
             }
         }
-        .navigationSubtitle("Bir uygulamayı kalıntılarıyla birlikte kaldır")
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
                 Button {

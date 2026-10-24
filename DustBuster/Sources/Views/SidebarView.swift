@@ -1,3 +1,4 @@
+// Sources/Views/SidebarView.swift
 import SwiftUI
 
 struct SidebarView: View {
@@ -6,25 +7,35 @@ struct SidebarView: View {
     var body: some View {
         List(selection: $selection) {
             Section("Genel") {
-                row(.dashboard)
+                NavigationLink(value: SidebarItem.dashboard) {
+                    Label("Panel", systemImage: "gauge.with.dots.needle.33percent")
+                        .font(.body)
+                }
             }
+
             Section("Araçlar") {
-                row(.processes)
-                row(.largeFiles)
-                row(.uninstaller)
-            }
-            Section {
-                row(.settings)
+                NavigationLink(value: SidebarItem.processes) {
+                    Label("Çalışan Uygulamalar", systemImage: "rectangle.stack.badge.person.crop")
+                        .font(.body)
+                }
+
+                NavigationLink(value: SidebarItem.largeFiles) {
+                    Label("Büyük Dosyalar", systemImage: "externaldrive")
+                        .font(.body)
+                }
+
+                NavigationLink(value: SidebarItem.uninstaller) {
+                    Label("Uygulama Kaldır", systemImage: "trash.slash")
+                        .font(.body)
+                }
+
+                NavigationLink(value: SidebarItem.settings) {
+                    Label("Ayarlar", systemImage: "gearshape")
+                        .font(.body)
+                }
             }
         }
         .listStyle(.sidebar)
-        .navigationSplitViewColumnWidth(min: 200, ideal: 230, max: 280)
-    }
-
-    private func row(_ item: SidebarItem) -> some View {
-        NavigationLink(value: item) {
-            Label(item.title, systemImage: item.systemImage)
-                .symbolRenderingMode(.hierarchical)
-        }
+        .navigationSplitViewColumnWidth(min: 220, ideal: 240, max: 280)
     }
 }

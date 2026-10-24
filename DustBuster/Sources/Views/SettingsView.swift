@@ -58,6 +58,5 @@ struct SettingsView: View {
             }
         }
         .formStyle(.grouped)
-        .navigationSubtitle("İzinler, gizlilik ve sürüm")
     }
 }

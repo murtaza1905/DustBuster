@@ -1,3 +1,4 @@
+// Sources/App/ContentView.swift
 import SwiftUI
 
 struct ContentView: View {
@@ -11,9 +12,8 @@ struct ContentView: View {
         } detail: {
             MainDetailRouter(selection: selection)
                 .environmentObject(largeFilesViewModel)
-                .navigationTitle(selection?.title ?? SidebarItem.dashboard.title)
         }
         .navigationSplitViewStyle(.balanced)
-        .frame(minWidth: 860, minHeight: 600)
+        .frame(minWidth: 800, minHeight: 600)
     }
 }

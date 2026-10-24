@@ -1,38 +1,33 @@
 import SwiftUI
-import AppKit
-
-struct MaterialCardModifier: ViewModifier {
-    func body(content: Content) -> some View {
-        content
-            .padding()
-            .adaptiveGlassEffect(in: .rect(cornerRadius: 16))
-    }
-}
 
 extension View {
     func materialCard() -> some View {
-        self.modifier(MaterialCardModifier())
+        self.cardSurface()
     }
 }
 
-// A reusable card view component
+/// Başlıklı içerik kartı.
 struct MaterialCard<Content: View>: View {
     let title: String
+    var subtitle: String? = nil
+    var systemImage: String? = nil
+    var tint: Color = .accentColor
     let content: Content
-    
-    init(title: String, @ViewBuilder content: () -> Content) {
+
+    init(title: String, subtitle: String? = nil, systemImage: String? = nil, tint: Color = .accentColor,
+         @ViewBuilder content: () -> Content) {
         self.title = title
+        self.subtitle = subtitle
+        self.systemImage = systemImage
+        self.tint = tint
         self.content = content()
     }
-    
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text(title)
-                .font(.headline)
-                .foregroundColor(.secondary)
-            
+        VStack(alignment: .leading, spacing: DS.Spacing.lg) {
+            CardHeader(title, subtitle: subtitle, systemImage: systemImage, tint: tint)
             content
         }
-        .materialCard()
+        .cardSurface()
     }
 }

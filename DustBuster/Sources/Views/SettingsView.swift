@@ -1,135 +1,63 @@
-// Sources/Views/SettingsView.swift
 import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject var permissionVM: AppPermissionViewModel
-    
-    // Uygulama sürümü (Info.plist'ten okur)
+
     private var appVersion: String {
-        let version = Bundle.main.object(
-            forInfoDictionaryKey: "CFBundleShortVersionString"
-        ) as? String ?? "1.0"
-        
-        let build = Bundle.main.object(
-            forInfoDictionaryKey: "CFBundleVersion"
-        ) as? String ?? "1"
-        
-        return "Sürüm \(version) (Build \(build))"
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"
+        let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "1"
+        return "\(version) (\(build))"
     }
-    
+
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                
-                // MARK: - Güvenlik ve İzinler
-                MaterialCard(title: "Güvenlik ve İzinler") {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("DustBuster, sadece önbellek, log ve büyük geçici dosyaları temizler. Şifreler, tarayıcı geçmişi, yer işaretleri ve kişisel belgelerine dokunmaz.")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                        
-                        Divider()
-                            .padding(.vertical, 4)
-                        
-                        HStack(alignment: .top, spacing: 8) {
-                            Image(systemName: permissionVM.hasFullDiskAccess ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
-                                .foregroundColor(permissionVM.hasFullDiskAccess ? .green : .orange)
-                                .font(.title3)
-                            
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Tam Disk Erişimi")
-                                    .font(.subheadline)
-                                    .bold()
-                                
-                                Text(permissionVM.hasFullDiskAccess ? "Durum: İzin verildi" : "Durum: İzin yok")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                                    .fixedSize(horizontal: false, vertical: true)
-                                
-                                Text("Bazı klasörlere erişilemiyorsa Sistem Ayarları > Güvenlik ve Gizlilik > Tam Disk Erişimi bölümünden DustBuster’a izin verebilirsiniz.")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                                    .fixedSize(horizontal: false, vertical: true)
-                            }
-                            
-                            Spacer()
-                            
-                            Button("Ayarları Aç") {
-                                PermissionManager.openFullDiskAccessSettings()
-                            }
-                            .buttonStyle(.bordered)
+        Form {
+            Section {
+                LabeledContent {
+                    HStack(spacing: DS.Spacing.sm) {
+                        Tag(text: permissionVM.hasFullDiskAccess ? "Verildi" : "Verilmedi",
+                            tone: permissionVM.hasFullDiskAccess ? .success : .warning,
+                            systemImage: permissionVM.hasFullDiskAccess ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                        Button("Sistem Ayarları'nı Aç") {
+                            PermissionManager.openFullDiskAccessSettings()
                         }
                     }
+                } label: {
+                    Text("Tam Disk Erişimi")
+                    Text("Önbellek, günlük ve uygulama klasörlerini okumak için gerekir. Sistem Ayarları › Gizlilik ve Güvenlik › Tam Disk Erişimi")
                 }
-                
-                // MARK: - Hakkında DustBuster
-                MaterialCard(title: "Hakkında DustBuster") {
-                    VStack(alignment: .leading, spacing: 10) {
-                        HStack {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("DustBuster")
-                                    .font(.title3)
-                                    .bold()
-                                
-                                Text("macOS için güvenli sistem temizleyici.")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                            Spacer()
-                        }
-                        
-                        Divider()
-                            .padding(.vertical, 4)
-                        
-                        VStack(alignment: .leading, spacing: 6) {
-                            Label("Geliştirici: Murat Onurcu", systemImage: "person.fill")
-                                .font(.subheadline)
-                            
-                            HStack(spacing: 6) {
-                                Image(systemName: "envelope")
-                                Link(
-                                    "muratonurcu@outlook.com",
-                                    destination: URL(string: "mailto:muratonurcu@outlook.com")!
-                                )
-                                .font(.subheadline)
-                            }
-                            
-                            Text(appVersion)
-                                .font(.subheadline)
-                                .padding(.top, 4)
-                            
-                            Text("Tüm işlemler sadece bu cihazda çalışır; hiçbir dosya veya sistem bilgisi uzak sunuculara gönderilmez.")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                                .fixedSize(horizontal: false, vertical: true)
-                                .padding(.top, 4)
-                            
-                            Divider()
-                                .padding(.vertical, 4)
-                            
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("Logları Dışa Aktar")
-                                    .font(.subheadline)
-                                    .bold()
-                                
-                                Text("Son 7 günün loglarını ve temel sistem bilgilerini cihazına kaydedebilirsin. Loglar sadece bu cihazda saklanır; otomatik gönderim yoktur.")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                                    .fixedSize(horizontal: false, vertical: true)
-                                
-                                Button("Logları Dışa Aktar") {
-                                    LogManager.shared.exportLogs()
-                                }
-                                .buttonStyle(.bordered)
-                            }
-                        }
-                    }
-                }
-                
-                Spacer()
+            } header: {
+                Text("İzinler")
+            } footer: {
+                Text("DustBuster yalnızca önbellek, günlük ve uygulama kalıntılarını listeler; şifrelere, tarayıcı geçmişine, yer işaretlerine ve belgelere dokunmaz. Silinen her şey Çöp Kutusu'na taşınır.")
             }
-            .padding()
+
+            Section("Gizlilik") {
+                LabeledContent("Ağ erişimi", value: "Yok")
+                LabeledContent("Homebrew veritabanı", value: "Uygulamaya gömülü, çevrimdışı")
+                LabeledContent("Günlükler", value: "Yalnızca bu cihazda")
+                LabeledContent {
+                    Button("Dışa Aktar…") {
+                        LogManager.shared.exportLogs()
+                    }
+                } label: {
+                    Text("Tanılama günlükleri")
+                    Text("Son 7 günün kayıtları ve temel sistem bilgisi; kullanıcı adı ve yol bilgileri temizlenir.")
+                }
+            }
+
+            Section("Hakkında") {
+                LabeledContent("Sürüm", value: appVersion)
+                LabeledContent("Geliştirici", value: "Murat Onurcu")
+                LabeledContent("İletişim") {
+                    Link("muratonurcu@outlook.com", destination: URL(string: "mailto:muratonurcu@outlook.com")!)
+                }
+                LabeledContent("Kaynak kod") {
+                    Link("github.com/murtaza1905/DustBuster", destination: URL(string: "https://github.com/murtaza1905/DustBuster")!)
+                }
+                LabeledContent("Lisans", value: "GPL-3.0")
+            }
         }
+        .formStyle(.grouped)
+        .navigationSubtitle("İzinler, gizlilik ve sürüm")
     }
 }

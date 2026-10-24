@@ -1,193 +1,31 @@
-// Sources/Views/DashboardView.swift
 import SwiftUI
 
 struct DashboardView: View {
     @EnvironmentObject var permissionVM: AppPermissionViewModel
     @StateObject var viewModel = DashboardViewModel()
     @State private var showFullDiskAccessAlert = false
-    
+
+    private var canScan: Bool {
+        permissionVM.hasFullDiskAccess && !viewModel.isScanning && !viewModel.isCleaning
+    }
+
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
-                // Header
-                HStack {
-                    Text("Sistem Durumu")
-                        .font(.largeTitle)
-                        .bold()
-                    Spacer()
-                    if !viewModel.permissionManager.hasFullDiskAccess {
-                        Button(action: viewModel.openSettings) {
-                            HStack {
-                                Image(systemName: "exclamationmark.triangle.fill")
-                                Text("Disk Erişimi Gerekli")
-                            }
-                        }
-                        .adaptiveGlassButtonStyle(prominent: false)
-                        .tint(.orange)
-                    }
-                }
-                
-                // System Monitor Cards
-                HStack(spacing: 16) {
-                    UsageCard(
-                        title: "RAM Kullanımı",
-                        percentage: viewModel.ramUsage,
-                        primaryColor: .green,
-                        usedText: "Kullanılan: \(viewModel.systemMonitor.memoryUsedString)",
-                        freeText: "Boş: \(viewModel.systemMonitor.memoryFreeString)",
-                        totalText: "Toplam: \(viewModel.systemMonitor.memoryTotalString)"
-                    )
-                    
-                    UsageCard(
-                        title: "Disk Kullanımı",
-                        percentage: viewModel.diskUsage,
-                        primaryColor: .yellow,
-                        usedText: "Kullanılan: \(viewModel.systemMonitor.diskUsedString)",
-                        freeText: "Boş: \(viewModel.systemMonitor.diskFreeString)",
-                        totalText: "Toplam: \(viewModel.systemMonitor.diskTotalString)"
-                    )
-                    
-                    UsageCard(
-                        title: "CPU Kullanımı",
-                        percentage: viewModel.cpuUsage,
-                        primaryColor: .orange,
-                        usedText: viewModel.systemMonitor.cpuBusyString,
-                        freeText: viewModel.systemMonitor.cpuIdleString,
-                        totalText: viewModel.systemMonitor.cpuTotalString
-                    )
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .frame(height: 190)
-                
-                // Cleaning Section
-                MaterialCard(title: "Sistem Temizliği") {
-                    VStack(alignment: .leading, spacing: 16) {
-                        // Header with titles and status
-                        HStack(alignment: .top, spacing: 16) {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Sistem Temizliği")
-                                    .font(.subheadline)
-                                    .foregroundColor(.secondary)
-                                Text("Önbellek ve Gereksiz Dosyalar")
-                                    .font(.title2)
-                                    .bold()
-                                Text("Tarayıcı önbellekleri (Safari, Chrome, Brave, Edge, Opera, Firefox), uygulama önbellekleri ve kullanıcı logları.")
-                                    .font(.footnote)
-                                    .foregroundColor(.secondary)
-                            }
-                            
-                            Spacer()
-                            
-                            HStack(spacing: 6) {
-                                Image(systemName: permissionVM.hasFullDiskAccess ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
-                                Text(permissionVM.hasFullDiskAccess ? "Tam Disk Erişimi Verildi" : "Tam Disk Erişimi Gerekli")
-                                    .font(.subheadline)
-                            }
-                            .foregroundStyle(permissionVM.hasFullDiskAccess ? Color.green : Color.orange)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                            .adaptiveGlassEffect(in: .capsule)
-                        }
-                        
-                        Divider()
-                        
-                        if permissionVM.hasFullDiskAccess {
-                            VStack(alignment: .center, spacing: 12) {
-                                Text("Tam Disk Erişimi")
-                                    .font(.subheadline)
-                                    .bold()
-                                
-                                Text("Tam Disk Erişimi verildiğinde DustBuster, önbellek, log ve tarayıcı konteyner klasörlerine güvenli şekilde erişebilir. Bu yetkiyi dilediğiniz zaman Sistem Ayarları > Gizlilik ve Güvenlik > Tam Disk Erişimi bölümünden yönetebilirsiniz.")
-                                    .font(.footnote)
-                                    .foregroundColor(.secondary)
-                                    .multilineTextAlignment(.center)
-                                    .frame(maxWidth: 560)
-                                
-                                Button(action: {
-                                    if permissionVM.hasFullDiskAccess {
-                                        viewModel.scanSystem()
-                                    } else {
-                                        showFullDiskAccessAlert = true
-                                    }
-                                }) {
-                                    HStack(spacing: 8) {
-                                        if viewModel.isScanning {
-                                            ProgressView()
-                                                .scaleEffect(0.5)
-                                        } else {
-                                            Image(systemName: "magnifyingglass")
-                                        }
-                                        Text("Sistemi Tara")
-                                    }
-                                    .font(.headline)
-                                    .padding(.vertical, 12)
-                                    .frame(maxWidth: .infinity)
-                                }
-                                .adaptiveGlassButtonStyle(prominent: true)
-                                .tint(.blue)
-                                .frame(maxWidth: .infinity, alignment: .center)
-                                .disabled(viewModel.isScanning || viewModel.isCleaning || !permissionVM.hasFullDiskAccess)
-                                .opacity(permissionVM.hasFullDiskAccess ? 1.0 : 0.5)
-                            }
-                            .frame(maxWidth: .infinity)
-                        } else {
-                            VStack(alignment: .center, spacing: 12) {
-                                VStack(alignment: .center, spacing: 8) {
-                                    Text("Tam Disk Erişimi")
-                                        .font(.subheadline)
-                                        .bold()
-                                    
-                                    Text("Durum: İzin yok. Bazı loglar ve klasörler taranamayabilir. Bu yetkiyi Sistem Ayarları > Gizlilik ve Güvenlik > Tam Disk Erişimi bölümünden yönetebilir ve DustBuster’a dilediğiniz zaman verebilirsiniz.")
-                                        .font(.footnote)
-                                        .foregroundColor(.secondary)
-                                        .frame(maxWidth: 520)
-                                }
-                                .multilineTextAlignment(.center)
-                                
-                                Button(action: {
-                                    if permissionVM.hasFullDiskAccess {
-                                        viewModel.scanSystem()
-                                    } else {
-                                        showFullDiskAccessAlert = true
-                                    }
-                                }) {
-                                    HStack {
-                                        if viewModel.isScanning {
-                                            ProgressView()
-                                                .scaleEffect(0.5)
-                                        } else {
-                                            Image(systemName: "magnifyingglass")
-                                        }
-                                        Text("Sistemi Tara")
-                                    }
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 12)
-                                }
-                                .adaptiveGlassButtonStyle(prominent: true)
-                                .tint(.blue)
-                                .frame(maxWidth: .infinity, alignment: .center)
-                                .disabled(viewModel.isScanning || viewModel.isCleaning || !permissionVM.hasFullDiskAccess)
-                                .opacity(permissionVM.hasFullDiskAccess ? 1.0 : 0.5)
-                            }
-                            .frame(maxWidth: .infinity)
-                        }
-                        
-                        if viewModel.lastTrashTransaction != nil {
-                            HStack {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .foregroundColor(.green)
-                                Text("Son Temizlik: \(viewModel.lastCleanedSize) Çöp Kutusu'na taşındı (boşaltılınca alan açılır).")
-                                    .foregroundColor(.green)
-                            }
-                            .padding(.top, 5)
-                        }
-                    }
-                }
+            VStack(alignment: .leading, spacing: DS.Spacing.xl) {
+                usageCards
+                cleaningCard
             }
-            .frame(maxWidth: 900, alignment: .leading)
-            .padding(.horizontal, 32)
-            .padding(.vertical, 24)
-            .frame(maxWidth: .infinity, alignment: .top)
+            .pageLayout()
+        }
+        .navigationSubtitle("Sistem durumu ve temizlik")
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button(action: scan) {
+                    Label("Sistemi Tara", systemImage: "magnifyingglass")
+                }
+                .disabled(!canScan)
+                .help("Önbellek, günlük ve tarayıcı önbelleklerini tara")
+            }
         }
         .sheet(isPresented: $viewModel.showCleanerReview) {
             CleanerReviewView(viewModel: viewModel)
@@ -196,69 +34,177 @@ struct DashboardView: View {
                isPresented: $showFullDiskAccessAlert) {
             Button("Tamam", role: .cancel) { }
         } message: {
-            Text("Ayarlar > Tam Disk Erişimi bölümünden DustBuster’a izin verin.")
+            Text("Sistem Ayarları › Gizlilik ve Güvenlik › Tam Disk Erişimi bölümünden DustBuster'a izin verin.")
+        }
+    }
+
+    private func scan() {
+        if permissionVM.hasFullDiskAccess {
+            viewModel.scanSystem()
+        } else {
+            showFullDiskAccessAlert = true
+        }
+    }
+
+    // MARK: - Kullanım kartları
+
+    private var usageCards: some View {
+        HStack(spacing: DS.Spacing.lg) {
+            UsageCard(
+                title: "Bellek",
+                systemImage: "memorychip",
+                percentage: viewModel.ramUsage,
+                primaryColor: .green,
+                usedText: "Kullanılan: \(viewModel.systemMonitor.memoryUsedString)",
+                freeText: "Boş: \(viewModel.systemMonitor.memoryFreeString)",
+                totalText: "Toplam: \(viewModel.systemMonitor.memoryTotalString)"
+            )
+
+            UsageCard(
+                title: "Disk",
+                systemImage: "internaldrive",
+                percentage: viewModel.diskUsage,
+                primaryColor: .yellow,
+                usedText: "Kullanılan: \(viewModel.systemMonitor.diskUsedString)",
+                freeText: "Boş: \(viewModel.systemMonitor.diskFreeString)",
+                totalText: "Toplam: \(viewModel.systemMonitor.diskTotalString)"
+            )
+
+            UsageCard(
+                title: "İşlemci",
+                systemImage: "cpu",
+                percentage: viewModel.cpuUsage,
+                primaryColor: .orange,
+                usedText: viewModel.systemMonitor.cpuBusyString,
+                freeText: viewModel.systemMonitor.cpuIdleString,
+                totalText: viewModel.systemMonitor.cpuTotalString
+            )
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    // MARK: - Temizlik kartı
+
+    private var cleaningCard: some View {
+        VStack(alignment: .leading, spacing: DS.Spacing.lg) {
+            CardHeader("Sistem Temizliği",
+                       subtitle: "Tarayıcı önbellekleri, uygulama önbellekleri ve kullanıcı günlükleri",
+                       systemImage: "sparkles",
+                       tint: .accentColor) {
+                accessStatus
+            }
+
+            Divider()
+
+            HStack(alignment: .center, spacing: DS.Spacing.lg) {
+                VStack(alignment: .leading, spacing: DS.Spacing.xs) {
+                    Text(permissionVM.hasFullDiskAccess
+                         ? "Tarama hiçbir şeyi silmez; sonuçları gözden geçirip seçtiklerini Çöp Kutusu'na taşırsın."
+                         : "Tam Disk Erişimi olmadan önbellek ve günlük klasörleri okunamaz.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    if viewModel.lastTrashTransaction != nil {
+                        Label("Son temizlik: \(viewModel.lastCleanedSize) Çöp Kutusu'na taşındı",
+                              systemImage: "checkmark.circle.fill")
+                            .font(.subheadline)
+                            .foregroundStyle(.green)
+                    }
+                }
+
+                Spacer(minLength: DS.Spacing.lg)
+
+                Button(action: scan) {
+                    HStack(spacing: DS.Spacing.sm) {
+                        if viewModel.isScanning {
+                            ProgressView().controlSize(.small)
+                        } else {
+                            Image(systemName: "magnifyingglass")
+                        }
+                        Text(viewModel.isScanning ? "Taranıyor…" : "Sistemi Tara")
+                    }
+                    .frame(minWidth: 140)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .disabled(!canScan)
+            }
+        }
+        .cardSurface()
+    }
+
+    private var accessStatus: some View {
+        HStack(spacing: 6) {
+            Image(systemName: permissionVM.hasFullDiskAccess ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                .symbolRenderingMode(.hierarchical)
+            Text(permissionVM.hasFullDiskAccess ? "Tam Disk Erişimi verildi" : "Tam Disk Erişimi gerekli")
+                .font(.caption.weight(.medium))
+        }
+        .foregroundStyle(permissionVM.hasFullDiskAccess ? Color.green : Color.orange)
+        .statusCapsule()
+        .onTapGesture {
+            if !permissionVM.hasFullDiskAccess { viewModel.openSettings() }
         }
     }
 }
 
 struct UsageCard: View {
     let title: String
+    var systemImage: String? = nil
     let percentage: Double
     let primaryColor: Color
     let usedText: String
     let freeText: String
     let totalText: String
-    
+
     var body: some View {
-        VStack(alignment: .center, spacing: 10) {
-            Text(title)
-                .font(.headline)
-                .foregroundColor(.secondary)
-            
-            UsageRingView(percentage: percentage, primaryColor: primaryColor)
-            
-            UsageDetailsView(
-                usedText: usedText,
-                freeText: freeText,
-                totalText: totalText
-            )
+        VStack(alignment: .leading, spacing: DS.Spacing.md) {
+            HStack(spacing: DS.Spacing.sm) {
+                if let systemImage {
+                    Image(systemName: systemImage)
+                        .symbolRenderingMode(.hierarchical)
+                        .foregroundStyle(primaryColor)
+                }
+                Text(title)
+                    .font(.headline)
+                Spacer()
+            }
+
+            HStack(alignment: .center, spacing: DS.Spacing.lg) {
+                UsageRingView(percentage: percentage, primaryColor: primaryColor)
+                UsageDetailsView(usedText: usedText, freeText: freeText, totalText: totalText)
+                Spacer(minLength: 0)
+            }
         }
         .frame(maxWidth: .infinity)
-        .multilineTextAlignment(.center)
-        .padding()
-        .adaptiveGlassEffect(in: .rect(cornerRadius: 16))
+        .cardSurface()
     }
 }
 
 struct UsageRingView: View {
     let percentage: Double
     let primaryColor: Color
-    
-    private let size: CGFloat = 96
-    private let lineWidth: CGFloat = 12
-    
+
+    private let size: CGFloat = 84
+    private let lineWidth: CGFloat = 10
+
+    private var clamped: Double { min(max(percentage, 0.0), 1.0) }
+
     var body: some View {
         ZStack {
             Circle()
-                .stroke(lineWidth: lineWidth)
-                .foregroundColor(Color.gray.opacity(0.2))
-            
+                .stroke(.quaternary, lineWidth: lineWidth)
+
             Circle()
-                .trim(from: 0.0, to: CGFloat(min(max(percentage, 0.0), 1.0)))
-                .stroke(
-                    style: StrokeStyle(
-                        lineWidth: lineWidth,
-                        lineCap: .round,
-                        lineJoin: .round
-                    )
-                )
-                .foregroundColor(primaryColor)
+                .trim(from: 0.0, to: CGFloat(clamped))
+                .stroke(primaryColor, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round, lineJoin: .round))
                 .rotationEffect(Angle(degrees: -90))
-                .animation(.linear, value: percentage)
-            
-            Text(String(format: "%.0f%%", min(max(percentage, 0.0), 1.0) * 100.0))
-                .font(.title2)
-                .bold()
+                .animation(.easeInOut(duration: 0.4), value: percentage)
+
+            Text(String(format: "%.0f%%", clamped * 100.0))
+                .font(.title3.weight(.semibold))
+                .monospacedDigit()
         }
         .frame(width: size, height: size)
     }
@@ -268,15 +214,16 @@ struct UsageDetailsView: View {
     let usedText: String
     let freeText: String
     let totalText: String
-    
+
     var body: some View {
-        VStack(alignment: .center, spacing: 4) {
+        VStack(alignment: .leading, spacing: DS.Spacing.xs) {
             Text(usedText)
             Text(freeText)
             Text(totalText)
         }
         .font(.caption)
-        .foregroundColor(.secondary)
-        .multilineTextAlignment(.center)
+        .foregroundStyle(.secondary)
+        .monospacedDigit()
+        .lineLimit(1)
     }
 }

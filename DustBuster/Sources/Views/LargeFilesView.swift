@@ -1,4 +1,3 @@
-// Sources/Views/LargeFilesView.swift
 import SwiftUI
 
 struct LargeFilesView: View {
@@ -6,111 +5,75 @@ struct LargeFilesView: View {
     @State private var showDeleteAlert = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            header
-            controls
+        VStack(alignment: .leading, spacing: DS.Spacing.lg) {
             fileList
             errorBanner
             footer
         }
-        .padding()
-        .alert("Seçili dosyaları silmek istiyor musun?",
-               isPresented: $showDeleteAlert) {
-            Button("İptal", role: .cancel) { }
-            Button("Sil", role: .destructive) {
+        .pageLayout()
+        .navigationSubtitle("250 MB ve üzeri dosyalar")
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    viewModel.scheduleScan()
+                } label: {
+                    Label("Yeniden Tara", systemImage: "arrow.clockwise")
+                }
+                .disabled(viewModel.isScanning)
+            }
+        }
+        .alert("Seçili dosyalar Çöp Kutusu'na taşınsın mı?", isPresented: $showDeleteAlert) {
+            Button("Vazgeç", role: .cancel) { }
+            Button("Çöp Kutusuna Taşı", role: .destructive) {
                 viewModel.deleteSelected()
             }
         } message: {
-            Text("Dosyalar kalıcı olarak silinmez; macOS Çöp Kutusu'na taşınır.")
+            Text("Dosyalar kalıcı olarak silinmez; Çöp Kutusu'ndan geri alınabilir.")
         }
     }
 
-    // MARK: - Header
-
-    private var header: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("Büyük Dosyalar")
-                .font(.title)
-                .bold()
-
-            Text("250 MB ve üzerindeki dosyaları bulup silebilirsin.")
-                .font(.caption)
-                .foregroundColor(.secondary)
-        }
-    }
-
-    // MARK: - Kontroller
-
-    private var controls: some View {
-        HStack {
-            Text("Eşik: 250 MB ve üzeri")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-
-            Spacer()
-
-            Button {
-                viewModel.scheduleScan()
-            } label: {
-                HStack(spacing: 6) {
-                    if viewModel.isScanning {
-                        ProgressView()
-                            .controlSize(.small)
-                    } else {
-                        Image(systemName: "arrow.clockwise")
-                    }
-                    Text("Yeniden Tara")
-                }
-            }
-            .disabled(viewModel.isScanning)
-        }
-    }
-
-    // MARK: - File List
+    // MARK: - Liste
 
     private var fileList: some View {
-        List {
-            if viewModel.items.isEmpty {
-                Section {
-                    if viewModel.isScanning {
-                        HStack(spacing: 8) {
-                            ProgressView()
-                                .controlSize(.small)
-                            Text("Tarama yapılıyor...")
-                                .foregroundColor(.secondary)
-                        }
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(.vertical, 12)
-                    } else {
-                        Text("250 MB ve üzerinde dosya bulunamadı.")
-                            .foregroundColor(.secondary)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .padding(.vertical, 12)
-                    }
+        VStack(alignment: .leading, spacing: DS.Spacing.md) {
+            CardHeader("Büyük Dosyalar", subtitle: "Ev dizinindeki 250 MB ve üzeri dosyalar", systemImage: "externaldrive") {
+                if viewModel.isScanning {
+                    ProgressView().controlSize(.small)
+                } else if !viewModel.items.isEmpty {
+                    Tag(text: "\(viewModel.items.count) dosya")
                 }
+            }
+
+            if viewModel.items.isEmpty {
+                EmptyState(systemImage: viewModel.isScanning ? "magnifyingglass" : "externaldrive.badge.checkmark",
+                           title: viewModel.isScanning ? "Tarama yapılıyor…" : "Büyük dosya bulunamadı",
+                           message: viewModel.isScanning ? nil : "250 MB ve üzerinde dosya yok.")
             } else {
-                Section {
+                List {
                     ForEach($viewModel.items) { $item in
                         FileRowView(item: $item)
                     }
                 }
+                .listStyle(.inset)
+                .scrollContentBackground(.hidden)
+                .frame(minHeight: 260, maxHeight: 560)
+                .clipShape(RoundedRectangle(cornerRadius: DS.Radius.inner, style: .continuous))
             }
         }
-        .listStyle(.inset)
-        .frame(minHeight: 200, maxHeight: 420)
+        .cardSurface()
     }
 
-    // MARK: - Footer
+    // MARK: - Alt çubuk
 
     private var footer: some View {
-        HStack {
+        HStack(spacing: DS.Spacing.lg) {
             VStack(alignment: .leading, spacing: 2) {
-                Text("Seçili dosya sayısı: \(viewModel.selectedCount)")
-                    .font(.subheadline)
-
-                Text("Toplam boyut: \(viewModel.selectedSizeString)")
+                Text("\(viewModel.selectedCount) dosya seçili")
+                    .font(.subheadline.weight(.medium))
+                Text(viewModel.selectedSizeString)
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
+                    .monospacedDigit()
             }
 
             Spacer()
@@ -118,74 +81,63 @@ struct LargeFilesView: View {
             Button(role: .destructive) {
                 showDeleteAlert = true
             } label: {
-                Label("Seçilenleri Sil", systemImage: "trash")
+                Label("Çöp Kutusuna Taşı", systemImage: "trash")
             }
+            .buttonStyle(.borderedProminent)
+            .tint(.red)
+            .controlSize(.large)
             .disabled(!viewModel.hasSelectedItems || viewModel.isDeleting)
         }
-        .padding(.top, 8)
     }
-    
-    // MARK: - Error Banner
-    
+
+    // MARK: - Hata
+
     private var errorBanner: some View {
         Group {
             if !viewModel.deleteErrors.isEmpty {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Çöp Kutusu'na taşınamayan dosyalar:")
-                        .font(.subheadline)
-                        .foregroundColor(.red)
-                    ForEach(viewModel.deleteErrors, id: \.self) { message in
-                        Text(message)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                            .lineLimit(2)
-                            .truncationMode(.middle)
-                    }
-                }
-                .padding(.top, 4)
+                NoticeBanner(text: "Çöp Kutusu'na taşınamayan dosyalar:\n" + viewModel.deleteErrors.joined(separator: "\n"), kind: .danger)
             }
         }
     }
 }
 
-// MARK: - File Row View
+// MARK: - Satır
 
 private struct FileRowView: View {
     @Binding var item: LargeFileItem
-    
+
     var body: some View {
-        HStack(alignment: .center, spacing: 12) {
+        HStack(alignment: .center, spacing: DS.Spacing.md) {
+            Toggle("", isOn: $item.isSelected)
+                .labelsHidden()
+                .toggleStyle(.checkbox)
+
             Image(systemName: "doc.fill")
-                .font(.title2)
-                .foregroundColor(.blue)
-                .frame(width: 32)
+                .symbolRenderingMode(.hierarchical)
+                .font(.title3)
+                .foregroundStyle(Color.accentColor)
+                .frame(width: 24)
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 3) {
                 Text(item.name)
-                    .font(.headline)
+                    .font(.body.weight(.medium))
                     .lineLimit(1)
-
-                Text(item.path)
+                Text(item.path.replacingOccurrences(of: NSHomeDirectory(), with: "~"))
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                     .lineLimit(1)
                     .truncationMode(.middle)
             }
 
             Spacer()
 
-            VStack(alignment: .trailing, spacing: 4) {
-                Text(item.displaySize)
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-
-                Toggle("", isOn: $item.isSelected)
-                    .labelsHidden()
-                    .toggleStyle(.checkbox)
-            }
+            Text(item.displaySize)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .monospacedDigit()
+                .frame(width: 76, alignment: .trailing)
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 10)
+        .padding(.vertical, 6)
         .contentShape(Rectangle())
     }
 }

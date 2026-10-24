@@ -1,216 +1,201 @@
 import SwiftUI
 import UniformTypeIdentifiers
+import AppKit
 import DustBusterCore
 
 struct UninstallerView: View {
     @StateObject private var viewModel = UninstallerViewModel()
     @State private var isTargeted: Bool = false
     @State private var showWeakItems: Bool = true
+    @State private var showOptions: Bool = false
+
+    private var hasApp: Bool { viewModel.appURL != nil }
 
     var body: some View {
         ZStack(alignment: .bottom) {
             ScrollView {
-                VStack(alignment: .leading, spacing: 18) {
-                    header
+                VStack(alignment: .leading, spacing: DS.Spacing.xl) {
                     dropArea
                     errorBanner
-                    appInfo
-                    itemsSection
-                    resultSummary
+                    if hasApp {
+                        appCard
+                        itemsCard
+                        resultSummary
+                    }
                     undoHistorySection
                 }
-                .padding()
-                .padding(.bottom, 96) // allow space for the action bar
+                .pageLayout()
+                .padding(.bottom, hasApp ? 110 : 0)
             }
 
-            bottomBar
+            if hasApp {
+                bottomBar
+                    .padding(.horizontal, DS.Spacing.xl)
+                    .padding(.bottom, DS.Spacing.lg)
+            }
         }
-    }
-
-    // MARK: - Header
-
-    private var header: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text("Uygulama Kaldır")
-                    .font(.title)
-                    .bold()
-                Spacer()
-                Button("Sıfırla") {
-                    viewModel.reset()
+        .navigationSubtitle("Bir uygulamayı kalıntılarıyla birlikte kaldır")
+        .toolbar {
+            ToolbarItemGroup(placement: .primaryAction) {
+                Button {
+                    showOptions.toggle()
+                } label: {
+                    Label("Tarama seçenekleri", systemImage: "slider.horizontal.3")
                 }
-                .buttonStyle(.bordered)
-                .disabled(viewModel.appURL == nil && viewModel.items.isEmpty && viewModel.resultSummary == nil && viewModel.errorMessage == nil)
+                .popover(isPresented: $showOptions, arrowEdge: .bottom) {
+                    optionsPopover
+                }
+                .help("Sistem konumları ve geniş tarama")
+
+                Button {
+                    viewModel.reset()
+                } label: {
+                    Label("Sıfırla", systemImage: "arrow.counterclockwise")
+                }
+                .disabled(!hasApp && viewModel.items.isEmpty && viewModel.resultSummary == nil && viewModel.errorMessage == nil)
+                .help("Seçimi ve sonuçları temizle")
             }
-            
-            Text("Bir .app sürükleyip bırak, Library altındaki kalan dosyaları bulup Çöp Kutusu'na taşı.")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
         }
     }
 
-    // MARK: - Drop area
+    // MARK: - Bırakma alanı
 
     private var dropArea: some View {
-        RoundedRectangle(cornerRadius: 16, style: .continuous)
-            .strokeBorder(isTargeted ? Color.accentColor : Color.gray.opacity(0.4), style: StrokeStyle(lineWidth: 2, dash: [8]))
-            .frame(height: 180)
-            .overlay(
-                VStack(spacing: 12) {
-                    Image(systemName: "square.and.arrow.down.on.square")
-                        .font(.system(size: 48))
-                        .foregroundColor(.accentColor)
-                    Text(".app dosyasını buraya bırak")
-                        .font(.title3)
-                        .fontWeight(.medium)
-                    Text("Sadece uygulama paketleri kabul edilir.")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
-            )
-            .onDrop(of: [UTType.fileURL], isTargeted: $isTargeted) { providers in
-                viewModel.handleDrop(providers: providers)
+        let shape = RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
+        return VStack(spacing: DS.Spacing.sm) {
+            Image(systemName: hasApp ? "checkmark.circle" : "square.and.arrow.down.on.square")
+                .font(.system(size: hasApp ? 28 : 40, weight: .regular))
+                .symbolRenderingMode(.hierarchical)
+                .foregroundStyle(isTargeted ? Color.accentColor : (hasApp ? Color.green : Color.secondary))
+            Text(hasApp ? "Başka bir .app bırakarak yeni tarama başlat" : ".app dosyasını buraya bırak")
+                .font(hasApp ? .subheadline : .title3.weight(.medium))
+                .foregroundStyle(hasApp ? .secondary : .primary)
+            if !hasApp {
+                Text("Yalnızca uygulama paketleri kabul edilir; hiçbir şey otomatik silinmez.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
             }
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: hasApp ? 84 : 180)
+        .background(isTargeted ? Color.accentColor.opacity(0.08) : Color.clear, in: shape)
+        .overlay(shape.strokeBorder(isTargeted ? Color.accentColor : Color.secondary.opacity(0.35),
+                                    style: StrokeStyle(lineWidth: isTargeted ? 2 : 1.5, dash: [8, 6])))
+        .animation(.easeInOut(duration: 0.15), value: isTargeted)
+        .onDrop(of: [UTType.fileURL], isTargeted: $isTargeted) { providers in
+            viewModel.handleDrop(providers: providers)
+        }
     }
 
-    // MARK: - Info note & System Scan Toggle
+    // MARK: - Seçenekler
 
-    private var infoNote: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Guvenlik: Sadece sectigin uygulama paketi ve ~/Library altindaki yollar listelenir.")
-                .font(.caption)
-                .foregroundColor(.secondary)
+    private var optionsPopover: some View {
+        VStack(alignment: .leading, spacing: DS.Spacing.md) {
+            Text("Tarama seçenekleri")
+                .font(.headline)
 
             Toggle(isOn: $viewModel.includeSystemLocations) {
-                HStack(spacing: 4) {
-                    Image(systemName: "gearshape.2")
-                        .foregroundColor(.secondary)
-                    Text("Sistem dosyalarini da tara")
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Sistem konumlarını da tara")
+                    Text("/Library altındaki ortak dosyalar; silmek yönetici yetkisi isteyebilir.")
                         .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
             }
-            .toggleStyle(.checkbox)
-            .onChange(of: viewModel.includeSystemLocations) { _, newValue in
-                // Toggle degistiginde uygulama yukluyse yeniden tara
-                if viewModel.appURL != nil {
-                    if let url = viewModel.appURL {
-                        viewModel.loadApp(at: url)
-                    }
-                }
+            .onChange(of: viewModel.includeSystemLocations) { _, _ in
+                if let url = viewModel.appURL { viewModel.loadApp(at: url) }
             }
 
             Toggle(isOn: $viewModel.includeAggressiveLocations) {
-                HStack(spacing: 4) {
-                    Image(systemName: "magnifyingglass")
-                        .foregroundColor(.secondary)
-                    Text("Geniş tarama (daha yavaş)")
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Geniş tarama")
+                    Text("WebKit, Developer, Frameworks gibi büyük alanlar; daha yavaş.")
                         .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
             }
-            .toggleStyle(.checkbox)
             .onChange(of: viewModel.includeAggressiveLocations) { _, _ in
-                if let url = viewModel.appURL {
-                    viewModel.loadApp(at: url)
-                }
-            }
-
-            if viewModel.includeAggressiveLocations {
-                Text("Not: WebKit/Developer/Frameworks gibi büyük alanlar taranır, süre artar.")
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-            }
-
-            if viewModel.includeSystemLocations {
-                HStack(spacing: 4) {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .foregroundColor(.orange)
-                        .font(.caption)
-                    Text("/Library/ altindaki sistem dosyalari da taranacak (admin yetkisi gerektirebilir)")
-                        .font(.caption)
-                        .foregroundColor(.orange)
-                }
-                .padding(.vertical, 4)
+                if let url = viewModel.appURL { viewModel.loadApp(at: url) }
             }
         }
+        .toggleStyle(.switch)
+        .controlSize(.small)
+        .padding(DS.Spacing.lg)
+        .frame(width: 360)
     }
 
-    // MARK: - Error
+    // MARK: - Hata
 
     private var errorBanner: some View {
         Group {
             if let message = viewModel.errorMessage, !message.isEmpty {
-                HStack(spacing: 8) {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .foregroundColor(.yellow)
-                    Text(message)
-                        .font(.subheadline)
-                        .foregroundColor(.primary)
-                }
-                .padding(10)
-                .background(Color.yellow.opacity(0.15))
-                .cornerRadius(8)
+                NoticeBanner(text: message, kind: .warning)
             }
         }
     }
 
-    // MARK: - App info
+    // MARK: - Uygulama kartı
 
-    private var appInfo: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text("Seçilen Uygulama")
-                .font(.headline)
-
+    private var appCard: some View {
+        Group {
             if let appURL = viewModel.appURL {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(viewModel.appName.isEmpty ? appURL.deletingPathExtension().lastPathComponent : viewModel.appName)
-                        .font(.title3)
-                        .bold()
-                    Text("Bundle ID: \(viewModel.bundleIdentifier.isEmpty ? "-" : viewModel.bundleIdentifier)")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    Text(appURL.path)
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                        .lineLimit(1)
-                        .truncationMode(.middle)
+                HStack(spacing: DS.Spacing.lg) {
+                    Image(nsImage: NSWorkspace.shared.icon(forFile: appURL.path))
+                        .resizable()
+                        .frame(width: 56, height: 56)
+
+                    VStack(alignment: .leading, spacing: DS.Spacing.xs) {
+                        Text(viewModel.appName.isEmpty ? appURL.deletingPathExtension().lastPathComponent : viewModel.appName)
+                            .font(.title3.weight(.semibold))
+                        Text(viewModel.bundleIdentifier.isEmpty ? "Bundle ID yok" : viewModel.bundleIdentifier)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        Text(appURL.path.replacingOccurrences(of: NSHomeDirectory(), with: "~"))
+                            .font(.caption)
+                            .foregroundStyle(.tertiary)
+                            .lineLimit(1)
+                            .truncationMode(.middle)
+                    }
+
+                    Spacer()
+
+                    if viewModel.isScanning {
+                        HStack(spacing: DS.Spacing.sm) {
+                            ProgressView().controlSize(.small)
+                            Text("Taranıyor…")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+                    } else {
+                        VStack(alignment: .trailing, spacing: 2) {
+                            Text(viewModel.totalSize)
+                                .font(.title3.weight(.semibold))
+                                .monospacedDigit()
+                            Text("\(viewModel.items.count) öğe bulundu")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
                 }
-                .padding()
-                .background(Color.gray.opacity(0.06))
-                .cornerRadius(10)
-            } else {
-                Text("Henüz bir uygulama seçilmedi.")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .padding(.vertical, 6)
+                .cardSurface()
             }
         }
     }
 
-    // MARK: - Items
+    // MARK: - Öğeler
 
-    private var itemsSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text("Öğeler")
-                    .font(.headline)
+    private var itemsCard: some View {
+        VStack(alignment: .leading, spacing: DS.Spacing.md) {
+            CardHeader("Bulunan Öğeler", subtitle: "Seçili olanlar Çöp Kutusu'na taşınır", systemImage: "list.bullet.rectangle") {
                 if viewModel.isScanning {
-                    ProgressView()
-                        .controlSize(.small)
+                    ProgressView().controlSize(.small)
                 }
             }
 
             if viewModel.items.isEmpty {
-                Group {
-                    if viewModel.isScanning {
-                        Text("Tarama yapılıyor...")
-                    } else if viewModel.appURL != nil {
-                        Text("Liste boş. Uygulama paketi ve kalıntılar bulunamadı.")
-                    } else {
-                        Text(".app bırak ve öğeleri listele.")
-                    }
-                }
-                .foregroundColor(.secondary)
-                .padding(.vertical, 8)
+                EmptyState(systemImage: viewModel.isScanning ? "magnifyingglass" : "checkmark.seal",
+                           title: viewModel.isScanning ? "Tarama yapılıyor…" : "Kalıntı bulunamadı",
+                           message: viewModel.isScanning ? nil : "Uygulama paketi dışında silinecek bir şey yok.")
             } else {
                 List {
                     Section {
@@ -218,8 +203,8 @@ struct UninstallerView: View {
                             row(for: item)
                         }
                     } header: {
-                        sectionHeader(title: "Kaldırılacaklar", count: strongItems.count,
-                                      note: "Kesin kaynaklarla bulundu, varsayılan seçili", color: .green)
+                        SectionTitle(title: "Kaldırılacaklar", count: strongItems.count,
+                                     note: "Kesin kaynaklarla bulundu, varsayılan seçili", tone: .success)
                     }
 
                     if !weakItems.isEmpty {
@@ -230,16 +215,16 @@ struct UninstallerView: View {
                                 }
                             }
                         } header: {
-                            HStack(spacing: 10) {
+                            HStack(spacing: DS.Spacing.sm) {
                                 Button {
                                     withAnimation(.easeInOut(duration: 0.15)) { showWeakItems.toggle() }
                                 } label: {
-                                    HStack(spacing: 8) {
+                                    HStack(spacing: DS.Spacing.sm) {
                                         Image(systemName: showWeakItems ? "chevron.down" : "chevron.right")
                                             .font(.caption.weight(.semibold))
                                             .frame(width: 12)
-                                        sectionHeader(title: "Kontrol et", count: weakItems.count,
-                                                      note: "Paylaşılan grup, satıcı klasörü veya ad benzerliği; varsayılan seçimsiz", color: .orange)
+                                        SectionTitle(title: "Kontrol et", count: weakItems.count,
+                                                     note: "Paylaşılan grup, satıcı klasörü veya ad benzerliği; varsayılan seçimsiz", tone: .warning)
                                     }
                                 }
                                 .buttonStyle(.plain)
@@ -248,33 +233,17 @@ struct UninstallerView: View {
                         }
                     }
                 }
-                .frame(minHeight: 280, maxHeight: 500)
-                .listStyle(.inset(alternatesRowBackgrounds: true))
+                .listStyle(.inset)
+                .scrollContentBackground(.hidden)
+                .frame(minHeight: 280, maxHeight: 520)
+                .clipShape(RoundedRectangle(cornerRadius: DS.Radius.inner, style: .continuous))
             }
         }
+        .cardSurface()
     }
 
     private var strongItems: [UninstallItem] { viewModel.items.filter { $0.isStrongMatch } }
     private var weakItems: [UninstallItem] { viewModel.items.filter { !$0.isStrongMatch } }
-
-    private func sectionHeader(title: String, count: Int, note: String, color: Color) -> some View {
-        HStack(spacing: 8) {
-            Text(title)
-                .font(.subheadline.weight(.semibold))
-            Text("\(count)")
-                .font(.caption2.weight(.semibold))
-                .padding(.horizontal, 6)
-                .padding(.vertical, 2)
-                .background(color.opacity(0.15))
-                .foregroundColor(color)
-                .clipShape(Capsule())
-            Text(note)
-                .font(.caption)
-                .foregroundColor(.secondary)
-        }
-        .padding(.vertical, 4)
-        .textCase(nil)
-    }
 
     private func selectionBinding(for item: UninstallItem) -> Binding<Bool> {
         Binding(
@@ -288,109 +257,83 @@ struct UninstallerView: View {
     }
 
     private func row(for item: UninstallItem) -> some View {
-        HStack(alignment: .center, spacing: 12) {
+        HStack(alignment: .center, spacing: DS.Spacing.md) {
+            Toggle("", isOn: selectionBinding(for: item))
+                .labelsHidden()
+                .toggleStyle(.checkbox)
+
             Image(systemName: iconName(for: item.kind))
+                .symbolRenderingMode(.hierarchical)
                 .font(.title3)
-                .foregroundColor(.secondary)
+                .foregroundStyle(item.isStrongMatch ? Color.accentColor : Color.secondary)
                 .frame(width: 24)
 
-            VStack(alignment: .leading, spacing: 4) {
-                HStack(spacing: 8) {
+            VStack(alignment: .leading, spacing: 3) {
+                HStack(spacing: DS.Spacing.sm) {
                     Text(item.displayName)
-                        .font(.body)
-                        .fontWeight(.medium)
+                        .font(.body.weight(.medium))
                         .lineLimit(1)
-
-                    tag(item.kind.rawValue, color: .secondary)
-
+                    Tag(text: item.kind.rawValue)
                     if let badge = item.sourceBadge {
-                        tag(badge, color: .green)
+                        Tag(text: badge, tone: .success)
                     }
                 }
-
                 Text(item.url.path.replacingOccurrences(of: NSHomeDirectory(), with: "~"))
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                     .lineLimit(1)
                     .truncationMode(.middle)
             }
 
             Spacer()
 
-            HStack(spacing: 12) {
-                Text(sizeText(for: item))
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .monospacedDigit()
-                    .frame(width: 70, alignment: .trailing)
-
-                Toggle("", isOn: selectionBinding(for: item))
-                    .labelsHidden()
-                    .toggleStyle(.checkbox)
-            }
+            Text(sizeText(for: item))
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .monospacedDigit()
+                .frame(width: 76, alignment: .trailing)
         }
-        .padding(.vertical, 8)
+        .padding(.vertical, 6)
         .help(item.note)
         .onAppear {
             viewModel.requestSize(for: item.id)
         }
     }
 
-    private func tag(_ text: String, color: Color) -> some View {
-        Text(text)
-            .font(.caption2)
-            .padding(.horizontal, 6)
-            .padding(.vertical, 2)
-            .background(color.opacity(0.15))
-            .foregroundColor(color == .secondary ? .primary : color)
-            .cornerRadius(4)
-    }
-
-    // MARK: - Action
+    // MARK: - Eylem çubuğu
 
     private var bottomBar: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                HStack(spacing: 16) {
-                    // Seçili öğe sayısı ve boyutu
-                    HStack(spacing: 4) {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundColor(.green)
-                            .font(.caption)
-                        Text("Seçili: \(viewModel.selectedCount) öğe")
-                            .font(.subheadline)
-                    }
-                    
-                    // Seçili toplam boyut
-                    HStack(spacing: 4) {
-                        Image(systemName: "arrow.down.circle.fill")
-                            .foregroundColor(.blue)
-                            .font(.caption)
-                        Text(viewModel.selectedTotalSize)
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                    }
-                    
-                    // Toplam boyut (tüm öğeler)
+        HStack(spacing: DS.Spacing.lg) {
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: DS.Spacing.sm) {
+                    Text("\(viewModel.selectedCount) öğe seçili")
+                        .font(.subheadline.weight(.medium))
+                    Text("·")
+                        .foregroundStyle(.tertiary)
+                    Text(viewModel.selectedTotalSize)
+                        .font(.subheadline.weight(.semibold))
+                        .monospacedDigit()
                     if viewModel.selectedCount != viewModel.items.count {
                         Text("/ \(viewModel.totalSize)")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
+                            .monospacedDigit()
                     }
                 }
-                
-                Text("Kaynaklar: bundle ID, kod imzası ve entitlements, Homebrew Cask veritabanı, uygulama kuralları (ağ erişimi yok).")
+                Text("Çöp Kutusu'na taşınır; Geçmiş'ten geri alınabilir.")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
             }
+
             Spacer()
+
             Button {
                 viewModel.exportReport()
             } label: {
-                Label("Rapor (.txt)", systemImage: "doc.text")
+                Label("Rapor", systemImage: "doc.text")
             }
-            .buttonStyle(.bordered)
-            .disabled(viewModel.appURL == nil || viewModel.isScanning)
+            .adaptiveGlassButtonStyle()
+            .disabled(viewModel.isScanning)
             .help("Bulunan öğeleri, arama kriterlerini ve ham listeyi metin dosyası olarak kaydet")
 
             Button {
@@ -398,8 +341,8 @@ struct UninstallerView: View {
             } label: {
                 Label("Test vakası", systemImage: "checkmark.seal")
             }
-            .buttonStyle(.bordered)
-            .disabled(viewModel.appURL == nil || viewModel.isScanning)
+            .adaptiveGlassButtonStyle()
+            .disabled(viewModel.isScanning)
             .help("Bu taramayı test korpusuna eklenecek JSON vakası olarak kaydet")
 
             Button {
@@ -407,134 +350,103 @@ struct UninstallerView: View {
             } label: {
                 HStack(spacing: 6) {
                     if viewModel.isProcessing {
-                        ProgressView()
-                            .controlSize(.small)
+                        ProgressView().controlSize(.small)
                     } else {
                         Image(systemName: "trash")
                     }
                     Text("Çöp Kutusuna Taşı")
                 }
             }
-            .buttonStyle(.borderedProminent)
+            .adaptiveGlassButtonStyle(prominent: true)
+            .tint(.red)
             .disabled(viewModel.isProcessing || viewModel.selectedCount == 0)
         }
-        .padding()
-        .frame(maxWidth: .infinity)
-        .background(.thinMaterial)
-        .overlay(alignment: .top) {
-            Divider()
-        }
+        .controlSize(.large)
+        .floatingBar()
     }
 
-    // MARK: - Result
+    // MARK: - Sonuç
 
     private var resultSummary: some View {
         Group {
             if let summary = viewModel.resultSummary {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("Sonuç Özeti")
-                        .font(.headline)
-                    HStack(spacing: 12) {
-                        Label("Taşındı: \(summary.moved)", systemImage: "checkmark.circle.fill")
-                            .foregroundColor(.green)
-                        Label("Atlandı: \(summary.skipped)", systemImage: "minus.circle")
-                            .foregroundColor(.orange)
-                        Label("Hata: \(summary.failed)", systemImage: "xmark.octagon.fill")
-                            .foregroundColor(.red)
+                VStack(alignment: .leading, spacing: DS.Spacing.md) {
+                    CardHeader("Sonuç", systemImage: "checkmark.circle", tint: .green)
+                    HStack(spacing: DS.Spacing.md) {
+                        Tag(text: "Taşındı \(summary.moved)", tone: .success, systemImage: "checkmark.circle.fill")
+                        Tag(text: "Atlandı \(summary.skipped)", tone: .warning, systemImage: "minus.circle")
+                        Tag(text: "Hata \(summary.failed)", tone: summary.failed > 0 ? .danger : .neutral, systemImage: "xmark.octagon.fill")
                     }
                     ForEach(summary.messages, id: \.self) { message in
                         Text(message)
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                             .lineLimit(2)
                             .truncationMode(.middle)
                     }
                 }
-                .padding()
-                .background(Color.gray.opacity(0.06))
-                .cornerRadius(10)
+                .cardSurface()
             }
         }
     }
-    
-    // MARK: - Undo History
+
+    // MARK: - Geçmiş
 
     private var undoHistorySection: some View {
         Group {
             if !viewModel.uninstallHistory.isEmpty {
-                VStack(spacing: 0) {
-                    HStack {
-                        Image(systemName: "clock.arrow.circlepath")
-                            .foregroundColor(.green)
-                        Text("Son Kaldırılanlar")
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                        
-                        Spacer()
-                        
-                        if viewModel.uninstallHistory.count > 1 {
-                            Text("\(viewModel.uninstallHistory.count) uygulama")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                        
+                VStack(alignment: .leading, spacing: DS.Spacing.md) {
+                    CardHeader("Son Kaldırılanlar", subtitle: "\(viewModel.uninstallHistory.count) uygulama",
+                               systemImage: "clock.arrow.circlepath", tint: .secondary) {
                         Button("Geçmişi Temizle") {
                             viewModel.clearUndoHistory()
                         }
-                        .font(.caption)
                         .buttonStyle(.borderless)
-                        .foregroundColor(.secondary)
+                        .font(.caption)
                     }
-                    .padding(.horizontal)
-                    .padding(.top, 8)
-                    .padding(.bottom, 4)
-                    
-                    ScrollView {
-                        VStack(spacing: 4) {
-                            ForEach(viewModel.uninstallHistory) { transaction in
-                                HStack(spacing: 10) {
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text(transaction.appName.isEmpty ? "Bilinmeyen" : transaction.appName)
-                                            .font(.subheadline)
-                                        HStack(spacing: 8) {
-                                            Text("\(transaction.itemCount) öğe")
-                                            Text("•")
-                                            Text(transaction.formattedSize)
-                                            Text("•")
-                                            Text(transaction.date, style: .relative)
-                                        }
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
+
+                    VStack(spacing: 0) {
+                        ForEach(Array(viewModel.uninstallHistory.enumerated()), id: \.element.id) { index, transaction in
+                            HStack(spacing: DS.Spacing.md) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(transaction.appName.isEmpty ? "Bilinmeyen" : transaction.appName)
+                                        .font(.subheadline.weight(.medium))
+                                    HStack(spacing: 6) {
+                                        Text("\(transaction.itemCount) öğe")
+                                        Text("·")
+                                        Text(transaction.formattedSize)
+                                        Text("·")
+                                        Text(transaction.date, style: .relative)
                                     }
-                                    
-                                    Spacer()
-                                    
-                                    Button {
-                                        viewModel.undoUninstall(transaction)
-                                    } label: {
-                                        HStack(spacing: 4) {
-                                            if viewModel.isUndoing {
-                                                ProgressView()
-                                                    .controlSize(.small)
-                                            } else {
-                                                Image(systemName: "arrow.uturn.backward")
-                                            }
-                                            Text("Geri Al")
-                                        }
-                                    }
-                                    .buttonStyle(.bordered)
-                                    .controlSize(.small)
-                                    .disabled(viewModel.isUndoing)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
                                 }
-                                .padding(.horizontal)
-                                .padding(.vertical, 6)
+                                Spacer()
+                                Button {
+                                    viewModel.undoUninstall(transaction)
+                                } label: {
+                                    HStack(spacing: 4) {
+                                        if viewModel.isUndoing {
+                                            ProgressView().controlSize(.small)
+                                        } else {
+                                            Image(systemName: "arrow.uturn.backward")
+                                        }
+                                        Text("Geri Al")
+                                    }
+                                }
+                                .buttonStyle(.bordered)
+                                .controlSize(.small)
+                                .disabled(viewModel.isUndoing)
+                            }
+                            .padding(.vertical, DS.Spacing.sm)
+                            if index < viewModel.uninstallHistory.count - 1 {
+                                Divider()
                             }
                         }
                     }
-                    .frame(maxHeight: 120)
+                    .insetSurface()
                 }
-                .background(Color.green.opacity(0.05))
-                .cornerRadius(10)
+                .cardSurface()
             }
         }
     }

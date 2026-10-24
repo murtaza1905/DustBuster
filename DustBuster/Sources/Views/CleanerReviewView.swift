@@ -127,17 +127,23 @@ struct CleanerReviewView: View {
     // MARK: - Header
     
     private var header: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text("Temizlik Planı İncelemesi")
-                .font(.title3)
-                .bold()
-            Text("Tarama sonucu bulunan dosyaları gözden geçir ve Çöp Kutusu'na taşı.")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
+        HStack(alignment: .firstTextBaseline, spacing: DS.Spacing.md) {
+            Image(systemName: "sparkles")
+                .symbolRenderingMode(.hierarchical)
+                .foregroundStyle(Color.accentColor)
+                .font(.title2)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Temizlik Planı")
+                    .font(.title2.weight(.semibold))
+                Text("Bulunanları gözden geçir; seçtiklerin Çöp Kutusu'na taşınır.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer()
         }
-        .padding(.horizontal)
-        .padding(.top, 12)
-        .padding(.bottom, 4)
+        .padding(.horizontal, DS.Spacing.xl)
+        .padding(.top, DS.Spacing.xl)
+        .padding(.bottom, DS.Spacing.sm)
     }
     
     // MARK: - Summary badges
@@ -145,14 +151,14 @@ struct CleanerReviewView: View {
     private var summaryBadges: some View {
         VStack(spacing: 8) {
             // Üst satır: Boyut badge'leri ve sonuç
-            HStack {
-                badge(text: "Toplam \(viewModel.totalScanSize)", color: .blue)
-                badge(text: "Seçili \(viewModel.selectedScanSize)", color: .purple)
+            HStack(spacing: DS.Spacing.sm) {
+                Tag(text: "Toplam \(viewModel.totalScanSize)", tone: .neutral, systemImage: "externaldrive")
+                Tag(text: "Seçili \(viewModel.selectedScanSize)", tone: .accent, systemImage: "checkmark.circle")
                 Spacer()
                 if let result = viewModel.cleaningResult {
                     Text(result.summaryLine)
-                        .font(.subheadline)
-                        .foregroundColor(result.hasFailures ? .orange : .secondary)
+                        .font(.caption)
+                        .foregroundStyle(result.hasFailures ? Color.orange : Color.secondary)
                 }
             }
             
@@ -177,9 +183,9 @@ struct CleanerReviewView: View {
                 
                 Spacer()
                 
-                Text("Sırala:")
+                Text("Sırala")
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                 
                 Picker("", selection: $sortKey) {
                     ForEach(CleanerSortKey.allCases) { key in
@@ -198,18 +204,8 @@ struct CleanerReviewView: View {
                 .help(sortOrder == .ascending ? "Küçükten büyüğe" : "Büyükten küçüğe")
             }
         }
-        .padding(.horizontal)
-        .padding(.bottom, 8)
-    }
-    
-    private func badge(text: String, color: Color) -> some View {
-        Text(text)
-            .font(.caption)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 6)
-            .background(color.opacity(0.12))
-            .foregroundColor(color)
-            .clipShape(Capsule())
+        .padding(.horizontal, DS.Spacing.xl)
+        .padding(.bottom, DS.Spacing.sm)
     }
     
     // MARK: - Tabs
@@ -221,8 +217,8 @@ struct CleanerReviewView: View {
             }
         }
         .pickerStyle(.segmented)
-        .padding(.horizontal)
-        .padding(.bottom, 8)
+        .padding(.horizontal, DS.Spacing.xl)
+        .padding(.bottom, DS.Spacing.sm)
     }
     
     // MARK: - Content
@@ -269,7 +265,7 @@ struct CleanerReviewView: View {
                 }
             }
         }
-        .listStyle(.plain)
+        .listStyle(.inset)
     }
 
     /// Apple sistem servisleri ayrı, varsayılan daraltılmış bölümde durur; macOS bunları yeniden ürettiği
@@ -283,18 +279,11 @@ struct CleanerReviewView: View {
                     Image(systemName: showSystemServices ? "chevron.down" : "chevron.right")
                         .font(.caption.weight(.semibold))
                         .frame(width: 12)
-                    Text("Apple sistem servisleri")
-                        .font(.subheadline.weight(.semibold))
-                    Text("\(sortedSystemItems.count) öğe · \(systemTotalSize)")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                    SectionTitle(title: "Apple sistem servisleri", count: sortedSystemItems.count,
+                                 note: "\(systemTotalSize) · macOS yeniden üretir, varsayılan seçimsiz", tone: .warning)
                 }
             }
             .buttonStyle(.plain)
-
-            Text("macOS yeniden üretir, varsayılan seçimsiz")
-                .font(.caption)
-                .foregroundColor(.orange)
 
             Spacer()
 
@@ -310,7 +299,6 @@ struct CleanerReviewView: View {
                     .foregroundColor(.secondary)
             }
         }
-        .padding(.vertical, 6)
         .textCase(nil)
     }
 
@@ -322,22 +310,29 @@ struct CleanerReviewView: View {
             ))
             .toggleStyle(CheckboxToggleStyle())
 
-            VStack(alignment: .leading, spacing: 2) {
+            Image(systemName: item.isDirectory ? "folder.fill" : "doc.fill")
+                .symbolRenderingMode(.hierarchical)
+                .foregroundStyle(item.isSystemService ? Color.secondary : Color.accentColor)
+                .frame(width: 20)
+
+            VStack(alignment: .leading, spacing: 3) {
                 Text(item.displayName)
-                    .font(.body)
+                    .font(.body.weight(.medium))
+                    .lineLimit(1)
                 Text(item.path.replacingOccurrences(of: NSHomeDirectory(), with: "~"))
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                     .lineLimit(1)
                     .truncationMode(.middle)
             }
             Spacer()
             Text(item.formattedSize)
-                .font(.callout)
-                .foregroundColor(.secondary)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
                 .monospacedDigit()
+                .frame(width: 76, alignment: .trailing)
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 6)
     }
 
     // MARK: - History
@@ -345,31 +340,28 @@ struct CleanerReviewView: View {
     private var historySection: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text("Çöp Kutusu Geçmişi (son 50)")
-                    .font(.headline)
+                SectionTitle(title: "Çöp Kutusu Geçmişi", count: viewModel.trashHistory.count, note: "son 50 işlem")
                 Spacer()
                 if viewModel.isRestoring {
-                    ProgressView().scaleEffect(0.7)
+                    ProgressView().controlSize(.small)
                 }
             }
-            .padding(.horizontal)
-            .padding(.top, 8)
+            .padding(.horizontal, DS.Spacing.xl)
+            .padding(.top, DS.Spacing.sm)
 
             if viewModel.trashHistory.isEmpty {
-                Text("Henüz geçmiş yok.")
-                    .foregroundColor(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.vertical, 40)
+                EmptyState(systemImage: "clock.arrow.circlepath", title: "Henüz geçmiş yok",
+                           message: "Çöp Kutusu'na taşınan öğeler burada listelenir ve geri alınabilir.")
             } else {
                 List {
                     ForEach(viewModel.trashHistory) { entry in
                         HStack {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(entry.displayName)
-                                    .font(.subheadline)
-                                Text("\(entry.formattedDate) • \(entry.formattedSize)")
+                                    .font(.subheadline.weight(.medium))
+                                Text("\(entry.formattedDate) · \(entry.formattedSize)")
                                     .font(.caption)
-                                    .foregroundColor(.secondary)
+                                    .foregroundStyle(.secondary)
                             }
                             Spacer()
                             Button("Geri Al") {
@@ -381,7 +373,7 @@ struct CleanerReviewView: View {
                         .padding(.vertical, 4)
                     }
                 }
-                .listStyle(.plain)
+                .listStyle(.inset)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -436,10 +428,13 @@ struct CleanerReviewView: View {
                 }
             }
             .buttonStyle(.borderedProminent)
+            .tint(.red)
             .disabled(!hasSelectedItems || viewModel.isCleaning)
         }
-        .padding()
-        .background(Color(NSColor.windowBackgroundColor))
+        .controlSize(.large)
+        .padding(.horizontal, DS.Spacing.xl)
+        .padding(.vertical, DS.Spacing.lg)
+        .background(.bar)
     }
     
     // MARK: - Helpers

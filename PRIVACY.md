@@ -10,7 +10,7 @@ DustBuster does not collect, store, transmit or share any personal data. It has 
 
 ## Data stored on your Mac
 
-- Preferences (large-file threshold, section states, undo history of the last trashed items) in the application's user defaults (`com.muratonurcu.DustBuster`). `scripts/uninstall.sh` removes them.
+- The undo history of the last 50 trashed items (original path, location in the Trash, size) in the application's user defaults (`com.muratonurcu.DustBuster`), so that they can be restored from the app. `scripts/uninstall.sh` removes it.
 - Scan results (file paths, sizes, dates) are held in memory while the app runs. Reports and JSON test cases are written only when you export them, to the location you choose; file paths in them refer to your own Mac, so review them before sharing.
 - Diagnostic logs use Apple's unified logging (`os.log`) and stay on the device. The optional export in Settings sanitizes usernames, hostnames and home-folder paths.
 

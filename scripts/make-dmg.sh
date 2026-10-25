@@ -1,31 +1,68 @@
 #!/bin/bash
-# DustBuster — evrensel (Intel + Apple Silicon) .dmg üretir.
-# Kullanım:  ./scripts/make-dmg.sh
-# Çıktı:    dist/DustBuster-<sürüm>.dmg
+# DustBuster — dağıtım için disk imajı üretir.
+#
+# Kullanım:
+#   ./scripts/make-dmg.sh              önce derler (scripts/build.sh), sonra paketler
+#   ./scripts/make-dmg.sh --app YOL    derlenmiş bir DustBuster.app'i paketler
+#
+# Çıktı: dist/DustBuster-<sürüm>.dmg
+# Pencere düzeni için create-dmg (https://github.com/create-dmg/create-dmg) kuruluysa
+# onu kullanır; yoksa düz hdiutil imajına düşer.
 set -euo pipefail
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/common.sh"
 
 DIST_DIR="$ROOT_DIR/dist"
+APP=""
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --app) APP="$2"; shift 2 ;;
+        *) die "Bilinmeyen seçenek: $1" ;;
+    esac
+done
+
+if [ -z "$APP" ]; then
+    "$ROOT_DIR/scripts/build.sh"
+    APP="$BUILD_DIR/$APP_NAME.app"
+fi
+[ -d "$APP" ] || die "Uygulama paketi bulunamadı: $APP"
+
+VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$APP/Contents/Info.plist")"
+DMG="$DIST_DIR/$APP_NAME-$VERSION.dmg"
+STAGING="$BUILD_DIR/dmg-staging"
+ICON="$APP/Contents/Resources/AppIcon.icns"
 
 echo
-log "$APP_NAME DMG üretimi"
-require_xcode
-resolve_xcodegen
-generate_project
-build_release
-sign_app
+log "$APP_NAME-$VERSION.dmg üretiliyor"
+rm -rf "$STAGING" "$DMG"
+mkdir -p "$STAGING" "$DIST_DIR"
+cp -R "$APP" "$STAGING/$APP_NAME.app"
 
-VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$APP_PATH/Contents/Info.plist")"
-DMG_NAME="$APP_NAME-$VERSION.dmg"
-STAGING="$BUILD_DIR/dmg-staging"
+if command -v create-dmg >/dev/null 2>&1; then
+    args=(
+        --volname "$APP_NAME $VERSION"
+        --window-pos 200 120
+        --window-size 660 400
+        --icon-size 128
+        --text-size 14
+        --icon "$APP_NAME.app" 180 170
+        --hide-extension "$APP_NAME.app"
+        --app-drop-link 480 170
+        --no-internet-enable
+    )
+    [ -f "$ICON" ] && args+=(--volicon "$ICON")
+    if ! create-dmg "${args[@]}" "$DMG" "$STAGING"; then
+        warn "create-dmg başarısız oldu; hdiutil ile devam ediliyor."
+        rm -f "$DMG"
+    fi
+fi
 
-rm -rf "$STAGING" && mkdir -p "$STAGING" "$DIST_DIR"
-cp -R "$APP_PATH" "$STAGING/"
-ln -s /Applications "$STAGING/Applications"
+if [ ! -f "$DMG" ]; then
+    ln -sfn /Applications "$STAGING/Applications"
+    hdiutil create -volname "$APP_NAME $VERSION" -srcfolder "$STAGING" -ov -format UDZO "$DMG" >/dev/null \
+        || die "hdiutil DMG oluşturamadı."
+fi
 
-rm -f "$DIST_DIR/$DMG_NAME"
-hdiutil create -volname "$APP_NAME" -srcfolder "$STAGING" -ov -format UDZO "$DIST_DIR/$DMG_NAME" >/dev/null \
-    || die "hdiutil DMG oluşturamadı."
-
-ok "DMG hazır: $DIST_DIR/$DMG_NAME"
-echo "GitHub'da yayınlamak için: Releases › New release › tag v$VERSION › bu dosyayı sürükleyin."
+rm -rf "$STAGING"
+ok "DMG hazır: dist/$APP_NAME-$VERSION.dmg"
+echo "Yayınlamak için: git tag v$VERSION && git push origin v$VERSION  (Release workflow DMG'yi kendisi üretir ve yayınlar)"

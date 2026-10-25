@@ -3,7 +3,7 @@ import SwiftUI
 @main
 struct DustBusterApp: App {
     @StateObject private var permissionVM = AppPermissionViewModel()
-    
+
     var body: some Scene {
         WindowGroup {
             ContentView()
@@ -11,6 +11,9 @@ struct DustBusterApp: App {
         }
         .windowStyle(HiddenTitleBarWindowStyle())
         .commands {
+            CommandGroup(replacing: .appInfo) {
+                Button("DustBuster Hakkında") { AboutPanel.show() }
+            }
             SidebarCommands()
         }
     }

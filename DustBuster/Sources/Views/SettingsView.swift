@@ -54,7 +54,13 @@ struct SettingsView: View {
                 LabeledContent("Kaynak kod") {
                     Link("github.com/murtaza1905/DustBuster", destination: URL(string: "https://github.com/murtaza1905/DustBuster")!)
                 }
-                LabeledContent("Lisans", value: "GPL-3.0")
+                LabeledContent("Lisans", value: "MIT")
+                LabeledContent {
+                    Link("Homebrew Cask verisi (BSD-2-Clause)", destination: URL(string: "https://github.com/murtaza1905/DustBuster/blob/main/THIRD_PARTY_NOTICES.md")!)
+                } label: {
+                    Text("Üçüncü taraf bildirimleri")
+                    Text("Kalıntı veritabanı Homebrew Cask tanımlarından türetilir.")
+                }
             }
         }
         .formStyle(.grouped)

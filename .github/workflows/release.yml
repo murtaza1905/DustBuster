@@ -1,0 +1,52 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build DMG and publish release
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check tag matches MARKETING_VERSION
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          version="$(grep -E 'MARKETING_VERSION:' project.yml | head -1 | sed -E 's/.*"([^"]+)".*/\1/')"
+          echo "tag=$tag project=$version"
+          if [ "$tag" != "$version" ]; then
+            echo "::error::Tag v$tag does not match MARKETING_VERSION $version in project.yml"
+            exit 1
+          fi
+
+      - name: Build universal DMG (ad-hoc signed)
+        env:
+          DUSTBUSTER_NO_PULL: "1"
+        run: ./scripts/make-dmg.sh
+
+      - name: Zip the app as well
+        run: |
+          app="build/Build/Products/Release/DustBuster.app"
+          version="${GITHUB_REF_NAME#v}"
+          ditto -c -k --keepParent "$app" "dist/DustBuster-$version.zip"
+          ls -la dist
+
+      - name: Checksums
+        run: |
+          cd dist
+          shasum -a 256 *.dmg *.zip > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/*.dmg dist/*.zip dist/SHA256SUMS.txt \
+            --title "DustBuster $GITHUB_REF_NAME" \
+            --generate-notes \
+            --notes "Universal (Apple Silicon + Intel), macOS 14 or later. The app is ad-hoc signed, not notarized: after copying it to Applications, open it once via right-click › Open, or run \`xattr -dr com.apple.quarantine /Applications/DustBuster.app\`."

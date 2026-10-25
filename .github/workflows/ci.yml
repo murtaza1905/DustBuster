@@ -101,6 +101,16 @@ jobs:
           git push -q -f "https://x-access-token:${TOKEN}@github.com/${{ github.repository }}.git" ci-logs-app-build:ci-logs-app-build
       - name: Package app
         run: ditto -c -k --keepParent "build/Build/Products/Release/DustBuster.app" DustBuster-ci.zip
+      - name: Package DMG (release path smoke test)
+        run: |
+          brew install create-dmg >/dev/null 2>&1 || echo "create-dmg not installed; using hdiutil fallback"
+          ./scripts/make-dmg.sh --app "build/Build/Products/Release/DustBuster.app"
+          ls -la dist
+      - name: Upload DMG
+        uses: actions/upload-artifact@v4
+        with:
+          name: DustBuster-dmg
+          path: dist/*.dmg
       - name: Upload app
         uses: actions/upload-artifact@v4
         with:

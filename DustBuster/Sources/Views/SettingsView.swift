@@ -52,11 +52,11 @@ struct SettingsView: View {
                     Link("muratonurcu@outlook.com", destination: URL(string: "mailto:muratonurcu@outlook.com")!)
                 }
                 LabeledContent("Kaynak kod") {
-                    Link("github.com/murtaza1905/DustBuster", destination: URL(string: "https://github.com/murtaza1905/DustBuster")!)
+                    Link("github.com/murtaza1905/DustBuster-macOS", destination: URL(string: "https://github.com/murtaza1905/DustBuster-macOS")!)
                 }
                 LabeledContent("Lisans", value: "MIT")
                 LabeledContent {
-                    Link("Homebrew Cask verisi (BSD-2-Clause)", destination: URL(string: "https://github.com/murtaza1905/DustBuster/blob/main/THIRD_PARTY_NOTICES.md")!)
+                    Link("Homebrew Cask verisi (BSD-2-Clause)", destination: URL(string: "https://github.com/murtaza1905/DustBuster-macOS/blob/main/THIRD_PARTY_NOTICES.md")!)
                 } label: {
                     Text("Üçüncü taraf bildirimleri")
                     Text("Kalıntı veritabanı Homebrew Cask tanımlarından türetilir.")

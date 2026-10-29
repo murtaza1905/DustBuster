@@ -5,8 +5,8 @@
 <p align="center">A privacy-first cleaner and app uninstaller for macOS.</p>
 
 <p align="center">
-  <a href="https://github.com/murtaza1905/DustBuster/actions/workflows/ci.yml"><img src="https://github.com/murtaza1905/DustBuster/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-  <a href="https://github.com/murtaza1905/DustBuster/releases/latest"><img src="https://img.shields.io/github/v/release/murtaza1905/DustBuster?display_name=tag" alt="Latest release"></a>
+  <a href="https://github.com/murtaza1905/DustBuster-macOS/actions/workflows/ci.yml"><img src="https://github.com/murtaza1905/DustBuster-macOS/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/murtaza1905/DustBuster-macOS/releases/latest"><img src="https://img.shields.io/github/v/release/murtaza1905/DustBuster-macOS?display_name=tag" alt="Latest release"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a>
   <img src="https://img.shields.io/badge/macOS-14%2B-black" alt="macOS 14 or later">
   <img src="https://img.shields.io/badge/Intel%20%7C%20Apple%20Silicon-universal-black" alt="Universal binary">
@@ -38,7 +38,7 @@ The interface is currently in Turkish; English localization is on the roadmap.
 
 ### Download
 
-1. Get `DustBuster-<version>.dmg` from the [latest release](https://github.com/murtaza1905/DustBuster/releases/latest) and drag **DustBuster.app** to **Applications**.
+1. Get `DustBuster-<version>.dmg` from the [latest release](https://github.com/murtaza1905/DustBuster-macOS/releases/latest) and drag **DustBuster.app** to **Applications**.
 2. The app is ad-hoc signed, not notarized. On first launch macOS will refuse to open it; either right-click the app › **Open**, or run:
 
    ```bash
@@ -54,15 +54,15 @@ Requires Xcode. No Homebrew needed — the scripts download XcodeGen on their ow
 
 ```bash
 cd ~/Desktop
-git clone https://github.com/murtaza1905/DustBuster.git
-cd ~/Desktop/DustBuster
+git clone https://github.com/murtaza1905/DustBuster-macOS.git
+cd ~/Desktop/DustBuster-macOS
 ./scripts/install.sh
 ```
 
 The script pulls the latest code, generates the Xcode project, builds a universal Release binary, ad-hoc signs it, archives the build to `releases/`, replaces the copy in `/Applications` and launches it. Keep the cloned folder as a permanent hub and run the same command again to update. A failed build never touches the installed app.
 
 ```bash
-cd ~/Desktop/DustBuster
+cd ~/Desktop/DustBuster-macOS
 ./scripts/install.sh                        # update + clean reinstall
 ./scripts/install.sh --list                 # archived builds in releases/
 ./scripts/install.sh releases/<file>.zip    # reinstall an archived build
@@ -90,7 +90,7 @@ System Cleanup is driven by data as well (`Core/Sources/DustBusterCore/Resources
 Every real-world scan can be exported from the app as a JSON test case (**Test vakası**, *test case*) and dropped into `Core/Tests/DustBusterCoreTests/Fixtures/`; the test suite replays it against a virtual `~/Library` and checks what must be selected, what must be listed unselected and what must never appear. CI runs the suite and builds the app with both Xcode 26 and Xcode 16 on every push.
 
 ```bash
-cd ~/Desktop/DustBuster/Core
+cd ~/Desktop/DustBuster-macOS/Core
 swift test
 ```
 
@@ -122,13 +122,13 @@ project.yml                        # XcodeGen project definition
 
 ## Development
 
-- CI on every push and pull request: Core tests plus universal app builds with Xcode 26 (macOS 26 runner) and Xcode 16 (macOS 15 runner) — [CI](https://github.com/murtaza1905/DustBuster/actions/workflows/ci.yml).
+- CI on every push and pull request: Core tests plus universal app builds with Xcode 26 (macOS 26 runner) and Xcode 16 (macOS 15 runner) — [CI](https://github.com/murtaza1905/DustBuster-macOS/actions/workflows/ci.yml).
 - Releases are produced by the [Release workflow](.github/workflows/release.yml) from a `v*` tag; see [CONTRIBUTING.md](CONTRIBUTING.md) for the exact steps.
 - Changes are tracked in [CHANGELOG.md](CHANGELOG.md).
 
 ## Contributing and support
 
-- Bugs and feature ideas: [Issues](https://github.com/murtaza1905/DustBuster/issues) (templates are provided). For wrong matches or misses in the uninstaller, attach the exported `.txt` report or JSON test case — that is what turns a report into a permanent fix.
+- Bugs and feature ideas: [Issues](https://github.com/murtaza1905/DustBuster-macOS/issues) (templates are provided). For wrong matches or misses in the uninstaller, attach the exported `.txt` report or JSON test case — that is what turns a report into a permanent fix.
 - Pull requests are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
 - Security problems: see [SECURITY.md](SECURITY.md) — please do not open a public issue.
 

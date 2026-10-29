@@ -6,8 +6,8 @@ enum AboutPanel {
 
     static let author = "Murat Onurcu"
     static let email = "muratonurcu@outlook.com"
-    static let repository = URL(string: "https://github.com/murtaza1905/DustBuster")!
-    static let thirdPartyNotices = URL(string: "https://github.com/murtaza1905/DustBuster/blob/main/THIRD_PARTY_NOTICES.md")!
+    static let repository = URL(string: "https://github.com/murtaza1905/DustBuster-macOS")!
+    static let thirdPartyNotices = URL(string: "https://github.com/murtaza1905/DustBuster-macOS/blob/main/THIRD_PARTY_NOTICES.md")!
 
     @MainActor
     static func show() {

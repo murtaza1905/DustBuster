@@ -4,6 +4,9 @@ All notable changes to DustBuster are documented here. The format follows [Keep 
 
 ## [Unreleased]
 
+### Changed
+- Repository renamed to `DustBuster-macOS`; links in the README, community files, Settings and the About window point to the new address.
+
 ## [1.4.0] - 2026-10-25
 
 First public release on GitHub Releases (build 25). Earlier builds were installed from source only.
@@ -25,5 +28,5 @@ First public release on GitHub Releases (build 25). Earlier builds were installe
 - License changed from GPL-3.0 to MIT; the embedded Homebrew Cask data keeps its BSD-2-Clause notice.
 - Target and bundle renamed from `CleanerApp` to `DustBuster` (`com.muratonurcu.DustBuster`); the committed Xcode project was replaced by an XcodeGen `project.yml`.
 
-[Unreleased]: https://github.com/murtaza1905/DustBuster/compare/v1.4.0...HEAD
-[1.4.0]: https://github.com/murtaza1905/DustBuster/releases/tag/v1.4.0
+[Unreleased]: https://github.com/murtaza1905/DustBuster-macOS/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/murtaza1905/DustBuster-macOS/releases/tag/v1.4.0

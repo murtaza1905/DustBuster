@@ -19,8 +19,8 @@ Thank you for taking the time to contribute. Bug reports, feature ideas, documen
 Xcode 16 or later. XcodeGen is downloaded into `.tools/` automatically when it is not installed; Homebrew is not required. The matching logic lives in the `Core/` Swift package and has its own test suite.
 
 ```bash
-git clone https://github.com/murtaza1905/DustBuster.git
-cd DustBuster
+git clone https://github.com/murtaza1905/DustBuster-macOS.git
+cd DustBuster-macOS
 ./scripts/build.sh          # build/DustBuster.app (universal, ad-hoc signed)
 ./scripts/install.sh        # pull, build, archive to releases/, install to /Applications, launch
 (cd Core && swift test)     # DustBusterCore fixture tests

@@ -2,7 +2,7 @@
 
 ## Supported versions
 
-Only the latest release on the [Releases](https://github.com/murtaza1905/DustBuster/releases/latest) page receives fixes. Please update before reporting a problem.
+Only the latest release on the [Releases](https://github.com/murtaza1905/DustBuster-macOS/releases/latest) page receives fixes. Please update before reporting a problem.
 
 ## Reporting a vulnerability
 

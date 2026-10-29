@@ -1,0 +1,115 @@
+Building for debugging...
+[0/11] /Users/runner/work/DustBuster-macOS/DustBuster-macOS/Core/.build/arm64-apple-macosx/debug/DustBusterCorePackageTests.derived/runner.swift
+[1/11] Copying rules.json
+[2/11] Copying conditions.json
+[2/11] Copying cask-zap.json
+[4/11] Write sources
+[7/11] Copying Fixtures
+[8/11] Write swift-version-7974D3F7F03D5E95.txt
+[10/20] Compiling DustBusterCore FileSystem.swift
+[11/20] Compiling DustBusterCore Fixture.swift
+[12/20] Compiling DustBusterCore Glob.swift
+[13/20] Compiling DustBusterCore LeftoverScanner.swift
+[14/20] Emitting module DustBusterCore
+[15/20] Compiling DustBusterCore AppConditions.swift
+[16/20] Compiling DustBusterCore AppIdentity.swift
+[17/20] Compiling DustBusterCore CaskDatabase.swift
+[18/20] Compiling DustBusterCore CleanupRules.swift
+[19/24] Compiling DustBusterCore PathKind.swift
+[20/24] Compiling DustBusterCore ReceiptProvider.swift
+[21/24] Compiling DustBusterCore SearchTerms.swift
+[22/24] Compiling DustBusterCore resource_bundle_accessor.swift
+[23/28] Compiling DustBusterCoreTests FixtureTests.swift
+[24/28] Compiling DustBusterCoreTests RulesTests.swift
+[25/28] Emitting module DustBusterCoreTests
+[26/28] Compiling DustBusterCoreTests SearchTermsTests.swift
+[27/29] Compiling DustBusterCoreTests resource_bundle_accessor.swift
+[28/31] Emitting module DustBusterCorePackageTests
+[29/31] Compiling DustBusterCorePackageTests runner.swift
+[29/31] Write Objects.LinkFileList
+[30/31] Linking DustBusterCorePackageTests
+Build complete! (33.34s)
+Test Suite 'All tests' started at 2026-10-29 11:40:46.701.
+Test Suite 'DustBusterCorePackageTests.xctest' started at 2026-10-29 11:40:46.706.
+Test Suite 'CleanupRulesTests' started at 2026-10-29 11:40:46.706.
+Test Case '-[DustBusterCoreTests.CleanupRulesTests testBundledRulesLoad]' started.
+Test Case '-[DustBusterCoreTests.CleanupRulesTests testBundledRulesLoad]' passed (0.005 seconds).
+Test Case '-[DustBusterCoreTests.CleanupRulesTests testChromiumDetectionCoversCachesMirrorAndVendorSplit]' started.
+Test Case '-[DustBusterCoreTests.CleanupRulesTests testChromiumDetectionCoversCachesMirrorAndVendorSplit]' passed (0.004 seconds).
+Test Case '-[DustBusterCoreTests.CleanupRulesTests testOperaSingleProfileRoot]' started.
+Test Case '-[DustBusterCoreTests.CleanupRulesTests testOperaSingleProfileRoot]' passed (0.002 seconds).
+Test Case '-[DustBusterCoreTests.CleanupRulesTests testVerdicts]' started.
+Test Case '-[DustBusterCoreTests.CleanupRulesTests testVerdicts]' passed (0.001 seconds).
+Test Suite 'CleanupRulesTests' passed at 2026-10-29 11:40:46.721.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.012 (0.015) seconds
+Test Suite 'ConditionsTests' started at 2026-10-29 11:40:46.721.
+Test Case '-[DustBusterCoreTests.ConditionsTests testBundledConditionsLoad]' started.
+Test Case '-[DustBusterCoreTests.ConditionsTests testBundledConditionsLoad]' passed (0.001 seconds).
+Test Case '-[DustBusterCoreTests.ConditionsTests testConditionMatchesByCaskToken]' started.
+Test Case '-[DustBusterCoreTests.ConditionsTests testConditionMatchesByCaskToken]' passed (0.608 seconds).
+Test Case '-[DustBusterCoreTests.ConditionsTests testConditionNeverOverridesProtectedRoots]' started.
+Test Case '-[DustBusterCoreTests.ConditionsTests testConditionNeverOverridesProtectedRoots]' passed (0.000 seconds).
+Test Case '-[DustBusterCoreTests.ConditionsTests testIncludeAddsAndExcludeRemovesFromAnySource]' started.
+Test Case '-[DustBusterCoreTests.ConditionsTests testIncludeAddsAndExcludeRemovesFromAnySource]' passed (0.001 seconds).
+Test Suite 'ConditionsTests' passed at 2026-10-29 11:40:47.333.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.611 (0.612) seconds
+Test Suite 'FixtureTests' started at 2026-10-29 11:40:47.333.
+Test Case '-[DustBusterCoreTests.FixtureTests testAllFixtures]' started.
+Test Case '-[DustBusterCoreTests.FixtureTests testAllFixtures]' passed (0.720 seconds).
+Test Case '-[DustBusterCoreTests.FixtureTests testBundledDatabaseLoads]' started.
+Test Case '-[DustBusterCoreTests.FixtureTests testBundledDatabaseLoads]' passed (0.001 seconds).
+Test Case '-[DustBusterCoreTests.FixtureTests testFixturesRoundTripThroughJSON]' started.
+Test Case '-[DustBusterCoreTests.FixtureTests testFixturesRoundTripThroughJSON]' passed (0.009 seconds).
+Test Suite 'FixtureTests' passed at 2026-10-29 11:40:48.064.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.729 (0.731) seconds
+Test Suite 'SearchTermsTests' started at 2026-10-29 11:40:48.064.
+Test Case '-[DustBusterCoreTests.SearchTermsTests testAppleAppKeepsAppleNames]' started.
+Test Case '-[DustBusterCoreTests.SearchTermsTests testAppleAppKeepsAppleNames]' passed (0.000 seconds).
+Test Case '-[DustBusterCoreTests.SearchTermsTests testBundleIdForms]' started.
+Test Case '-[DustBusterCoreTests.SearchTermsTests testBundleIdForms]' passed (0.002 seconds).
+Test Case '-[DustBusterCoreTests.SearchTermsTests testCaskLookupPrefersSingleAppCaskOverSuite]' started.
+Test Case '-[DustBusterCoreTests.SearchTermsTests testCaskLookupPrefersSingleAppCaskOverSuite]' passed (0.463 seconds).
+Test Case '-[DustBusterCoreTests.SearchTermsTests testCaskLookupPrefersSpecificPkgCaskOverSuite]' started.
+Test Case '-[DustBusterCoreTests.SearchTermsTests testCaskLookupPrefersSpecificPkgCaskOverSuite]' passed (0.490 seconds).
+Test Case '-[DustBusterCoreTests.SearchTermsTests testEffectivelyEmptyDirectory]' started.
+Test Case '-[DustBusterCoreTests.SearchTermsTests testEffectivelyEmptyDirectory]' passed (0.000 seconds).
+Test Case '-[DustBusterCoreTests.SearchTermsTests testEmptyShellsAreListedFromDeterministicSourcesOnly]' started.
+Test Case '-[DustBusterCoreTests.SearchTermsTests testEmptyShellsAreListedFromDeterministicSourcesOnly]' passed (0.000 seconds).
+Test Case '-[DustBusterCoreTests.SearchTermsTests testGenericLastComponentNeverMatches]' started.
+Test Case '-[DustBusterCoreTests.SearchTermsTests testGenericLastComponentNeverMatches]' passed (0.000 seconds).
+Test Case '-[DustBusterCoreTests.SearchTermsTests testGenericNamesUseOnlyBundleId]' started.
+Test Case '-[DustBusterCoreTests.SearchTermsTests testGenericNamesUseOnlyBundleId]' passed (0.000 seconds).
+Test Case '-[DustBusterCoreTests.SearchTermsTests testGlob]' started.
+Test Case '-[DustBusterCoreTests.SearchTermsTests testGlob]' passed (0.000 seconds).
+Test Case '-[DustBusterCoreTests.SearchTermsTests testGlobExpansionOverVirtualFileSystem]' started.
+Test Case '-[DustBusterCoreTests.SearchTermsTests testGlobExpansionOverVirtualFileSystem]' passed (0.000 seconds).
+Test Case '-[DustBusterCoreTests.SearchTermsTests testLongNamePrefixMatchesWeakly]' started.
+Test Case '-[DustBusterCoreTests.SearchTermsTests testLongNamePrefixMatchesWeakly]' passed (0.000 seconds).
+Test Case '-[DustBusterCoreTests.SearchTermsTests testOtherOwnersFromCaskDatabase]' started.
+Test Case '-[DustBusterCoreTests.SearchTermsTests testOtherOwnersFromCaskDatabase]' passed (0.568 seconds).
+Test Case '-[DustBusterCoreTests.SearchTermsTests testPathAdmission]' started.
+Test Case '-[DustBusterCoreTests.SearchTermsTests testPathAdmission]' passed (0.000 seconds).
+Test Case '-[DustBusterCoreTests.SearchTermsTests testReceiptMatching]' started.
+Test Case '-[DustBusterCoreTests.SearchTermsTests testReceiptMatching]' passed (0.000 seconds).
+Test Case '-[DustBusterCoreTests.SearchTermsTests testSameAppCasksAreNotOtherOwners]' started.
+Test Case '-[DustBusterCoreTests.SearchTermsTests testSameAppCasksAreNotOtherOwners]' passed (0.527 seconds).
+Test Case '-[DustBusterCoreTests.SearchTermsTests testTwoWordNames]' started.
+Test Case '-[DustBusterCoreTests.SearchTermsTests testTwoWordNames]' passed (0.001 seconds).
+Test Case '-[DustBusterCoreTests.SearchTermsTests testVendorFolderIsNeverAutoSelected]' started.
+Test Case '-[DustBusterCoreTests.SearchTermsTests testVendorFolderIsNeverAutoSelected]' passed (0.001 seconds).
+Test Case '-[DustBusterCoreTests.SearchTermsTests testVendorFolderRelativePaths]' started.
+Test Case '-[DustBusterCoreTests.SearchTermsTests testVendorFolderRelativePaths]' passed (0.000 seconds).
+Test Case '-[DustBusterCoreTests.SearchTermsTests testVirtualFileSystemMetadataAndLaunchd]' started.
+Test Case '-[DustBusterCoreTests.SearchTermsTests testVirtualFileSystemMetadataAndLaunchd]' passed (0.000 seconds).
+Test Case '-[DustBusterCoreTests.SearchTermsTests testVirtualFileSystemShape]' started.
+Test Case '-[DustBusterCoreTests.SearchTermsTests testVirtualFileSystemShape]' passed (0.001 seconds).
+Test Suite 'SearchTermsTests' passed at 2026-10-29 11:40:50.124.
+	 Executed 20 tests, with 0 failures (0 unexpected) in 2.056 (2.060) seconds
+Test Suite 'DustBusterCorePackageTests.xctest' passed at 2026-10-29 11:40:50.124.
+	 Executed 31 tests, with 0 failures (0 unexpected) in 3.409 (3.417) seconds
+Test Suite 'All tests' passed at 2026-10-29 11:40:50.124.
+	 Executed 31 tests, with 0 failures (0 unexpected) in 3.409 (3.423) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.
